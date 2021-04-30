@@ -1,6 +1,5 @@
-from _Framework.ControlSurface import ControlSurface
-from _Framework.TransportComponent import TransportComponent
-from _Framework.SubjectSlot import subject_slot
+from ableton.v2.control_surface import ControlSurface, Component
+from ableton.v2.base.event import listens
 
 from . import dyna
 import importlib
@@ -8,21 +7,21 @@ import traceback
 import logging
 logger = logging.getLogger()
 
-class SpecialTransportComponent(TransportComponent):
+class TransportState(Component):
     def __init__(self, manager):
         super().__init__()
         self.manager = manager
-        self._on_tempo_changed.subject = self.song()
-        self._on_playing_changed.subject = self.song()
+        self._on_tempo_changed.subject = self.song
+        self._on_playing_changed.subject = self.song
 
-    @subject_slot('tempo')
+    @listens('tempo')
     def _on_tempo_changed(self):
         logging.info("tempo changed")
         self.manager.show_message("tempo changed")
 
-    @subject_slot('is_playing')
+    @listens('is_playing')
     def _on_playing_changed(self):
-        if self.song().is_playing:
+        if self.song.is_playing:
             self.manager.reload()
 
 class Tester (ControlSurface):
@@ -37,7 +36,7 @@ class Tester (ControlSurface):
         # Needed when first registering components
         #--------------------------------------------------------------------------------
         with self.component_guard():
-            self.c = SpecialTransportComponent(self)
+            self.transport_state = TransportState(self)
 
     def reload(self):
         try:

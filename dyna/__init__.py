@@ -1,47 +1,15 @@
-import Live
-import inspect
 import logging
 logger = logging.getLogger("liveosc")
 
-def describe_module(module):
-    """
-    Describe the module object passed as argument
-    including its root classes and functions """
+from ableton.v2.control_surface.components import MixerComponent, SessionComponent
 
-    logger.info("Module: %s" % module)
-    for name in dir(module):
-        obj = getattr(module, name)
-        if inspect.ismodule(obj):
-            describe_module(obj)
-        elif inspect.isclass(obj):
-            logger.info("Class: %s" % name)
-            members = inspect.getmembers(obj)
+from .channel_strip import CustomChannelStripComponent
+from .transport import CustomTransportComponent
 
-            logger.info("Builtins")
-            for name, member in members:
-                if inspect.isbuiltin(member):
-                    logger.info(" - %s" % (name))
+class CustomMixerComponent (MixerComponent):
+    def __init__(self, manager, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.manager = manager
 
-            logger.info("Functions")
-            for name, member in members:
-                if inspect.isfunction(member):
-                    logger.info(" - %s" % (name))
-
-            logger.info("Properties")
-            for name, member in members:
-                if str(type(member)) == "<type 'property'>":
-                    logger.info(" - %s" % (name))
-
-            logger.info("----------")
-
-    for name in dir(module):
-        obj = getattr(module, name)
-        if (inspect.ismethod(obj) or inspect.isfunction(obj)):
-            logger.info("Method", obj)
-
-class DynamicClass:
-    def foo(self):
-        return "bar"
-
-    def describe_live(self):
-        describe_module(Live)
+class CustomSessionComponent (SessionComponent):
+    pass

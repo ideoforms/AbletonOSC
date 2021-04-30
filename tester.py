@@ -5,7 +5,13 @@ from . import dyna
 import importlib
 import traceback
 import logging
+
 logger = logging.getLogger()
+file_handler = logging.FileHandler('/tmp/liveosc.log')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 class TransportState(Component):
     def __init__(self, manager):
@@ -16,8 +22,7 @@ class TransportState(Component):
 
     @listens('tempo')
     def _on_tempo_changed(self):
-        logging.info("tempo changed")
-        self.manager.show_message("tempo changed")
+        logging.info("Tempo changed (%.1f)" % self.song.tempo)
 
     @listens('is_playing')
     def _on_playing_changed(self):
@@ -27,9 +32,6 @@ class TransportState(Component):
 class Tester (ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
-        file_handler = logging.FileHandler('/tmp/liveosc.log')
-        file_handler.setLevel(logging.INFO)
-        logger.addHandler(file_handler)
         self.show_message("Loaded LiveOSC")
 
         #--------------------------------------------------------------------------------
@@ -49,3 +51,4 @@ class Tester (ControlSurface):
 
     def disconnect(self):
         self.show_message("Disconnecting...")
+        super().disconnect()

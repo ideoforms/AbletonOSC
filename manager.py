@@ -33,6 +33,7 @@ class Manager (ControlSurface):
 
     def on_tempo_changed(self):
         self.show_message("Tempo: %.1f" % self.song.tempo)
+        self.osc_server.send("/live/tempo", (self.song.tempo,))
 
     def tick(self):
         """

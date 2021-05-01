@@ -1,6 +1,6 @@
 from typing import Tuple, Any, Callable
 from ..pythonosc.osc_message import OscMessage, ParseError
-from ..pythonosc.osc_message_builder import OscMessageBuilder
+from ..pythonosc.osc_message_builder import OscMessageBuilder, BuildError
 
 import errno
 import socket
@@ -37,11 +37,16 @@ class OSCServer:
             address: The OSC address (e.g. /frequency)
             params: A tuple of zero or more OSC params
         """
-        msg = OscMessageBuilder(address)
+        msg_builder = OscMessageBuilder(address)
         for param in params:
-            msg.add_arg(param)
+            msg_builder.add_arg(param)
 
-        self._socket.sendto(msg.build(), self._remote_addr)
+        try:
+            msg = msg_builder.build()
+            self._socket.sendto(msg.dgram, self._remote_addr)
+        except BuildError:
+            self.logger.info("LiveOSC: OSC build error: %s" % (traceback.format_exc()))
+        
 
     def process(self) -> None:
         """

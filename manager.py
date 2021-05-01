@@ -6,6 +6,7 @@ import importlib
 import traceback
 import functools
 import logging
+from typing import Tuple, Any
 
 logger = logging.getLogger("liveosc")
 file_handler = logging.FileHandler('/tmp/liveosc.log')
@@ -28,7 +29,7 @@ class Manager(ControlSurface):
     def create_session(self):
         self.osc_server.add_handler("/live/test", lambda _, params: self.show_message("Received OSC OK"))
 
-        set_properties = [
+        for property in [
             "arrangement_overdub",
             "back_to_arranger",
             "clip_trigger_quantization",
@@ -44,29 +45,46 @@ class Manager(ControlSurface):
             "punch_in",
             "punch_out",
             "record_mode"
-        ]
-        for property in set_properties:
-            address = "/live/set/%s" % property
+        ]:
             def set_property(prop, address, params):
                 setattr(self.song, prop, params[0])
-            callback = functools.partial(set_property, property)
-            self.osc_server.add_handler(address, callback)
 
-        set_methods = [
+            callback = functools.partial(set_property, property)
+            self.osc_server.add_handler("/live/set/%s" % property, callback)
+
+        for method in [
             "start_playing",
             "stop_playing",
             "stop_all_clips",
             "create_audio_track",
             "create_midi_track"
-        ]
-        for method in set_methods:
-            address = "/live/set/%s" % method
+        ]:
             def call_method(_method, address, params):
                 getattr(self.song, _method)()
+
             callback = functools.partial(call_method, method)
-            self.osc_server.add_handler(address, callback)
+            self.osc_server.add_handler("/live/set/%s" % method, callback)
 
         self.song.add_tempo_listener(self.on_tempo_changed)
+
+        def create_clip(_, params: Tuple[Any]):
+            track_index, clip_index, clip_length = params
+            track = self.song.tracks[track_index]
+            clip_slot = track.clip_slots[clip_index]
+            clip_slot.create_clip(clip_length)
+        def set_clip_color(_, params: Tuple[Any]):
+            track_index, clip_index, color = params
+            track = self.song.tracks[track_index]
+            clip_slot = track.clip_slots[clip_index]
+            clip_slot.clip.color = color
+        def get_is_midi_clip(_, params: Tuple[Any]):
+            track_index, clip_index = params
+            track = self.song.tracks[track_index]
+            clip_slot = track.clip_slots[clip_index]
+            self.osc_server.send("/live/clip/get/is_midi_clip", (track_index, clip_index, clip_slot.clip.is_midi_clip))
+        self.osc_server.add_handler("/live/clip/create", create_clip)
+        self.osc_server.add_handler("/live/clip/set/color", set_clip_color)
+        self.osc_server.add_handler("/live/clip/get/is_midi_clip", get_is_midi_clip)
 
     def on_tempo_changed(self):
         self.show_message("Tempo: %.1f" % self.song.tempo)

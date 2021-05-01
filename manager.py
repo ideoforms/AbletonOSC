@@ -2,6 +2,7 @@ from ableton.v2.control_surface import ControlSurface
 
 from . import dyna
 
+import Live
 import importlib
 import traceback
 import functools
@@ -67,24 +68,52 @@ class Manager(ControlSurface):
 
         self.song.add_tempo_listener(self.on_tempo_changed)
 
-        def create_clip(_, params: Tuple[Any]):
+        def clip_command(func):
+            def clip_command_wrapper(address, params: Tuple[Any]):
+                track_index, clip_index, clip_length = params
+                track = self.song.tracks[track_index]
+                clip_slot = track.clip_slots[clip_index]
+                return func(clip_slot, tuple(params[2:]))
+            return clip_command_wrapper
+
+        def clip_create(_, params: Tuple[Any]):
             track_index, clip_index, clip_length = params
             track = self.song.tracks[track_index]
             clip_slot = track.clip_slots[clip_index]
             clip_slot.create_clip(clip_length)
-        def set_clip_color(_, params: Tuple[Any]):
-            track_index, clip_index, color = params
+            
+        def clip_slot_fire(_, params: Tuple[Any]):
+            track_index, clip_index = params
             track = self.song.tracks[track_index]
             clip_slot = track.clip_slots[clip_index]
-            clip_slot.clip.color = color
-        def get_is_midi_clip(_, params: Tuple[Any]):
+            clip_slot.fire()
+
+        @clip_command
+        def clip_set_color(clip_slot, params: Tuple[Any]):
+            clip_slot.clip.color = params[0]
+
+        def clip_get_is_midi_clip(_, params: Tuple[Any]):
             track_index, clip_index = params
             track = self.song.tracks[track_index]
             clip_slot = track.clip_slots[clip_index]
             self.osc_server.send("/live/clip/get/is_midi_clip", (track_index, clip_index, clip_slot.clip.is_midi_clip))
-        self.osc_server.add_handler("/live/clip/create", create_clip)
-        self.osc_server.add_handler("/live/clip/set/color", set_clip_color)
-        self.osc_server.add_handler("/live/clip/get/is_midi_clip", get_is_midi_clip)
+
+        def clip_add_new_note(_, params: Tuple[Any]):
+            track_index, clip_index, start_time, duration, pitch, velocity, mute = params
+            note = Live.Clip.MidiNoteSpecification(start_time=start_time,
+                                                   duration=duration,
+                                                   pitch=pitch,
+                                                   velocity=velocity,
+                                                   mute=mute)
+            track = self.song.tracks[track_index]
+            clip = track.clip_slots[clip_index].clip
+            clip.add_new_notes((note,))
+
+        self.osc_server.add_handler("/live/clip/create", clip_create)
+        self.osc_server.add_handler("/live/clip/fire", clip_slot_fire)
+        self.osc_server.add_handler("/live/clip/set/color", clip_set_color)
+        self.osc_server.add_handler("/live/clip/get/is_midi_clip", clip_get_is_midi_clip)
+        self.osc_server.add_handler("/live/clip/add_new_note", clip_add_new_note)
 
     def on_tempo_changed(self):
         self.show_message("Tempo: %.1f" % self.song.tempo)

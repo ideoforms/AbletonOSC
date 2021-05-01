@@ -1,5 +1,4 @@
 from ableton.v2.control_surface import ControlSurface
-from ableton.v2.control_surface.components import SessionRingComponent
 
 from . import dyna
 
@@ -19,23 +18,17 @@ class Manager (ControlSurface):
         ControlSurface.__init__(self, c_instance)
         self.reload_imports()
         self.show_message("Loaded LiveOSC")
-        self.create_session()
 
         self.osc_server = dyna.OSCServer()
         self.schedule_message(0, self.tick)
+
+        self.create_session()
 
     def create_session(self):
         #--------------------------------------------------------------------------------
         # Needed when first registering components
         #--------------------------------------------------------------------------------
-        with self.component_guard():
-            self.transport = dyna.CustomTransportComponent(self)
-            self.session_ring = SessionRingComponent()
-            self.session = dyna.CustomSessionComponent(session_ring=self.session_ring)
-            self.mixer = dyna.CustomMixerComponent(self,
-                                                   tracks_provider=self.session_ring,
-                                                   channel_strip_component_type=dyna.CustomChannelStripComponent)
-
+        self.osc_server.add_handler("/live/tempo", lambda address, params: self.show_message("Got OSC: %s %f" % (address, params[0])))
         self.song.add_tempo_listener(self.on_tempo_changed)
 
     def on_tempo_changed(self):

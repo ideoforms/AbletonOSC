@@ -1,7 +1,6 @@
 from . import OSC
-import socket
-import sys
 import errno
+import socket
 import traceback
 
 import logging

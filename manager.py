@@ -4,6 +4,7 @@ from . import dyna
 
 import importlib
 import traceback
+import functools
 import logging
 
 logger = logging.getLogger("liveosc")
@@ -13,7 +14,7 @@ formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-class Manager (ControlSurface):
+class Manager(ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
         self.reload_imports()
@@ -25,10 +26,46 @@ class Manager (ControlSurface):
         self.create_session()
 
     def create_session(self):
-        #--------------------------------------------------------------------------------
-        # Needed when first registering components
-        #--------------------------------------------------------------------------------
-        self.osc_server.add_handler("/live/tempo", lambda address, params: self.show_message("Got OSC: %s %f" % (address, params[0])))
+        self.osc_server.add_handler("/live/test", lambda _, params: self.show_message("Received OSC OK"))
+
+        set_properties = [
+            "arrangement_overdub",
+            "back_to_arranger",
+            "clip_trigger_quantization",
+            "current_song_time",
+            "groove_amount",
+            "loop",
+            "loop_length",
+            "loop_start",
+            "metronome",
+            "midi_recording_quantization",
+            "nudge_down",
+            "nudge_up",
+            "punch_in",
+            "punch_out",
+            "record_mode"
+        ]
+        for property in set_properties:
+            address = "/live/set/%s" % property
+            def set_property(prop, address, params):
+                setattr(self.song, prop, params[0])
+            callback = functools.partial(set_property, property)
+            self.osc_server.add_handler(address, callback)
+
+        set_methods = [
+            "start_playing",
+            "stop_playing",
+            "stop_all_clips",
+            "create_audio_track",
+            "create_midi_track"
+        ]
+        for method in set_methods:
+            address = "/live/set/%s" % method
+            def call_method(_method, address, params):
+                getattr(self.song, _method)()
+            callback = functools.partial(call_method, method)
+            self.osc_server.add_handler(address, callback)
+
         self.song.add_tempo_listener(self.on_tempo_changed)
 
     def on_tempo_changed(self):

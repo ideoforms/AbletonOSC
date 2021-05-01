@@ -26,8 +26,6 @@ class OSCServer:
         self.logger.info("Starting OSC server (local %s, remote %s)",
                          str(self._local_addr), str(self._remote_addr))
 
-        self.add_handler("/test", lambda address, params: self.logger.info("Received test!"))
-
     def add_handler(self, address: str, handler: Callable):
         self._callbacks[address] = handler
 
@@ -46,7 +44,7 @@ class OSCServer:
             self._socket.sendto(msg.dgram, self._remote_addr)
         except BuildError:
             self.logger.info("LiveOSC: OSC build error: %s" % (traceback.format_exc()))
-        
+
 
     def process(self) -> None:
         """

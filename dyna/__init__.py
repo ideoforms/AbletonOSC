@@ -5,6 +5,7 @@ from ableton.v2.control_surface.components import MixerComponent, SessionCompone
 
 from .channel_strip import CustomChannelStripComponent
 from .transport import CustomTransportComponent
+from .osc_handler import OSCHandler
 
 class CustomMixerComponent (MixerComponent):
     def __init__(self, manager, *args, **kwargs):

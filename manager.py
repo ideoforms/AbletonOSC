@@ -2,6 +2,9 @@ from ableton.v2.control_surface import ControlSurface
 from ableton.v2.control_surface.components import SessionRingComponent
 
 from . import dyna
+# from .pythonosc import dispatcher
+# from .pythonosc import osc_server
+
 import importlib
 import traceback
 import logging
@@ -20,6 +23,14 @@ class Manager (ControlSurface):
         self.show_message("Loaded LiveOSC")
         self.create_session()
 
+        # disp = dispatcher.Dispatcher()
+        # disp.map("/test", lambda: logger.info("test ok"))
+        # self.server = osc_server.OSCUDPServer(("127.0.0.1", 12345), disp)
+        # logger.info("Serving on {}".format(self.server.server_address))
+
+        self.osc_handler = dyna.OSCHandler()
+        self.schedule_message(1, self.refresh)
+
     def create_session(self):
         #--------------------------------------------------------------------------------
         # Needed when first registering components
@@ -32,6 +43,12 @@ class Manager (ControlSurface):
                                                    tracks_provider=self.session_ring,
                                                    channel_strip_component_type=dyna.CustomChannelStripComponent)
 
+    def refresh(self):
+        logger.info("Refresh...")
+        # self.server._handle_request_noblock()
+        self.osc_handler.process()
+        self.schedule_message(1, self.refresh)
+
     def reload_imports(self):
         try:
             importlib.reload(dyna)
@@ -42,4 +59,5 @@ class Manager (ControlSurface):
 
     def disconnect(self):
         self.show_message("Disconnecting...")
+        self.osc_handler.shutdown()
         super().disconnect()

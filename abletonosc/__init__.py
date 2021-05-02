@@ -1,5 +1,5 @@
 import logging
-logger = logging.getLogger("liveosc")
+logger = logging.getLogger("abletonosc")
 
 from ableton.v2.control_surface.components import MixerComponent, SessionComponent
 

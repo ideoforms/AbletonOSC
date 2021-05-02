@@ -2,7 +2,7 @@ from ableton.v2.control_surface.components import TransportComponent
 from ableton.v2.base import listens, task
 
 import logging
-logger = logging.getLogger("liveosc")
+logger = logging.getLogger("abletonosc")
 
 class CustomTransportComponent (TransportComponent):
     def __init__(self, manager: 'Manager'):

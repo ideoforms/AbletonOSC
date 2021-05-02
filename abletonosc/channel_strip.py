@@ -2,7 +2,7 @@ from ableton.v2.control_surface.components import ChannelStripComponent
 from ableton.v2.base import liveobj_valid, listens
 
 import logging
-logger = logging.getLogger("liveosc")
+logger = logging.getLogger("abletonosc")
 
 class CustomChannelStripComponent (ChannelStripComponent):
     def __init__(self, *args, **kwargs):

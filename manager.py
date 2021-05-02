@@ -9,8 +9,8 @@ from functools import partial
 import logging
 from typing import Optional, Tuple, Any
 
-logger = logging.getLogger("liveosc")
-file_handler = logging.FileHandler('/tmp/liveosc.log')
+logger = logging.getLogger("abletonosc")
+file_handler = logging.FileHandler('/tmp/abletonosc.log')
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
 file_handler.setFormatter(formatter)
@@ -20,15 +20,24 @@ class Manager(ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
         self.reload_imports()
-        self.show_message("Loaded LiveOSC")
+        self.show_message("Loaded AbletonOSC")
 
         self.osc_server = abletonosc.OSCServer()
         self.schedule_message(0, self.tick)
 
-        self.create_session()
+        self.init_api()
 
-    def create_session(self):
+    def init_api(self):
         self.osc_server.add_handler("/live/test", lambda _, params: self.show_message("Received OSC OK"))
+        self.init_set_api()
+        self.init_clip_api()
+
+    def init_set_api(self):
+        #--------------------------------------------------------------------------------
+        # Generic callbacks
+        #--------------------------------------------------------------------------------
+        def call_method(method, address, params):
+            getattr(self.song, method)()
 
         def set_property(prop, address: str, params: Optional[Tuple[Any]]) -> None:
             setattr(self.song, prop, params[0])
@@ -51,6 +60,22 @@ class Manager(ControlSurface):
             # TODO
             pass
 
+        #--------------------------------------------------------------------------------
+        # Init callbacks for Set: methods
+        #--------------------------------------------------------------------------------
+        for method in [
+            "start_playing",
+            "stop_playing",
+            "stop_all_clips",
+            "create_audio_track",
+            "create_midi_track"
+        ]:
+            callback = partial(call_method, method)
+            self.osc_server.add_handler("/live/set/%s" % method, callback)
+
+        #--------------------------------------------------------------------------------
+        # Init callbacks for Set: properties
+        #--------------------------------------------------------------------------------
         properties_rw = [
             "arrangement_overdub",
             "back_to_arranger",
@@ -79,21 +104,7 @@ class Manager(ControlSurface):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(set_property, prop))
 
-        for method in [
-            "start_playing",
-            "stop_playing",
-            "stop_all_clips",
-            "create_audio_track",
-            "create_midi_track"
-        ]:
-            def call_method(_method, address, params):
-                getattr(self.song, _method)()
-
-            callback = partial(call_method, method)
-            self.osc_server.add_handler("/live/set/%s" % method, callback)
-
-        self.song.add_tempo_listener(self.on_tempo_changed)
-
+    def init_clip_api(self):
         def clip_command(func):
             def clip_command_wrapper(address, params: Tuple[Any]):
                 track_index, clip_index = params[:2]
@@ -150,10 +161,6 @@ class Manager(ControlSurface):
         self.osc_server.add_handler("/live/clip/get/is_midi_clip", clip_get_is_midi_clip)
         self.osc_server.add_handler("/live/clip/get/has_clip", clipslot_has_clip)
         self.osc_server.add_handler("/live/clip/add_new_note", clip_add_new_note)
-
-    def on_tempo_changed(self):
-        self.show_message("Tempo: %.1f" % self.song.tempo)
-        self.osc_server.send("/live/tempo", (self.song.tempo,))
 
     def tick(self):
         """

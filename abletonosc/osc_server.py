@@ -22,7 +22,7 @@ class OSCServer:
         self._socket.bind(self._local_addr)
         self._callbacks = {}
 
-        self.logger = logging.getLogger("liveosc")
+        self.logger = logging.getLogger("abletonosc")
         self.logger.info("Starting OSC server (local %s, remote %s)",
                          str(self._local_addr), str(self._remote_addr))
 
@@ -43,7 +43,7 @@ class OSCServer:
             msg = msg_builder.build()
             self._socket.sendto(msg.dgram, self._remote_addr)
         except BuildError:
-            self.logger.info("LiveOSC: OSC build error: %s" % (traceback.format_exc()))
+            self.logger.info("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
 
 
     def process(self) -> None:
@@ -63,18 +63,18 @@ class OSCServer:
                         if rv is not None:
                             self.send(message.address, rv)
                     else:
-                        self.logger.info("LiveOSC: Unknown OSC address: %s" % message.address)
+                        self.logger.info("AbletonOSC: Unknown OSC address: %s" % message.address)
                 except ParseError:
-                    self.logger.info("LiveOSC: OSC parse error: %s" % (traceback.format_exc()))
+                    self.logger.info("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
 
         except socket.error as e:
             if e.errno == errno.EAGAIN:
                 return
             else:
-                self.logger.info("LiveOSC: Socket error: %s" % (traceback.format_exc()))
+                self.logger.info("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
 
         except Exception as e:
-            self.logger.info("LiveOSC: Error handling message: %s" % (traceback.format_exc()))
+            self.logger.info("AbletonOSC: Error handling message: %s" % (traceback.format_exc()))
 
     def shutdown(self) -> None:
         """

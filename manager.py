@@ -37,12 +37,15 @@ class Manager(ControlSurface):
         # Generic callbacks
         #--------------------------------------------------------------------------------
         def call_method(method, address, params):
-            getattr(self.song, method)()
+            logger.info("Calling method: %s (params %s)" % (method, str(params)))
+            getattr(self.song, method)(*params)
 
         def set_property(prop, address: str, params: Optional[Tuple[Any]]) -> None:
+            logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
             setattr(self.song, prop, params[0])
 
         def get_property(prop, address, params) -> Tuple[Any]:
+            logger.info("Getting property: %s" % prop)
             return getattr(self.song, prop),
 
         def start_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
@@ -66,9 +69,13 @@ class Manager(ControlSurface):
         for method in [
             "start_playing",
             "stop_playing",
+            "continue_playing",
             "stop_all_clips",
             "create_audio_track",
-            "create_midi_track"
+            "create_midi_track",
+            "create_return_track",
+            "create_scene",
+            "jump_by"
         ]:
             callback = partial(call_method, method)
             self.osc_server.add_handler("/live/set/%s" % method, callback)

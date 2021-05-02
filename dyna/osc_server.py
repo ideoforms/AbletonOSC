@@ -58,7 +58,9 @@ class OSCServer:
 
                     if message.address in self._callbacks:
                         callback = self._callbacks[message.address]
-                        callback(message.address, message.params)
+                        rv = callback(message.address, message.params)
+                        if rv:
+                            self.send(message.address, rv)
                     else:
                         self.logger.info("LiveOSC: Unknown OSC address: %s" % message.address)
                 except ParseError:

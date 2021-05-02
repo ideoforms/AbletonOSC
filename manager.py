@@ -1,6 +1,6 @@
 from ableton.v2.control_surface import ControlSurface
 
-from . import dyna
+from . import abletonosc
 
 import Live
 import importlib
@@ -22,7 +22,7 @@ class Manager(ControlSurface):
         self.reload_imports()
         self.show_message("Loaded LiveOSC")
 
-        self.osc_server = dyna.OSCServer()
+        self.osc_server = abletonosc.OSCServer()
         self.schedule_message(0, self.tick)
 
         self.create_session()
@@ -168,7 +168,7 @@ class Manager(ControlSurface):
 
     def reload_imports(self):
         try:
-            importlib.reload(dyna)
+            importlib.reload(abletonosc)
         except Exception as e:
             exc = traceback.format_exc()
             logging.warning(exc)

@@ -5,9 +5,9 @@ from . import dyna
 import Live
 import importlib
 import traceback
-import functools
+from functools import partial
 import logging
-from typing import Tuple, Any
+from typing import Optional, Tuple, Any
 
 logger = logging.getLogger("liveosc")
 file_handler = logging.FileHandler('/tmp/liveosc.log')
@@ -30,7 +30,28 @@ class Manager(ControlSurface):
     def create_session(self):
         self.osc_server.add_handler("/live/test", lambda _, params: self.show_message("Received OSC OK"))
 
-        for property in [
+        def set_property(prop, address: str, params: Optional[Tuple[Any]]) -> None:
+            setattr(self.song, prop, params[0])
+
+        def get_property(prop, address, params) -> Tuple[Any]:
+            return getattr(self.song, prop),
+
+        def start_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
+            def property_changed_callback():
+                value = getattr(self.song, prop)
+                logger.info("Property %s changed: %s" % (prop, value))
+                osc_address = "/live/set/get_property/%s" % prop
+                self.osc_server.send(osc_address, (value,))
+
+            add_listener_function_name = "add_%s_listener" % prop
+            add_listener_function = getattr(self.song, add_listener_function_name)
+            add_listener_function(property_changed_callback)
+
+        def stop_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
+            # TODO
+            pass
+
+        properties_rw = [
             "arrangement_overdub",
             "back_to_arranger",
             "clip_trigger_quantization",
@@ -46,12 +67,17 @@ class Manager(ControlSurface):
             "punch_in",
             "punch_out",
             "record_mode"
-        ]:
-            def set_property(prop, address, params):
-                setattr(self.song, prop, params[0])
+        ]
+        properties_r = [
+            "is_playing"
+        ]
 
-            callback = functools.partial(set_property, property)
-            self.osc_server.add_handler("/live/set/%s" % property, callback)
+        for prop in properties_r + properties_rw:
+            self.osc_server.add_handler("/live/set/get_property/%s" % prop, partial(get_property, prop))
+            self.osc_server.add_handler("/live/set/start_property_listen/%s" % prop, partial(start_property_listen, prop))
+            self.osc_server.add_handler("/live/set/stop_property_listen/%s" % prop, partial(stop_property_listen, prop))
+        for prop in properties_rw:
+            self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(set_property, prop))
 
         for method in [
             "start_playing",
@@ -63,7 +89,7 @@ class Manager(ControlSurface):
             def call_method(_method, address, params):
                 getattr(self.song, _method)()
 
-            callback = functools.partial(call_method, method)
+            callback = partial(call_method, method)
             self.osc_server.add_handler("/live/set/%s" % method, callback)
 
         self.song.add_tempo_listener(self.on_tempo_changed)
@@ -74,6 +100,7 @@ class Manager(ControlSurface):
                 track = self.song.tracks[track_index]
                 clip_slot = track.clip_slots[clip_index]
                 return func(clip_slot, params[2:])
+
             return clip_command_wrapper
 
         @clip_command
@@ -135,7 +162,7 @@ class Manager(ControlSurface):
         and beachballs when a thread is started. Instead, this approach allows long-running
         processes such as the OSC server to perform operations.
         """
-        logger.info("Tick...")
+        logger.debug("Tick...")
         self.osc_server.process()
         self.schedule_message(1, self.tick)
 

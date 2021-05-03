@@ -8,7 +8,7 @@ import logging
 import traceback
 
 class OSCServer:
-    def __init__(self, local_addr=('127.0.0.1', 9000), remote_addr=('127.0.0.1', 9001)):
+    def __init__(self, local_addr=('127.0.0.1', 11000), remote_addr=('127.0.0.1', 11001)):
         """
         Implemented because pythonosc's OSC server causes a beachball when handling
         incoming messages. To investigate, as it would be ultimately better not to have

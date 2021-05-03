@@ -13,6 +13,7 @@ class SongComponent(Component):
         self.manager = manager
         self.osc_server = self.manager.osc_server
         self.init_api()
+        self.listener_functions = {}
 
     def init_api(self):
         #--------------------------------------------------------------------------------
@@ -40,10 +41,17 @@ class SongComponent(Component):
             add_listener_function_name = "add_%s_listener" % prop
             add_listener_function = getattr(self.song, add_listener_function_name)
             add_listener_function(property_changed_callback)
+            self.listener_functions[prop] = property_changed_callback
 
         def stop_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
-            # TODO
-            pass
+            if prop in self.listener_functions:
+                listener_function = self.listener_functions[prop]
+                remove_listener_function_name = "remove_%s_listener" % prop
+                remove_listener_function = getattr(self.song, remove_listener_function_name)
+                remove_listener_function(listener_function)
+                del self.listener_functions[prop]
+            else:
+                logger.warning("No listener function found for property: %s" % prop)
 
         #--------------------------------------------------------------------------------
         # Init callbacks for Set: methods

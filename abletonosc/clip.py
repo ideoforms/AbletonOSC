@@ -1,19 +1,13 @@
 from functools import partial
 from typing import Optional, Tuple, Any
-from ableton.v2.control_surface.component import Component
+from .component import AbletonOSCComponent
 
+import Live
 import logging
 
 logger = logging.getLogger("abletonosc")
 
-class ClipComponent(Component):
-    def __init__(self, manager):
-        super().__init__()
-
-        self.manager = manager
-        self.osc_server = self.manager.osc_server
-        self.init_api()
-
+class ClipComponent(AbletonOSCComponent):
     def init_api(self):
         def clip_command(func):
             def clip_command_wrapper(address, params: Tuple[Any]):

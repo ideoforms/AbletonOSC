@@ -29,6 +29,7 @@ class Manager(ControlSurface):
 
         with self.component_guard():
             self.song_component = abletonosc.SongComponent(self)
+            self.application_component = abletonosc.ApplicationComponent(self)
             self.clip_component = abletonosc.ClipComponent(self)
 
     def tick(self):

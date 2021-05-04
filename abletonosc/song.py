@@ -1,20 +1,12 @@
 from functools import partial
 from typing import Optional, Tuple, Any
-from ableton.v2.control_surface.component import Component
+from .component import AbletonOSCComponent
 
 import logging
 
 logger = logging.getLogger("abletonosc")
 
-class SongComponent(Component):
-    def __init__(self, manager):
-        super().__init__()
-
-        self.manager = manager
-        self.osc_server = self.manager.osc_server
-        self.init_api()
-        self.listener_functions = {}
-
+class SongComponent(AbletonOSCComponent):
     def init_api(self):
         #--------------------------------------------------------------------------------
         # Generic callbacks

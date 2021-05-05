@@ -32,6 +32,7 @@ class Manager(ControlSurface):
             self.application_component = abletonosc.ApplicationComponent(self)
             self.clip_component = abletonosc.ClipComponent(self)
             self.clip_slot_component = abletonosc.ClipSlotComponent(self)
+            self.track_component = abletonosc.TrackComponent(self)
 
     def tick(self):
         """

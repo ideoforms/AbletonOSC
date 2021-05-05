@@ -38,7 +38,8 @@ class SongComponent(AbletonOSCComponent):
             "nudge_up",
             "punch_in",
             "punch_out",
-            "record_mode"
+            "record_mode",
+            "tempo"
         ]
         properties_r = [
             "is_playing"

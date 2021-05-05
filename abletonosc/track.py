@@ -18,7 +18,8 @@ class TrackComponent(AbletonOSCComponent):
         ]
         properties_rw = [
             "color",
-            "mute"
+            "mute",
+            "solo"
         ]
 
         for method in methods:
@@ -35,3 +36,14 @@ class TrackComponent(AbletonOSCComponent):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/track/set_property/%s" % prop,
                                         create_track_callback(self._set_property, prop))
+
+        def track_set_volume(track, params: Tuple[Any]):
+            track.mixer_device.volume.value = params[0]
+        def track_set_panning(track, params: Tuple[Any]):
+            track.mixer_device.panning.value = params[0]
+        def track_set_send(track, params: Tuple[Any]):
+            send_id, value = params
+            track.mixer_device.sends[send_id].value = value
+        self.osc_server.add_handler("/live/track/set_property/volume", create_track_callback(track_set_volume))
+        self.osc_server.add_handler("/live/track/set_property/panning", create_track_callback(track_set_panning))
+        self.osc_server.add_handler("/live/track/set_property/send", create_track_callback(track_set_send))

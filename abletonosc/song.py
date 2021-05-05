@@ -9,43 +9,6 @@ logger = logging.getLogger("abletonosc")
 class SongComponent(AbletonOSCComponent):
     def init_api(self):
         #--------------------------------------------------------------------------------
-        # Generic callbacks
-        #--------------------------------------------------------------------------------
-        def call_method(method, address, params):
-            logger.info("Calling method: %s (params %s)" % (method, str(params)))
-            getattr(self.song, method)(*params)
-
-        def set_property(prop, address: str, params: Optional[Tuple[Any]]) -> None:
-            logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
-            setattr(self.song, prop, params[0])
-
-        def get_property(prop, address, params) -> Tuple[Any]:
-            logger.info("Getting property: %s" % prop)
-            return getattr(self.song, prop),
-
-        def start_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
-            def property_changed_callback():
-                value = getattr(self.song, prop)
-                logger.info("Property %s changed: %s" % (prop, value))
-                osc_address = "/live/set/get_property/%s" % prop
-                self.osc_server.send(osc_address, (value,))
-
-            add_listener_function_name = "add_%s_listener" % prop
-            add_listener_function = getattr(self.song, add_listener_function_name)
-            add_listener_function(property_changed_callback)
-            self.listener_functions[prop] = property_changed_callback
-
-        def stop_property_listen(prop, address: str, params: Optional[Tuple[Any]]) -> None:
-            if prop in self.listener_functions:
-                listener_function = self.listener_functions[prop]
-                remove_listener_function_name = "remove_%s_listener" % prop
-                remove_listener_function = getattr(self.song, remove_listener_function_name)
-                remove_listener_function(listener_function)
-                del self.listener_functions[prop]
-            else:
-                logger.warning("No listener function found for property: %s" % prop)
-
-        #--------------------------------------------------------------------------------
         # Init callbacks for Set: methods
         #--------------------------------------------------------------------------------
         for method in [
@@ -59,7 +22,7 @@ class SongComponent(AbletonOSCComponent):
             "create_scene",
             "jump_by"
         ]:
-            callback = partial(call_method, method)
+            callback = partial(self._call_method, self.song, method)
             self.osc_server.add_handler("/live/set/%s" % method, callback)
 
         #--------------------------------------------------------------------------------
@@ -87,8 +50,8 @@ class SongComponent(AbletonOSCComponent):
         ]
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/set/get_property/%s" % prop, partial(get_property, prop))
-            self.osc_server.add_handler("/live/set/start_property_listen/%s" % prop, partial(start_property_listen, prop))
-            self.osc_server.add_handler("/live/set/stop_property_listen/%s" % prop, partial(stop_property_listen, prop))
+            self.osc_server.add_handler("/live/set/get_property/%s" % prop, partial(self._get_property, self.song, prop))
+            self.osc_server.add_handler("/live/set/start_property_listen/%s" % prop, partial(self._start_property_listen, self.song, prop))
+            self.osc_server.add_handler("/live/set/stop_property_listen/%s" % prop, partial(self._stop_property_listen, self.song, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(set_property, prop))
+            self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(self._set_property, self.song, prop))

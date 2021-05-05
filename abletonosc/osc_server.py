@@ -58,7 +58,7 @@ class OSCServer:
 
                     if message.address in self._callbacks:
                         callback = self._callbacks[message.address]
-                        rv = callback(message.address, message.params)
+                        rv = callback(message.params)
 
                         if rv is not None:
                             self.send(message.address, rv)

@@ -1,10 +1,5 @@
 from functools import partial
-from typing import Optional, Tuple, Any
 from .component import AbletonOSCComponent
-
-import logging
-
-logger = logging.getLogger("abletonosc")
 
 class SongComponent(AbletonOSCComponent):
     def init_api(self):

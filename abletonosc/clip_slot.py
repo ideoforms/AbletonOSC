@@ -1,11 +1,5 @@
-from functools import partial
-from typing import Optional, Tuple, Any
+from typing import Tuple, Any
 from .component import AbletonOSCComponent
-
-import Live
-import logging
-
-logger = logging.getLogger("abletonosc")
 
 class ClipSlotComponent(AbletonOSCComponent):
     def init_api(self):

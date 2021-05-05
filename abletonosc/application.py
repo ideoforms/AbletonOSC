@@ -1,11 +1,6 @@
 import Live
-from functools import partial
-from typing import Optional, Tuple, Any
+from typing import Tuple
 from .component import AbletonOSCComponent
-
-import logging
-
-logger = logging.getLogger("abletonosc")
 
 class ApplicationComponent(AbletonOSCComponent):
     def init_api(self):

@@ -1,8 +1,8 @@
 from typing import Tuple, Any
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 import Live
 
-class ClipComponent(AbletonOSCComponent):
+class ClipHandler(AbletonOSCHandler):
     def init_api(self):
         def create_clip_callback(func, *args):
             def clip_callback(params: Tuple[Any]):

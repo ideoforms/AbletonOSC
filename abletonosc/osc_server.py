@@ -29,6 +29,9 @@ class OSCServer:
     def add_handler(self, address: str, handler: Callable):
         self._callbacks[address] = handler
 
+    def clear_handlers(self):
+        self._callbacks = {}
+
     def send(self, address: str, params: Tuple[Any] = ()) -> None:
         """
         Args:

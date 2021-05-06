@@ -1,7 +1,7 @@
 from typing import Tuple, Any
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 
-class DeviceComponent(AbletonOSCComponent):
+class DeviceHandler(AbletonOSCHandler):
     def init_api(self):
         def create_device_callback(func, *args):
             def device_callback(params: Tuple[Any]):
@@ -35,3 +35,50 @@ class DeviceComponent(AbletonOSCComponent):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/device/set_property/%s" % prop,
                                         create_device_callback(self._set_property, prop))
+
+        #--------------------------------------------------------------------------------
+        # Device: Get/set parameter lists
+        #--------------------------------------------------------------------------------
+        def device_get_num_parameters(device, params: Tuple[Any] = ()):
+            return len(device.parameters),
+
+        def device_get_parameters_name(device, params: Tuple[Any] = ()):
+            return tuple(parameter.name for parameter in device.parameters)
+
+        def device_get_parameters_value(device, params: Tuple[Any] = ()):
+            return tuple(parameter.value for parameter in device.parameters)
+
+        def device_get_parameters_min(device, params: Tuple[Any] = ()):
+            return tuple(parameter.min for parameter in device.parameters)
+
+        def device_get_parameters_max(device, params: Tuple[Any] = ()):
+            return tuple(parameter.max for parameter in device.parameters)
+
+        def device_set_parameters_value(device, params: Tuple[Any] = ()):
+            for index, value in params:
+                device.parameters[index].value = value
+
+        self.osc_server.add_handler("/live/device/get_property/num_parameters", create_device_callback(device_get_num_parameters))
+        self.osc_server.add_handler("/live/device/get_property/parameters/name", create_device_callback(device_get_parameters_name))
+        self.osc_server.add_handler("/live/device/get_property/parameters/value", create_device_callback(device_get_parameters_value))
+        self.osc_server.add_handler("/live/device/get_property/parameters/min", create_device_callback(device_get_parameters_min))
+        self.osc_server.add_handler("/live/device/get_property/parameters/max", create_device_callback(device_get_parameters_max))
+        self.osc_server.add_handler("/live/device/set_property/parameters/value", create_device_callback(device_set_parameters_value))
+
+        #--------------------------------------------------------------------------------
+        # Device: Get/set individual parameters
+        #--------------------------------------------------------------------------------
+        def device_get_parameter_value(device, params: Tuple[Any] = ()):
+            return device.parameters[params[0]].value,
+
+        def device_set_parameter_value(device, params: Tuple[Any] = ()):
+            param_id, param_value = params[:2]
+            device.parameters[param_id].value = param_value
+
+        def device_get_parameter_name(device, params: Tuple[Any] = ()):
+            return device.parameters[params[0]].name,
+
+        self.osc_server.add_handler("/live/device/get_property/parameter/value", create_device_callback(device_get_parameter_value))
+        self.osc_server.add_handler("/live/device/set_property/parameter/value", create_device_callback(device_set_parameter_value))
+
+        self.osc_server.add_handler("/live/device/get_property/parameter/name", create_device_callback(device_get_parameter_name))

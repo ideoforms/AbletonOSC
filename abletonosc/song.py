@@ -1,8 +1,8 @@
 from functools import partial
 from typing import Tuple, Any
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 
-class SongComponent(AbletonOSCComponent):
+class SongHandler(AbletonOSCHandler):
     def init_api(self):
         #--------------------------------------------------------------------------------
         # Init callbacks for Set: methods

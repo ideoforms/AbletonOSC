@@ -1,7 +1,7 @@
 from typing import Tuple, Any
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 
-class ClipSlotComponent(AbletonOSCComponent):
+class ClipSlotHandler(AbletonOSCHandler):
     def init_api(self):
         def create_clip_slot_callback(func, *args):
             def clip_slot_callback(params: Tuple[Any]):

@@ -1,7 +1,7 @@
 from typing import Tuple, Any
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 
-class TrackComponent(AbletonOSCComponent):
+class TrackHandler(AbletonOSCHandler):
     def init_api(self):
         def create_track_callback(func, *args):
             def track_callback(params: Tuple[Any]):

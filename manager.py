@@ -16,7 +16,7 @@ logger.addHandler(file_handler)
 class Manager(ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
-        self.reload_imports()
+        self.handlers = []
         self.show_message("Loaded AbletonOSC")
 
         self.osc_server = abletonosc.OSCServer()
@@ -25,15 +25,24 @@ class Manager(ControlSurface):
         self.init_api()
 
     def init_api(self):
-        self.osc_server.add_handler("/live/test", lambda _, params: self.show_message("Received OSC OK"))
+        self.osc_server.add_handler("/live/test", lambda _, *params: self.show_message("Received OSC OK"))
+        self.osc_server.add_handler("/live/reload", lambda _, *params: self.reload_imports())
 
         with self.component_guard():
-            self.song_component = abletonosc.SongComponent(self)
-            self.application_component = abletonosc.ApplicationComponent(self)
-            self.clip_component = abletonosc.ClipComponent(self)
-            self.clip_slot_component = abletonosc.ClipSlotComponent(self)
-            self.track_component = abletonosc.TrackComponent(self)
-            self.device_component = abletonosc.DeviceComponent(self)
+            logger.info("Init API")
+            self.handlers = [
+                abletonosc.SongHandler(self),
+                abletonosc.ApplicationHandler(self),
+                abletonosc.ClipHandler(self),
+                abletonosc.ClipSlotHandler(self),
+                abletonosc.TrackHandler(self),
+                abletonosc.DeviceHandler(self)
+            ]
+
+    def clear_api(self):
+        self.osc_server.clear_handlers()
+        for handler in self.handlers:
+            handler.clear_api()
 
     def tick(self):
         """
@@ -49,9 +58,20 @@ class Manager(ControlSurface):
     def reload_imports(self):
         try:
             importlib.reload(abletonosc)
+            importlib.reload(abletonosc.application)
+            importlib.reload(abletonosc.clip)
+            importlib.reload(abletonosc.clip_slot)
+            importlib.reload(abletonosc.device)
+            importlib.reload(abletonosc.osc_server)
+            importlib.reload(abletonosc.song)
+            importlib.reload(abletonosc.track)
         except Exception as e:
             exc = traceback.format_exc()
             logging.warning(exc)
+
+        if self.handlers:
+            self.clear_api()
+            self.init_api()
         logger.info("Reloaded code")
 
     def disconnect(self):

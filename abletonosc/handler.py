@@ -2,7 +2,7 @@ from ableton.v2.control_surface.component import Component
 from typing import Optional, Tuple, Any
 import logging
 
-class AbletonOSCComponent(Component):
+class AbletonOSCHandler(Component):
     def __init__(self, manager):
         super().__init__()
 
@@ -15,7 +15,10 @@ class AbletonOSCComponent(Component):
     def init_api(self):
         pass
 
-   #--------------------------------------------------------------------------------
+    def clear_api(self):
+        pass
+
+    #--------------------------------------------------------------------------------
     # Generic callbacks
     #--------------------------------------------------------------------------------
     def _call_method(self, target, method, params: Optional[Tuple[Any]] = ()):

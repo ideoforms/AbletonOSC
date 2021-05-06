@@ -1,8 +1,8 @@
 import Live
 from typing import Tuple
-from .component import AbletonOSCComponent
+from .handler import AbletonOSCHandler
 
-class ApplicationComponent(AbletonOSCComponent):
+class ApplicationHandler(AbletonOSCHandler):
     def init_api(self):
         #--------------------------------------------------------------------------------
         # Generic callbacks

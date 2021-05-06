@@ -44,6 +44,19 @@ class TrackComponent(AbletonOSCComponent):
         def track_set_send(track, params: Tuple[Any]):
             send_id, value = params
             track.mixer_device.sends[send_id].value = value
+        # TODO getters
         self.osc_server.add_handler("/live/track/set_property/volume", create_track_callback(track_set_volume))
         self.osc_server.add_handler("/live/track/set_property/panning", create_track_callback(track_set_panning))
         self.osc_server.add_handler("/live/track/set_property/send", create_track_callback(track_set_send))
+
+        def track_get_clips(track, params: Tuple[Any]):
+            clip_slots = track.clip_slots
+            rv = []
+            for clip_slot in clip_slots:
+                clip = clip_slot.clip
+                if clip:
+                    rv.append(clip.name)
+                else:
+                    rv.append(None)
+            return tuple(rv)
+        self.osc_server.add_handler("/live/track/get_property/clips", create_track_callback(track_get_clips))

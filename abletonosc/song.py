@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Tuple, Any
 from .component import AbletonOSCComponent
 
 class SongComponent(AbletonOSCComponent):
@@ -51,3 +52,8 @@ class SongComponent(AbletonOSCComponent):
             self.osc_server.add_handler("/live/set/stop_property_listen/%s" % prop, partial(self._stop_property_listen, self.song, prop))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(self._set_property, self.song, prop))
+
+        def song_get_num_tracks(song, params: Tuple[Any] = ()):
+            return len(song.tracks),
+        # TODO num_tracks listener
+        self.osc_server.add_handler("/live/set/get_property/num_tracks", partial(song_get_num_tracks, self.song))

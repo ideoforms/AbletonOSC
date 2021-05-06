@@ -18,10 +18,17 @@ class ClipComponent(AbletonOSCComponent):
             "stop"
         ]
         properties_r = [
-            "is_playing"
+            "file_path",
+            "is_midi_clip",
+            "is_audio_clip",
+            "is_playing",
+            "is_recording"
+
         ]
         properties_rw = [
-            "color"
+            "color",
+            "gain",
+            "name"
         ]
 
         for method in methods:

@@ -18,7 +18,7 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 API docs are in progress. Key calls are detailed below.
 
 | Address | Params | Description |
-|--------------------------------|
+| ------- | ------ | ----------- |
 | /live/test | | Display a test message and sends an OSC reply |
 | /live/application/version | | Query Live's version |
 | /live/song/start_playing | | Start session playback |

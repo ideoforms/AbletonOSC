@@ -26,22 +26,46 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 
 | Address | Query params | Response params | Description |
 | :------ | :----------- | :-------------- | :---------- |
-| `/live/song/start_playing` | | | Start session playback |
-| `/live/song/stop_playing` | | | Stop session playback |
-| `/live/song/continue_playing` | | | Resume session playback |
-| `/live/song/stop_all_clips` | | | Stop all clips from playing |
-| `/live/song/create_audio_track` | | | Create a new audio track at the cursor |
-| `/live/song/create_midi_track` | | | Create a new MIDI track at the cursor |
-| `/live/song/create_return_track` | | | Create a new return track at the cursor |
-| `/live/song/create_scene` | | | Create a new scene |
-| `/live/song/get/is_playing` | | tempo_bpm | Query whether the song is currently playing |
-| `/live/song/get/tempo` | | tempo_bpm | Query song tempo |
-| `/live/song/set/tempo` | tempo_bpm | | Set song tempo |
-| `/live/song/get/metronome` | | metronome_on | Query metronome on/off |
-| `/live/song/set/metronome`  | metronome_on | | Set metronome on/off |
+| /live/song/start_playing | | | Start session playback |
+| /live/song/stop_playing | | | Stop session playback |
+| /live/song/continue_playing | | | Resume session playback |
+| /live/song/stop_all_clips | | | Stop all clips from playing |
+| /live/song/create_audio_track | | | Create a new audio track at the cursor |
+| /live/song/create_midi_track | | | Create a new MIDI track at the cursor |
+| /live/song/create_return_track | | | Create a new return track at the cursor |
+| /live/song/create_scene | | | Create a new scene |
+| /live/song/get/is_playing | | tempo_bpm | Query whether the song is currently playing |
+| /live/song/get/tempo | | tempo_bpm | Query song tempo |
+| /live/song/set/tempo | tempo_bpm | | Set song tempo |
+| /live/song/get/metronome | | metronome_on | Query metronome on/off |
+| /live/song/set/metronome  | metronome_on | | Set metronome on/off |
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
  - `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
+
+### Track API
+
+| Address | Query params | Response params | Description |
+| :------ | :----------- | :-------------- | :---------- |
+| /live/track/stop_all_clips | track_id | | Stop all clips on track |
+| /live/track/get/color | track_id | color | Query track color |
+| /live/track/set/color | track_id, color | | Set track color |
+| /live/track/get/mute | track_id | mute | Query track mute on/off |
+| /live/track/set/mute | track_id, mute | | Set track mute on/off |
+| /live/track/get/solo | track_id | solo | Query track solo on/off |
+| /live/track/set/solo | track_id, solo | | Set track solo on/off |
+| /live/track/get/name | track_id | name | Query track name |
+| /live/track/set/name | track_id, name | | Set track name |
+| /live/track/get/volume | track_id | volume | Query track volume |
+| /live/track/set/volume | track_id, volume | | Set track volume |
+| /live/track/get/panning | track_id | panning | Query track panning |
+| /live/track/set/panning | track_id, panning | | Set track panning |
+| /live/track/get/send | track_id, send_id | name | Query track send |
+| /live/track/set/send | track_id, send_id, name | | Set track send |
+| /live/track/get/clips_name | track_id | [name, name, ....] | Query all clip names on track  |
+| /live/track/get/clips_length | track_id | [length, length, ...] | Query all clip lengths on track |
+| /live/track/get/num_devices | track_id | num_devices | Query the number of devices on the track  |
+
 
 ## Acknowledgements
 

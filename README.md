@@ -71,6 +71,16 @@ Additional properties are exposed to `get`, `set`, `start_listen` and `stop_list
 
 See **Device API** for details on type/class_name.
  
+ ### Clip Slot API
+ 
+| Address | Query params | Response params | Description |
+| :------ | :----------- | :-------------- | :---------- |
+| /live/clip_slot/create_clip | track_id, clip_id, length | | Create a clip in the slot |
+| /live/clip_slot/delete_clip | track_id, clip_id | | Delete the clip in the slot |
+| /live/clip_slot/get/has_clip | track_id, clip_id | | Query whether the slot has a clip |
+| /live/clip_slot/get/has_stop_button | track_id, clip_id | has_stop_button | Query whether the slot has a stop button |
+| /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button | | Add or remove stop button |
+
  ### Clip API
 
 | Address | Query params | Response params | Description |

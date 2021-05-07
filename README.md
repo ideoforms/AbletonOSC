@@ -71,12 +71,12 @@ Additional properties are exposed to `get`, `set`, `start_listen` and `stop_list
 | /live/track/set/panning | track_id, panning | | Set track panning |
 | /live/track/get/send | track_id, send_id | value | Query track send |
 | /live/track/set/send | track_id, send_id, value | | Set track send |
-| /live/track/get/clips_name | track_id | [name, name, ....] | Query all clip names on track  |
-| /live/track/get/clips_length | track_id | [length, length, ...] | Query all clip lengths on track |
+| /live/track/get/clips_name | track_id | [name, ....] | Query all clip names on track  |
+| /live/track/get/clips_length | track_id | [length, ...] | Query all clip lengths on track |
 | /live/track/get/num_devices | track_id | num_devices | Query the number of devices on the track  |
-| /live/track/get/devices/name | track_id | [name, name ...] | Query all device names on track |
-| /live/track/get/devices/type | track_id | [type, type ...] | Query all devices types on track |
-| /live/track/get/devices/class_name | track_id | [class, class ...] | Query all device class names on track |
+| /live/track/get/devices/name | track_id | [name, ...] | Query all device names on track |
+| /live/track/get/devices/type | track_id | [type, ...] | Query all devices types on track |
+| /live/track/get/devices/class_name | track_id | [class, ...] | Query all device class names on track |
 
 See **Device API** for details on type/class_name.
  
@@ -117,10 +117,10 @@ See **Device API** for details on type/class_name.
 | /live/device/get/class_name | track_id, device_id | | Get device class_name |
 | /live/device/get/type | track_id, device_id | | Get device type |
 | /live/device/get/num_parameters | track_id, device_id | num_parameters | Get the number of parameters exposed by the device |
-| /live/device/get/parameters/name | track_id, device_id | [name, name, ...] | Get the list of parameter names exposed by the device |
-| /live/device/get/parameters/value | track_id, device_id | [value, value, ...] | Get the device parameter values |
-| /live/device/get/parameters/min | track_id, device_id | [value, value, ...] | Get the device parameter minimum values |
-| /live/device/get/parameters/max | track_id, device_id | [value, value, ...] | Get the device parameter maximum values |
+| /live/device/get/parameters/name | track_id, device_id | [name, ...] | Get the list of parameter names exposed by the device |
+| /live/device/get/parameters/value | track_id, device_id | [value, ...] | Get the device parameter values |
+| /live/device/get/parameters/min | track_id, device_id | [value, ...] | Get the device parameter minimum values |
+| /live/device/get/parameters/max | track_id, device_id | [value, ...] | Get the device parameter maximum values |
 | /live/device/set/parameters/value | track_id, device_id, value, value ... | | Set the device parameter values |
 | /live/device/get/parameter/value | track_id, device_id, parameter_id | value | Get a device parameter value |
 | /live/device/set/parameter/value | track_id, device_id, parameter_id, value | | Set a device parameter value |

@@ -37,6 +37,7 @@ class AbletonOSCHandler(Component):
         def property_changed_callback():
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))
+            # TODO
             osc_address = "/live/set/get_property/%s" % prop
             self.osc_server.send(osc_address, (value,))
 

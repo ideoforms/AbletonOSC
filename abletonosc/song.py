@@ -19,7 +19,7 @@ class SongHandler(AbletonOSCHandler):
             "jump_by"
         ]:
             callback = partial(self._call_method, self.song, method)
-            self.osc_server.add_handler("/live/set/%s" % method, callback)
+            self.osc_server.add_handler("/live/song/%s" % method, callback)
 
         #--------------------------------------------------------------------------------
         # Init callbacks for Set: properties
@@ -47,13 +47,13 @@ class SongHandler(AbletonOSCHandler):
         ]
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/set/get_property/%s" % prop, partial(self._get_property, self.song, prop))
-            self.osc_server.add_handler("/live/set/start_property_listen/%s" % prop, partial(self._start_property_listen, self.song, prop))
-            self.osc_server.add_handler("/live/set/stop_property_listen/%s" % prop, partial(self._stop_property_listen, self.song, prop))
+            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get_property, self.song, prop))
+            self.osc_server.add_handler("/live/song/start_listen/%s" % prop, partial(self._start_property_listen, self.song, prop))
+            self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_property_listen, self.song, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/set/set_property/%s" % prop, partial(self._set_property, self.song, prop))
+            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
 
         def song_get_num_tracks(song, params: Tuple[Any] = ()):
             return len(song.tracks),
         # TODO num_tracks listener
-        self.osc_server.add_handler("/live/set/get_property/num_tracks", partial(song_get_num_tracks, self.song))
+        self.osc_server.add_handler("/live/song/get/num_tracks", partial(song_get_num_tracks, self.song))

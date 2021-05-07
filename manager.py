@@ -17,7 +17,7 @@ class Manager(ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
         self.handlers = []
-        self.show_message("Loaded AbletonOSC")
+        self.show_message("AbletonOSC: Listening for OSC on port %d" % abletonosc.OSC_LISTEN_PORT)
 
         self.osc_server = abletonosc.OSCServer()
         self.schedule_message(0, self.tick)
@@ -25,11 +25,16 @@ class Manager(ControlSurface):
         self.init_api()
 
     def init_api(self):
-        self.osc_server.add_handler("/live/test", lambda _, *params: self.show_message("Received OSC OK"))
-        self.osc_server.add_handler("/live/reload", lambda _, *params: self.reload_imports())
+        def test_callback(params):
+            self.show_message("Received OSC OK")
+            self.osc_server.send("/live/test", ("ok",))
+        def reload_callback(params):
+            self.reload_imports()
+
+        self.osc_server.add_handler("/live/test", test_callback)
+        self.osc_server.add_handler("/live/reload", reload_callback)
 
         with self.component_guard():
-            logger.info("Init API")
             self.handlers = [
                 abletonosc.SongHandler(self),
                 abletonosc.ApplicationHandler(self),
@@ -57,7 +62,6 @@ class Manager(ControlSurface):
 
     def reload_imports(self):
         try:
-            importlib.reload(abletonosc)
             importlib.reload(abletonosc.application)
             importlib.reload(abletonosc.clip)
             importlib.reload(abletonosc.clip_slot)
@@ -65,6 +69,7 @@ class Manager(ControlSurface):
             importlib.reload(abletonosc.osc_server)
             importlib.reload(abletonosc.song)
             importlib.reload(abletonosc.track)
+            importlib.reload(abletonosc)
         except Exception as e:
             exc = traceback.format_exc()
             logging.warning(exc)

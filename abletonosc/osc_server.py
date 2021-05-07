@@ -1,4 +1,5 @@
 from typing import Tuple, Any, Callable
+from .constants import OSC_LISTEN_PORT, OSC_RESPONSE_PORT
 from ..pythonosc.osc_message import OscMessage, ParseError
 from ..pythonosc.osc_message_builder import OscMessageBuilder, BuildError
 
@@ -8,7 +9,7 @@ import logging
 import traceback
 
 class OSCServer:
-    def __init__(self, local_addr=('127.0.0.1', 11000), remote_addr=('127.0.0.1', 11001)):
+    def __init__(self, local_addr=('127.0.0.1', OSC_LISTEN_PORT), remote_addr=('127.0.0.1', OSC_RESPONSE_PORT)):
         """
         Implemented because pythonosc's OSC server causes a beachball when handling
         incoming messages. To investigate, as it would be ultimately better not to have

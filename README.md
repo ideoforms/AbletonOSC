@@ -38,15 +38,15 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 | /live/song/create_return_track | | | Create a new return track at the cursor |
 | /live/song/create_scene | | | Create a new scene |
 | /live/song/get/is_playing | | is_playing | Query whether the song is currently playing |
-| /live/song/start_listen/is_playing | | is_playing | Start a listener that sends a notification when is_playing changes|
+| /live/song/start_listen/is_playing | | | Start a listener that sends a notification when is_playing changes|
 | /live/song/stop_listen/is_playing | | | Stop the above listener |
 | /live/song/get/tempo | | tempo_bpm | Query song tempo |
 | /live/song/set/tempo | tempo_bpm | | Set song tempo |
-| /live/song/start_listen/tempo | | tempo | Start a listener that sends a notification when tempo changes|
+| /live/song/start_listen/tempo | | | Start a listener that sends a notification when tempo changes|
 | /live/song/stop_listen/tempo | | | Stop the above listener |
 | /live/song/get/metronome | | metronome_on | Query metronome on/off |
 | /live/song/set/metronome  | metronome_on | | Set metronome on/off |
-| /live/song/start_listen/metronome | | tempo | Start a listener that sends a notification when metronome changes|
+| /live/song/start_listen/metronome | | | Start a listener that sends a notification when metronome changes|
 | /live/song/stop_listen/metronome | | | Stop the above listener |
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:

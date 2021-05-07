@@ -47,11 +47,11 @@ class SongHandler(AbletonOSCHandler):
         ]
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get_property, self.song, prop))
-            self.osc_server.add_handler("/live/song/start_listen/%s" % prop, partial(self._start_property_listen, self.song, prop))
-            self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_property_listen, self.song, prop))
+            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get, self.song, prop))
+            self.osc_server.add_handler("/live/song/start_listen/%s" % prop, partial(self._start_listen, self.song, prop))
+            self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_listen, self.song, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
+            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set, self.song, prop))
 
         def song_get_num_tracks(song, params: Tuple[Any] = ()):
             return len(song.tracks),

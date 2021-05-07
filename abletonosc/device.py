@@ -26,15 +26,15 @@ class DeviceHandler(AbletonOSCHandler):
                                         create_device_callback(self._call_method, method))
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/device/get_property/%s" % prop,
-                                        create_device_callback(self._get_property, prop))
-            self.osc_server.add_handler("/live/device/start_property_listen/%s" % prop,
-                                        create_device_callback(self._start_property_listen, prop))
-            self.osc_server.add_handler("/live/device/stop_property_listen/%s" % prop,
-                                        create_device_callback(self._stop_property_listen, prop))
+            self.osc_server.add_handler("/live/device/get/%s" % prop,
+                                        create_device_callback(self._get, prop))
+            self.osc_server.add_handler("/live/device/start_listen/%s" % prop,
+                                        create_device_callback(self._start_listen, prop))
+            self.osc_server.add_handler("/live/device/stop_listen/%s" % prop,
+                                        create_device_callback(self._stop_listen, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/device/set_property/%s" % prop,
-                                        create_device_callback(self._set_property, prop))
+            self.osc_server.add_handler("/live/device/set/%s" % prop,
+                                        create_device_callback(self._set, prop))
 
         #--------------------------------------------------------------------------------
         # Device: Get/set parameter lists
@@ -58,12 +58,12 @@ class DeviceHandler(AbletonOSCHandler):
             for index, value in params:
                 device.parameters[index].value = value
 
-        self.osc_server.add_handler("/live/device/get_property/num_parameters", create_device_callback(device_get_num_parameters))
-        self.osc_server.add_handler("/live/device/get_property/parameters/name", create_device_callback(device_get_parameters_name))
-        self.osc_server.add_handler("/live/device/get_property/parameters/value", create_device_callback(device_get_parameters_value))
-        self.osc_server.add_handler("/live/device/get_property/parameters/min", create_device_callback(device_get_parameters_min))
-        self.osc_server.add_handler("/live/device/get_property/parameters/max", create_device_callback(device_get_parameters_max))
-        self.osc_server.add_handler("/live/device/set_property/parameters/value", create_device_callback(device_set_parameters_value))
+        self.osc_server.add_handler("/live/device/get/num_parameters", create_device_callback(device_get_num_parameters))
+        self.osc_server.add_handler("/live/device/get/parameters/name", create_device_callback(device_get_parameters_name))
+        self.osc_server.add_handler("/live/device/get/parameters/value", create_device_callback(device_get_parameters_value))
+        self.osc_server.add_handler("/live/device/get/parameters/min", create_device_callback(device_get_parameters_min))
+        self.osc_server.add_handler("/live/device/get/parameters/max", create_device_callback(device_get_parameters_max))
+        self.osc_server.add_handler("/live/device/set/parameters/value", create_device_callback(device_set_parameters_value))
 
         #--------------------------------------------------------------------------------
         # Device: Get/set individual parameters
@@ -78,7 +78,7 @@ class DeviceHandler(AbletonOSCHandler):
         def device_get_parameter_name(device, params: Tuple[Any] = ()):
             return device.parameters[params[0]].name,
 
-        self.osc_server.add_handler("/live/device/get_property/parameter/value", create_device_callback(device_get_parameter_value))
-        self.osc_server.add_handler("/live/device/set_property/parameter/value", create_device_callback(device_set_parameter_value))
+        self.osc_server.add_handler("/live/device/get/parameter/value", create_device_callback(device_get_parameter_value))
+        self.osc_server.add_handler("/live/device/set/parameter/value", create_device_callback(device_set_parameter_value))
 
-        self.osc_server.add_handler("/live/device/get_property/parameter/name", create_device_callback(device_get_parameter_name))
+        self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))

@@ -36,12 +36,12 @@ class ClipSlotHandler(AbletonOSCHandler):
                                         create_clip_slot_callback(self._call_method, method))
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/clip_slot/get_property/%s" % prop,
-                                        create_clip_slot_callback(self._get_property, prop))
-            self.osc_server.add_handler("/live/clip_slot/start_property_listen/%s" % prop,
-                                        create_clip_slot_callback(self._start_property_listen, prop))
-            self.osc_server.add_handler("/live/clip_slot/stop_property_listen/%s" % prop,
-                                        create_clip_slot_callback(self._stop_property_listen, prop))
+            self.osc_server.add_handler("/live/clip_slot/get/%s" % prop,
+                                        create_clip_slot_callback(self._get, prop))
+            self.osc_server.add_handler("/live/clip_slot/start_listen/%s" % prop,
+                                        create_clip_slot_callback(self._start_listen, prop))
+            self.osc_server.add_handler("/live/clip_slot/stop_listen/%s" % prop,
+                                        create_clip_slot_callback(self._stop_listen, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/clip_slot/set_property/%s" % prop,
-                                        create_clip_slot_callback(self._set_property, prop))
+            self.osc_server.add_handler("/live/clip_slot/set/%s" % prop,
+                                        create_clip_slot_callback(self._set, prop))

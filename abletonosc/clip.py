@@ -36,15 +36,15 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._call_method, method))
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/clip/get_property/%s" % prop,
-                                        create_clip_callback(self._get_property, prop))
-            self.osc_server.add_handler("/live/clip/start_property_listen/%s" % prop,
-                                        create_clip_callback(self._start_property_listen, prop))
-            self.osc_server.add_handler("/live/clip/stop_property_listen/%s" % prop,
-                                        create_clip_callback(self._stop_property_listen, prop))
+            self.osc_server.add_handler("/live/clip/get/%s" % prop,
+                                        create_clip_callback(self._get, prop))
+            self.osc_server.add_handler("/live/clip/start_listen/%s" % prop,
+                                        create_clip_callback(self._start_listen, prop))
+            self.osc_server.add_handler("/live/clip/stop_listen/%s" % prop,
+                                        create_clip_callback(self._stop_listen, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/clip/set_property/%s" % prop,
-                                        create_clip_callback(self._set_property, prop))
+            self.osc_server.add_handler("/live/clip/set/%s" % prop,
+                                        create_clip_callback(self._set, prop))
 
         def clip_add_new_note(clip, params: Tuple[Any]):
             start_time, duration, pitch, velocity, mute = params

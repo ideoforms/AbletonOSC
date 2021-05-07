@@ -25,20 +25,20 @@ class AbletonOSCHandler(Component):
         self.logger.info("Calling method: %s (params %s)" % (method, str(params)))
         getattr(target, method)(*params)
 
-    def _set_property(self, target, prop, params: Tuple[Any]) -> None:
+    def _set(self, target, prop, params: Tuple[Any]) -> None:
         self.logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
         setattr(target, prop, params[0])
 
-    def _get_property(self, target, prop, params: Optional[Tuple[Any]] = ()) -> Tuple[Any]:
+    def _get(self, target, prop, params: Optional[Tuple[Any]] = ()) -> Tuple[Any]:
         self.logger.info("Getting property: %s" % prop)
         return getattr(target, prop),
 
-    def _start_property_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
+    def _start_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         def property_changed_callback():
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))
             # TODO
-            osc_address = "/live/set/get_property/%s" % prop
+            osc_address = "/live/set/get/%s" % prop
             self.osc_server.send(osc_address, (value,))
 
         add_listener_function_name = "add_%s_listener" % prop
@@ -46,7 +46,7 @@ class AbletonOSCHandler(Component):
         add_listener_function(property_changed_callback)
         self.listener_functions[prop] = property_changed_callback
 
-    def _stop_property_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
+    def _stop_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         if prop in self.listener_functions:
             listener_function = self.listener_functions[prop]
             remove_listener_function_name = "remove_%s_listener" % prop

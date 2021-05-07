@@ -15,12 +15,17 @@ To install the script:
 
 AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**. 
 
-API docs are in progress. Key calls are detailed below.
+### Application API
 
 | Address | Query params | Response params | Description |
 | :------ | :----------- | :-------------- | :---------- |
 | /live/test | | | Display a test message and sends an OSC reply |
-| /live/application/version | | | Query Live's version |
+| /live/application/get/version | | major_version, minor_version | Query Live's version |
+
+### Song API
+
+| Address | Query params | Response params | Description |
+| :------ | :----------- | :-------------- | :---------- |
 | /live/song/start_playing | | | Start session playback |
 | /live/song/stop_playing | | | Stop session playback |
 | /live/song/continue_playing | | | Resume session playback |
@@ -35,6 +40,7 @@ API docs are in progress. Key calls are detailed below.
 | /live/song/get/metronome | | metronome_on | Query metronome on/off |
 | /live/song/set/metronome  | metronome_on | | Set metronome on/off |
 
+Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner: `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
 
 ## Acknowledgements
 

@@ -10,6 +10,7 @@ To install the script:
  - Move the AbletonOSC folder to the MIDI Remote Scripts folder inside the Ableton application: `/Applications/Ableton Live*.app/Contents/App-Resources/MIDI Remote Scripts`
  - Restart Live
  - In `Preferences > MIDI`, add the new AbletonOSC Control Surface that should appear. Live should display a message saying "AbletonOSC: Listening for OSC on port 11000"
+ - On macOS, an activity log will be created at `/tmp/abletonosc.log` 
 
 ## Usage
 

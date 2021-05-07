@@ -26,21 +26,22 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 
 | Address | Query params | Response params | Description |
 | :------ | :----------- | :-------------- | :---------- |
-| /live/song/start_playing | | | Start session playback |
-| /live/song/stop_playing | | | Stop session playback |
-| /live/song/continue_playing | | | Resume session playback |
-| /live/song/stop_all_clips | | | Stop all clips from playing |
-| /live/song/create_audio_track | | | Create a new audio track at the cursor |
-| /live/song/create_midi_track | | | Create a new MIDI track at the cursor |
-| /live/song/create_return_track | | | Create a new return track at the cursor |
-| /live/song/create_scene | | | Create a new scene |
-| /live/song/get/is_playing | | tempo_bpm | Query whether the song is currently playing |
-| /live/song/get/tempo | | tempo_bpm | Query song tempo |
-| /live/song/set/tempo | tempo_bpm | | Set song tempo |
-| /live/song/get/metronome | | metronome_on | Query metronome on/off |
-| /live/song/set/metronome  | metronome_on | | Set metronome on/off |
+| `/live/song/start_playing` | | | Start session playback |
+| `/live/song/stop_playing` | | | Stop session playback |
+| `/live/song/continue_playing` | | | Resume session playback |
+| `/live/song/stop_all_clips` | | | Stop all clips from playing |
+| `/live/song/create_audio_track` | | | Create a new audio track at the cursor |
+| `/live/song/create_midi_track` | | | Create a new MIDI track at the cursor |
+| `/live/song/create_return_track` | | | Create a new return track at the cursor |
+| `/live/song/create_scene` | | | Create a new scene |
+| `/live/song/get/is_playing` | | tempo_bpm | Query whether the song is currently playing |
+| `/live/song/get/tempo` | | tempo_bpm | Query song tempo |
+| `/live/song/set/tempo` | tempo_bpm | | Set song tempo |
+| `/live/song/get/metronome` | | metronome_on | Query metronome on/off |
+| `/live/song/set/metronome`  | metronome_on | | Set metronome on/off |
 
-Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner: `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
+Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
+ - `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
 
 ## Acknowledgements
 

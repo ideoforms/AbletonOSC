@@ -4,10 +4,15 @@ from . import abletonosc
 
 import importlib
 import traceback
+import tempfile
+import platform
 import logging
+import os
 
 logger = logging.getLogger("abletonosc")
-file_handler = logging.FileHandler('/tmp/abletonosc.log')
+tmp_dir = "/tmp" if platform.system() == "Darwin" else tempfile.gettempdir()
+log_path = os.path.join(tmp_dir, "abletonosc.log")
+file_handler = logging.FileHandler(log_path)
 file_handler.setLevel(logging.INFO)
 formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
 file_handler.setFormatter(formatter)

@@ -1,6 +1,6 @@
 # AbletonOSC: Control Ableton Live 11+ with OSC
 
-AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API, providing comprehensive control over Live's control interfaces.
+AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API, providing comprehensive control over Live's control interfaces using the same naming structure and objecth hierarchy as LOM.
 
 It is currently (2021-05-07) a work-in-progress, exposing a few initial APIs.
 
@@ -37,11 +37,17 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 | /live/song/create_midi_track | | | Create a new MIDI track at the cursor |
 | /live/song/create_return_track | | | Create a new return track at the cursor |
 | /live/song/create_scene | | | Create a new scene |
-| /live/song/get/is_playing | | tempo_bpm | Query whether the song is currently playing |
+| /live/song/get/is_playing | | is_playing | Query whether the song is currently playing |
+| /live/song/start_listen/is_playing | | is_playing | Start a listener that sends a notification when is_playing changes|
+| /live/song/stop_listen/is_playing | | | Stop the above listener |
 | /live/song/get/tempo | | tempo_bpm | Query song tempo |
 | /live/song/set/tempo | tempo_bpm | | Set song tempo |
+| /live/song/start_listen/tempo | | tempo | Start a listener that sends a notification when tempo changes|
+| /live/song/stop_listen/tempo | | | Stop the above listener |
 | /live/song/get/metronome | | metronome_on | Query metronome on/off |
 | /live/song/set/metronome  | metronome_on | | Set metronome on/off |
+| /live/song/start_listen/metronome | | tempo | Start a listener that sends a notification when metronome changes|
+| /live/song/stop_listen/metronome | | | Stop the above listener |
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
  - `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`

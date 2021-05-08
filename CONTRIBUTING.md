@@ -1,5 +1,13 @@
 # Contributing
 
+## Tests
+
+To run unit tests, `pip3 install pytest`, start Live, and run:
+
+```
+pytest
+```
+
 ## Live reloading
 
 AbletonOSC supports dynamic reloading of the handler code modules so that it's not necessary to restart Live each time the code is modified.

@@ -48,7 +48,7 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._set, prop))
 
         def clip_add_new_note(clip, params: Tuple[Any] = ()):
-            start_time, duration, pitch, velocity, mute = params
+            pitch, start_time, duration, velocity, mute = params
             note = Live.Clip.MidiNoteSpecification(start_time=start_time,
                                                    duration=duration,
                                                    pitch=pitch,

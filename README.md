@@ -1,6 +1,6 @@
 # AbletonOSC: Control Ableton Live 11+ with OSC
 
-AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API, providing comprehensive control over Live's control interfaces using the same naming structure and objecth hierarchy as LOM.
+AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API, providing comprehensive control over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
 It is currently (2021-05-07) a work-in-progress, exposing a few initial APIs.
 
@@ -120,7 +120,7 @@ See **Device API** for details on type/class_name.
 | :------ | :----------- | :-------------- | :---------- |
 | /live/clip/fire | track_id, clip_id | | Start clip playback |
 | /live/clip/stop | track_id, clip_id | | Stop clip playback |
-| /live/clip/add_new_note | track_id, clip_id, start_time, duration, pitch, velocity, mute | | Add a new MIDI note to a clip |
+| /live/clip/add_new_note | track_id, clip_id, pitch, start_time, duration, velocity, mute | | Add a new MIDI note to a clip. pitch is MIDI note index, start_time and duration are floats in beats, velocity is MIDI velocity index, mute is on/off  |
 | /live/clip/get/color | track_id, clip_id | color | Get clip color |
 | /live/clip/set/color | track_id, clip_id, color | | Set clip color |
 | /live/clip/get/name | track_id, clip_id | name | Get clip name |

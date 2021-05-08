@@ -31,7 +31,7 @@ def query_and_await(client, server, address, fn):
     client.send_message(address, [])
     return await_reply(server, address, fn)
 
-def await_reply(server, address, fn):
+def await_reply(server, address, fn, timeout=TICK_DURATION):
     event = threading.Event()
     def received_response(address, *params):
         print("RECEIVED: %s" % str(params))
@@ -39,7 +39,7 @@ def await_reply(server, address, fn):
             nonlocal event
             event.set()
     server.dispatcher.map(address, received_response)
-    event.wait(TICK_DURATION)
+    event.wait(timeout)
     return event.is_set()
 
 def wait_one_tick():

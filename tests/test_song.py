@@ -18,3 +18,11 @@ def test_song_start_playing(client, server):
     wait_one_tick()
     assert query_and_await(client, server, "/live/song/get/is_playing",
                            lambda _, *params: params[0] is False)
+
+def test_song_beat(client, server):
+    client.send_message("/live/song/stop_playing", [])
+    client.send_message("/live/song/start_playing", [])
+    assert await_reply(server, "/live/song/beat", lambda _, *params: params[0] == 0, timeout=1.0)
+    assert await_reply(server, "/live/song/beat", lambda _, *params: params[0] == 1, timeout=1.0)
+    assert await_reply(server, "/live/song/beat", lambda _, *params: params[0] == 2, timeout=1.0)
+    client.send_message("/live/song/stop_playing", [])

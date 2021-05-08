@@ -25,6 +25,7 @@ class AbletonOSCHandler(Component):
         self.logger.info("Calling method: %s (params %s)" % (method, str(params)))
         getattr(target, method)(*params)
 
+
     def _set(self, target, prop, params: Tuple[Any]) -> None:
         self.logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
         setattr(target, prop, params[0])

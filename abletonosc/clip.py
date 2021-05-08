@@ -15,7 +15,8 @@ class ClipHandler(AbletonOSCHandler):
 
         methods = [
             "fire",
-            "stop"
+            "stop",
+            "remove_notes_by_id"
         ]
         properties_r = [
             "file_path",
@@ -46,7 +47,7 @@ class ClipHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/clip/set/%s" % prop,
                                         create_clip_callback(self._set, prop))
 
-        def clip_add_new_note(clip, params: Tuple[Any]):
+        def clip_add_new_note(clip, params: Tuple[Any] = ()):
             start_time, duration, pitch, velocity, mute = params
             note = Live.Clip.MidiNoteSpecification(start_time=start_time,
                                                    duration=duration,
@@ -56,3 +57,8 @@ class ClipHandler(AbletonOSCHandler):
             clip.add_new_notes((note,))
 
         self.osc_server.add_handler("/live/clip/add_new_note", create_clip_callback(clip_add_new_note))
+
+        def clip_get_notes(clip, params: Tuple[Any] = ()):
+            notes = clip.get_notes(0, 0, clip.length, 127)
+            return [item for sublist in notes for item in sublist]
+        self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))

@@ -70,6 +70,7 @@ class Manager(ControlSurface):
             importlib.reload(abletonosc.clip)
             importlib.reload(abletonosc.clip_slot)
             importlib.reload(abletonosc.device)
+            importlib.reload(abletonosc.handler)
             importlib.reload(abletonosc.osc_server)
             importlib.reload(abletonosc.song)
             importlib.reload(abletonosc.track)

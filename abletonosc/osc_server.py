@@ -11,6 +11,8 @@ import traceback
 class OSCServer:
     def __init__(self, local_addr=('127.0.0.1', OSC_LISTEN_PORT), remote_addr=('127.0.0.1', OSC_RESPONSE_PORT)):
         """
+        Class that handles OSC server and client responsibilitiess
+
         Implemented because pythonosc's OSC server causes a beachball when handling
         incoming messages. To investigate, as it would be ultimately better not to have
         to roll our own.
@@ -35,6 +37,8 @@ class OSCServer:
 
     def send(self, address: str, params: Tuple[Any] = ()) -> None:
         """
+        Send an OSC message.
+
         Args:
             address: The OSC address (e.g. /frequency)
             params: A tuple of zero or more OSC params
@@ -48,7 +52,6 @@ class OSCServer:
             self._socket.sendto(msg.dgram, self._remote_addr)
         except BuildError:
             self.logger.info("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
-
 
     def process(self) -> None:
         """

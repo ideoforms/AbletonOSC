@@ -1,6 +1,7 @@
 from ableton.v2.control_surface.component import Component
 from typing import Optional, Tuple, Any
 import logging
+from .osc_server import OSCServer
 
 class AbletonOSCHandler(Component):
     def __init__(self, manager):
@@ -8,7 +9,7 @@ class AbletonOSCHandler(Component):
 
         self.logger = logging.getLogger("abletonosc")
         self.manager = manager
-        self.osc_server = self.manager.osc_server
+        self.osc_server: OSCServer = self.manager.osc_server
         self.init_api()
         self.listener_functions = {}
 
@@ -24,7 +25,6 @@ class AbletonOSCHandler(Component):
     def _call_method(self, target, method, params: Optional[Tuple[Any]] = ()):
         self.logger.info("Calling method: %s (params %s)" % (method, str(params)))
         getattr(target, method)(*params)
-
 
     def _set(self, target, prop, params: Tuple[Any]) -> None:
         self.logger.info("Setting property: %s (new value %s)" % (prop, params[0]))

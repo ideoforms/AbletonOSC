@@ -24,6 +24,8 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 | :------ | :----------- | :-------------- | :---------- |
 | /live/test | | | Display a test message and sends an OSC reply |
 | /live/application/get/version | | major_version, minor_version | Query Live's version |
+| /live/startup | | | This message is sent to the client application when AbletonOSC is started |
+| /live/beat | | beat_number | This message is sent to the client application on each beat when the song is playing |
 
 ### Song API
 

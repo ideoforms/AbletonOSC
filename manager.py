@@ -86,5 +86,6 @@ class Manager(ControlSurface):
 
     def disconnect(self):
         self.show_message("Disconnecting...")
+        logger.info("Disconneting...")
         self.osc_server.shutdown()
         super().disconnect()

@@ -55,5 +55,17 @@ class SongHandler(AbletonOSCHandler):
 
         def song_get_num_tracks(song, params: Tuple[Any] = ()):
             return len(song.tracks),
+
         # TODO num_tracks listener
         self.osc_server.add_handler("/live/song/get/num_tracks", partial(song_get_num_tracks, self.song))
+
+        self.last_song_time = -1.0
+
+        def song_time_changed():
+            # If song has rewound or skipped to next beat, sent a /live/beat message
+            if (self.song.current_song_time < self.last_song_time) or \
+                    (int(self.song.current_song_time) > int(self.last_song_time)):
+                self.osc_server.send("/live/beat", (int(self.song.current_song_time),))
+            self.last_song_time = self.song.current_song_time
+
+        self.song.add_current_song_time_listener(song_time_changed)

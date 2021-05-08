@@ -65,7 +65,6 @@ class SongHandler(AbletonOSCHandler):
             # If song has rewound or skipped to next beat, sent a /live/beat message
             if (self.song.current_song_time < self.last_song_time) or \
                     (int(self.song.current_song_time) > int(self.last_song_time)):
-                self.osc_server.send("/live/beat", (int(self.song.current_song_time),))
+                self.osc_server.send("/live/song/beat", (int(self.song.current_song_time),))
             self.last_song_time = self.song.current_song_time
-
         self.song.add_current_song_time_listener(song_time_changed)

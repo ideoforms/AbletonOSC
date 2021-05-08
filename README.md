@@ -24,8 +24,14 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 | :------ | :----------- | :-------------- | :---------- |
 | /live/test | | | Display a test message and sends an OSC reply |
 | /live/application/get/version | | major_version, minor_version | Query Live's version |
-| /live/startup | | | This message is sent to the client application when AbletonOSC is started |
-| /live/beat | | beat_number | This message is sent to the client application on each beat when the song is playing |
+
+## Application status messages
+
+These messages are sent to the client automatically when the application state changes.
+
+| Address | Response params | Description |
+| :------ | :-------------- | :---------- |
+| /live/startup | | Sent to the client application when AbletonOSC is started |
 
 ### Song API
 
@@ -53,6 +59,14 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
  - `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
+
+## Song status messages
+
+These messages are sent to the client automatically when the song state changes.
+
+| Address | Response params | Description |
+| :------ | :-------------- | :---------- |
+| /live/song/beat | beat_number | Sent to the client application on each beat when the song is playing |
 
 ### Track API
 

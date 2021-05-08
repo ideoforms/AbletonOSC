@@ -25,13 +25,15 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 | /live/test | | | Display a test message and sends an OSC reply |
 | /live/application/get/version | | major_version, minor_version | Query Live's version |
 
-#### Application status messages
+### Application status messages
 
 These messages are sent to the client automatically when the application state changes.
 
 | Address | Response params | Description |
 | :------ | :-------------- | :---------- |
 | /live/startup | | Sent to the client application when AbletonOSC is started |
+
+---
 
 ## Song API
 
@@ -68,6 +70,8 @@ These messages are sent to the client automatically when the song state changes.
 | :------ | :-------------- | :---------- |
 | /live/song/beat | beat_number | Sent to the client application on each beat when the song is playing |
 
+---
+
 ## Track API
 
 | Address | Query params | Response params | Description |
@@ -96,7 +100,9 @@ These messages are sent to the client automatically when the song state changes.
 
 See **Device API** for details on type/class_name.
  
- ### Clip Slot API
+---
+ 
+## Clip Slot API
  
 | Address | Query params | Response params | Description |
 | :------ | :----------- | :-------------- | :---------- |
@@ -105,6 +111,8 @@ See **Device API** for details on type/class_name.
 | /live/clip_slot/get/has_clip | track_id, clip_id | | Query whether the slot has a clip |
 | /live/clip_slot/get/has_stop_button | track_id, clip_id | has_stop_button | Query whether the slot has a stop button |
 | /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button | | Add or remove stop button |
+
+---
 
 ## Clip API
 
@@ -124,6 +132,8 @@ See **Device API** for details on type/class_name.
 | /live/clip/get/is_midi_clip | track_id, clip_id | is_midi_clip | Query whether clip is MIDI |
 | /live/clip/get/is_playing | track_id, clip_id | is_playing | Query whether clip is playing |
 | /live/clip/get/is_recording | track_id, clip_id | is_recording | Query whether clip is recording |
+
+---
 
 ## Device API
 
@@ -145,6 +155,8 @@ For devices:
  - `name` is the human-readable name
  - `type` is 0 = audio_effect, 1 = instrument, 2 = midi_effect
  - `class_name` is the Live instrument/effect name, e.g. Operator, Reverb. For external plugins and racks, can be AuPluginDevice, PluginDevice, InstrumentGroupDevice...
+ 
+ ---
  
 # Acknowledgements
 

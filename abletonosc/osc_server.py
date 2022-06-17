@@ -75,7 +75,7 @@ class OSCServer:
                     self.logger.info("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
 
         except socket.error as e:
-            if e.errno == errno.EAGAIN:
+            if e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
                 return
             else:
                 self.logger.info("AbletonOSC: Socket error: %s" % (traceback.format_exc()))

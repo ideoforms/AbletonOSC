@@ -24,7 +24,6 @@ class ClipHandler(AbletonOSCHandler):
             "is_audio_clip",
             "is_playing",
             "is_recording"
-
         ]
         properties_rw = [
             "color",

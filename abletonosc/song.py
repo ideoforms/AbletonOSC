@@ -55,9 +55,12 @@ class SongHandler(AbletonOSCHandler):
 
         def song_get_num_tracks(song, params: Tuple[Any] = ()):
             return len(song.tracks),
+        def song_get_num_scenes(song, params: Tuple[Any] = ()):
+            return len(song.scenes),
 
         # TODO num_tracks listener
         self.osc_server.add_handler("/live/song/get/num_tracks", partial(song_get_num_tracks, self.song))
+        self.osc_server.add_handler("/live/song/get/num_scenes", partial(song_get_num_scenes, self.song))
 
         self.last_song_time = -1.0
 

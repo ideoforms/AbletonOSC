@@ -39,13 +39,15 @@ class TrackHandler(AbletonOSCHandler):
                                         create_track_callback(self._set, prop))
 
         def track_get_volume(track, params: Tuple[Any] = ()):
-            return track.mixer_device.volume.value
+            params = (track.mixer_device.volume.value,)
+            return params
 
         def track_set_volume(track, params: Tuple[Any] = ()):
             track.mixer_device.volume.value = params[0]
 
         def track_get_panning(track, params: Tuple[Any] = ()):
-            return track.mixer_device.panning.value
+            params = (track.mixer_device.panning.value,)
+            return params
 
         def track_set_panning(track, params: Tuple[Any] = ()):
             track.mixer_device.panning.value = params[0]

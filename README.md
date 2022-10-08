@@ -128,7 +128,7 @@ See **Device API** for details on type/class_name.
 | /live/clip/get/gain | track_id, clip_id | gain | Get clip gain |
 | /live/clip/set/gain | track_id, clip_id, gain | | Set clip gain |
 | /live/clip/get/pitch_coarse | track_id, clip_id | semitones | Get clip coarse re-pitch |
-| /live/clip/set/itch_coarse | track_id, clip_id, semitones | | Set clip coarse re-pitch |
+| /live/clip/set/pitch_coarse | track_id, clip_id, semitones | | Set clip coarse re-pitch |
 | /live/clip/get/pitch_fine | track_id, clip_id | cents | Get clip fine re-pitch |
 | /live/clip/set/pitch_fine | track_id, clip_id, cents| | Set clip fine re-pitch |
 | /live/clip/get/file_path | track_id, clip_id | file_path | Get clip file path |

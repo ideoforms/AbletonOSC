@@ -62,6 +62,8 @@ These messages are sent to the client automatically when the application state c
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
  - `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`, `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`, `record_mode`
 
+For further information on these properties and their parameters, see documentation for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_object_model#Song). 
+
 ### Song status messages
 
 These messages are sent to the client automatically when the song state changes.

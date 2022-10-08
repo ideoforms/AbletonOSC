@@ -35,5 +35,5 @@ def describe_module(module):
 
     for name in dir(module):
         obj = getattr(module, name)
-        if (inspect.ismethod(obj) or inspect.isfunction(obj)):
+        if inspect.ismethod(obj) or inspect.isfunction(obj):
             logger.info("Method", obj)

@@ -5,11 +5,18 @@ from . import abletonosc
 import importlib
 import traceback
 import logging
+import sys
 import os
 
-# TODO: This might need fixing to work on Windows
 logger = logging.getLogger("abletonosc")
-tmp_dir = "/tmp"
+
+if sys.platform == "darwin":
+    # On macOS, put logs in /tmp
+    tmp_dir = "/tmp"
+else:
+    # On Windows, put logs in c:\temp
+    tmp_dir = "c:\\temp"
+
 log_path = os.path.join(tmp_dir, "abletonosc.log")
 file_handler = logging.FileHandler(log_path)
 file_handler.setLevel(logging.INFO)

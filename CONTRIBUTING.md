@@ -14,6 +14,10 @@ AbletonOSC supports dynamic reloading of the handler code modules so that it's n
 
 To reload the codebase, send an OSC message to `/live/reload`. 
 
+## Viewing logs
+
+AbletonOSC logs events to `/tmp/abletonosc.log` on macOS, or `c:\temp\abletonosc.log` on Windows.
+
 ## Debugging compile-time issues
 
 To view the Live boot log:

@@ -16,7 +16,9 @@ class SongHandler(AbletonOSCHandler):
             "create_midi_track",
             "create_return_track",
             "create_scene",
-            "jump_by"
+            "jump_by",
+            "jump_to_prev_cue",
+            "jump_to_next_cue",
         ]:
             callback = partial(self._call_method, self.song, method)
             self.osc_server.add_handler("/live/song/%s" % method, callback)

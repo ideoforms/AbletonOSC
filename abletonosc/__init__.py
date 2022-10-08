@@ -1,7 +1,7 @@
 import logging
 logger = logging.getLogger("abletonosc")
 
-logger.info("reloaded abletonosc")
+logger.info("Reloading abletonosc...")
 
 from .osc_server import OSCServer
 

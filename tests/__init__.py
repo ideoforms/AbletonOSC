@@ -31,8 +31,9 @@ def client() -> SimpleUDPClient:
 def query_and_await(client: SimpleUDPClient,
                     server: ThreadingOSCUDPServer,
                     address: str,
+                    params: tuple = (),
                     fn: Callable = None):
-    client.send_message(address, [])
+    client.send_message(address, params)
     return await_reply(server, address, fn)
 
 def await_reply(server: ThreadingOSCUDPServer, address: str, fn: Callable = None, timeout: float = TICK_DURATION):
@@ -42,7 +43,7 @@ def await_reply(server: ThreadingOSCUDPServer, address: str, fn: Callable = None
 
     Args:
         server: OSC server
-        address: OSC reply address
+        address: OSC query (and reply) address
         fn: Optional assertion function
         timeout: Maximum number of seconds to wait for a successful reply
 
@@ -54,7 +55,8 @@ def await_reply(server: ThreadingOSCUDPServer, address: str, fn: Callable = None
     event = threading.Event()
 
     def received_response(address: str, *params):
-        if fn is None or fn(address, *params):
+        print("Received reply: %s (%s)" % (address, params))
+        if fn is None or fn(*params):
             nonlocal event
             event.set()
         nonlocal handler

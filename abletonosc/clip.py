@@ -28,7 +28,9 @@ class ClipHandler(AbletonOSCHandler):
         properties_rw = [
             "color",
             "gain",
-            "name"
+            "name",
+            "pitch_coarse",
+            "pitch_fine"
         ]
 
         for method in methods:

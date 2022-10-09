@@ -106,3 +106,34 @@ def test_song_property_record_mode(client, server):
 def test_song_property_tempo(client, server):
     _test_song_property(client, server, "tempo", [125.5, 120])
 
+#--------------------------------------------------------------------------------
+# Test song properties - tracks
+#--------------------------------------------------------------------------------
+
+def test_song_tracks(client, server):
+    assert query_and_await(client, server, "/live/song/get/num_tracks",
+                           fn=lambda *params: params[0] == 4)
+    client.send_message("/live/song/create_midi_track", [-1])
+    wait_one_tick()
+    wait_one_tick()
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_tracks",
+                           fn=lambda *params: params[0] == 5)
+    client.send_message("/live/song/delete_track", [4])
+    wait_one_tick()
+    wait_one_tick()
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_tracks",
+                           fn=lambda *params: params[0] == 4)
+
+def test_song_scenes(client, server):
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 8)
+    client.send_message("/live/song/create_scene", [-1])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 9)
+    client.send_message("/live/song/delete_scene", [8])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 8)

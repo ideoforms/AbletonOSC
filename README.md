@@ -6,7 +6,7 @@ older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to e
 entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API, providing comprehensive
 control over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
-It is currently (2021-05-07) a work-in-progress, exposing a few initial APIs.
+It is currently (2022-10-09) a work-in-progress, exposing a few initial APIs.
 
 # Installation
 

@@ -12,12 +12,27 @@ class TrackHandler(AbletonOSCHandler):
             return track_callback
 
         methods = [
+            "delete_device",
             "stop_all_clips"
         ]
         properties_r = [
+            "can_be_armed",
+            "fired_slot_index",
+            "has_audio_input",
+            "has_audio_output",
+            "has_midi_input",
+            "has_midi_output",
+            "is_foldable",
+            "is_grouped",
+            "is_visible",
+            "playing_slot_index",
         ]
         properties_rw = [
+            "arm",
             "color",
+            "color_index",
+            "current_monitoring_state",
+            "fold_state",
             "mute",
             "solo",
             "name"
@@ -29,14 +44,14 @@ class TrackHandler(AbletonOSCHandler):
 
         for prop in properties_r + properties_rw:
             self.osc_server.add_handler("/live/track/get/%s" % prop,
-                                        create_track_callback(self._get, prop))
+                                        create_track_callback(self._get_property, prop))
             self.osc_server.add_handler("/live/track/start_listen/%s" % prop,
                                         create_track_callback(self._start_listen, prop))
             self.osc_server.add_handler("/live/track/stop_listen/%s" % prop,
                                         create_track_callback(self._stop_listen, prop))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/track/set/%s" % prop,
-                                        create_track_callback(self._set, prop))
+                                        create_track_callback(self._set_property, prop))
 
         #--------------------------------------------------------------------------------
         # Volume, panning and send are properties of the track's mixer_device so
@@ -69,6 +84,12 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/set/panning", create_track_callback(track_set_panning))
         self.osc_server.add_handler("/live/track/get/send", create_track_callback(track_get_send))
         self.osc_server.add_handler("/live/track/set/send", create_track_callback(track_set_send))
+
+        def track_delete_clip(track, params: Tuple[Any]):
+            clip_index, = params
+            track.clip_slots[clip_index].delete_clip()
+
+        self.osc_server.add_handler("/live/track/delete_clip", create_track_callback(track_delete_clip))
 
         def track_get_clip_names(track, params: Tuple[Any]):
             return tuple(clip_slot.clip.name if clip_slot.clip else None for clip_slot in track.clip_slots)

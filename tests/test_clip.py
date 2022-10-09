@@ -1,4 +1,28 @@
 from . import client, server, query_and_await, await_reply, wait_one_tick
+import pytest
+
+#--------------------------------------------------------------------------------
+# To test clips, initialise by creating an empty MIDI clip and recording
+# a short segment of audio.
+#
+# Note that for these tests to succeed, a default audio input device must be set.
+#--------------------------------------------------------------------------------
+@pytest.fixture(scope="module", autouse=True)
+def _create_test_clips(client, server):
+    track_id = 0
+    clip_id = 0
+    client.send_message("/live/clip_slot/create_clip", [track_id, clip_id, 4.0])
+
+    track_id = 2
+    clip_id = 0
+    client.send_message("/live/track/set/arm", [track_id, True])
+    client.send_message("/live/clip_slot/fire", [track_id, clip_id])
+    wait_one_tick()
+    client.send_message("/live/song/stop_playing", [])
+    client.send_message("/live/song/stop_all_clips", [])
+    client.send_message("/live/track/set/arm", [track_id, False])
+    yield
+    client.send_message("/live/track/delete_clip", [track_id, clip_id])
 
 #--------------------------------------------------------------------------------
 # Test clip properties
@@ -13,14 +37,19 @@ def _test_clip_property(client, server, track_id, clip_id, property, values):
                                fn=lambda *params: params[0] == value)
 
 def test_clip_property_name(client, server):
-    client.send_message("/live/clip_slot/create_clip", [0, 0, 4.0])
     _test_clip_property(client, server, 0, 0, "name", ["Alpha", "Beta"])
-    client.send_message("/live/clip_slot/delete_clip", [0, 0])
 
 def test_clip_property_color(client, server):
-    client.send_message("/live/clip_slot/create_clip", [0, 0, 4.0])
     _test_clip_property(client, server, 0, 0, "color", [0x001AFF2F, 0x001A2F96])
-    client.send_message("/live/clip_slot/delete_clip", [0, 0])
+
+def test_clip_property_gain(client, server):
+    _test_clip_property(client, server, 2, 0, "gain", [0.5, 1.0])
+
+def test_clip_property_pitch_coarse(client, server):
+    _test_clip_property(client, server, 2, 0, "pitch_coarse", [4, 0])
+
+def test_clip_property_pitch_fine(client, server):
+    _test_clip_property(client, server, 2, 0, "pitch_fine", [0.5, 0.0])
 
 def test_clip_add_notes(client, server):
     client.send_message("/live/clip_slot/create_clip", [0, 0, 4.0])

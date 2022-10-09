@@ -27,14 +27,14 @@ class DeviceHandler(AbletonOSCHandler):
 
         for prop in properties_r + properties_rw:
             self.osc_server.add_handler("/live/device/get/%s" % prop,
-                                        create_device_callback(self._get, prop))
+                                        create_device_callback(self._get_property, prop))
             self.osc_server.add_handler("/live/device/start_listen/%s" % prop,
                                         create_device_callback(self._start_listen, prop))
             self.osc_server.add_handler("/live/device/stop_listen/%s" % prop,
                                         create_device_callback(self._stop_listen, prop))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/device/set/%s" % prop,
-                                        create_device_callback(self._set, prop))
+                                        create_device_callback(self._set_property, prop))
 
         #--------------------------------------------------------------------------------
         # Device: Get/set parameter lists

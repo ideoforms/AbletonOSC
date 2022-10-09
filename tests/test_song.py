@@ -1,5 +1,9 @@
 from . import client, server, query_and_await, await_reply, wait_one_tick
 
+#--------------------------------------------------------------------------------
+# Test song start/stop
+#--------------------------------------------------------------------------------
+
 def test_song_play(client, server):
     client.send_message("/live/song/start_playing", [])
     wait_one_tick()
@@ -126,6 +130,11 @@ def test_song_tracks(client, server):
     assert query_and_await(client, server, "/live/song/get/num_tracks",
                            fn=lambda *params: params[0] == 4)
 
+
+#--------------------------------------------------------------------------------
+# Test song properties - scenes
+#--------------------------------------------------------------------------------
+
 def test_song_scenes(client, server):
     assert query_and_await(client, server, "/live/song/get/num_scenes",
                            fn=lambda *params: params[0] == 8)
@@ -137,3 +146,41 @@ def test_song_scenes(client, server):
     wait_one_tick()
     assert query_and_await(client, server, "/live/song/get/num_scenes",
                            fn=lambda *params: params[0] == 8)
+
+def test_song_duplicate_scene(client, server):
+    track_id = 0
+    scene_id = 7
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 8)
+
+    client.send_message("/live/clip_slot/create_clip", [track_id, scene_id, 4])
+    client.send_message("/live/song/duplicate_scene", [scene_id])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/clip/get/is_midi_clip", (track_id, scene_id + 1),
+                           fn=lambda *params: params[0] is True)
+    client.send_message("/live/song/delete_scene", [scene_id + 1])
+    client.send_message("/live/clip_slot/delete_clip", [0, scene_id])
+
+#--------------------------------------------------------------------------------
+# Test song - undo/redo
+#--------------------------------------------------------------------------------
+
+def test_song_undo_redo(client, server):
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 8)
+    client.send_message("/live/song/create_scene", [-1])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 9)
+
+    wait_one_tick()
+    client.send_message("/live/song/undo", [])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 8)
+
+    client.send_message("/live/song/redo", [])
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/song/get/num_scenes",
+                           fn=lambda *params: params[0] == 9)
+    client.send_message("/live/song/delete_scene", [8])

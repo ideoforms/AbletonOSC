@@ -7,6 +7,7 @@ def test_track_get_send(client, server):
 
     for value in [0.5, 0.0]:
         client.send_message("/live/track/set/send", [track_id, send_id, value])
+        wait_one_tick()
         assert query_and_await(client, server, "/live/track/get/send", (track_id, send_id),
                                lambda *params: params[0] == value)
 

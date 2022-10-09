@@ -2,7 +2,9 @@
 
 ## Tests
 
-To run unit tests, `pip3 install pytest`, start Live, and run:
+For unit tests to pass, Live must be configured with default audio input and output devices.
+
+To run unit tests, `pip3 install pytest`, start Live, change to the `AbletonOSC` directory, and run:
 
 ```
 pytest

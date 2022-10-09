@@ -8,10 +8,7 @@ class SongHandler(AbletonOSCHandler):
         # Init callbacks for Set: methods
         #--------------------------------------------------------------------------------
         for method in [
-            "start_playing",
-            "stop_playing",
             "continue_playing",
-            "stop_all_clips",
             "create_audio_track",
             "create_midi_track",
             "create_return_track",
@@ -19,9 +16,18 @@ class SongHandler(AbletonOSCHandler):
             "delete_return_track",
             "delete_scene",
             "delete_track",
+            "duplicate_scene",
+            "duplicate_track",
             "jump_by",
             "jump_to_prev_cue",
             "jump_to_next_cue",
+            "redo",
+            "start_playing",
+            "stop_all_clips",
+            "stop_playing",
+            "tap_tempo",
+            "trigger_session_record",
+            "undo"
         ]:
             callback = partial(self._call_method, self.song, method)
             self.osc_server.add_handler("/live/song/%s" % method, callback)
@@ -45,18 +51,21 @@ class SongHandler(AbletonOSCHandler):
             "punch_in",
             "punch_out",
             "record_mode",
+            "start_time",
             "tempo"
         ]
         properties_r = [
+            "can_redo",
+            "can_undo",
             "is_playing"
         ]
 
         for prop in properties_r + properties_rw:
-            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get, self.song, prop))
+            self.osc_server.add_handler("/live/song/get/%s" % prop, partial(self._get_property, self.song, prop))
             self.osc_server.add_handler("/live/song/start_listen/%s" % prop, partial(self._start_listen, self.song, prop))
             self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_listen, self.song, prop))
         for prop in properties_rw:
-            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set, self.song, prop))
+            self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
 
         def song_get_num_tracks(song, params: Tuple[Any] = ()):
             return len(song.tracks),

@@ -10,7 +10,7 @@ CLIENT_PORT = 11000
 SERVER_PORT = 11001
 
 # Live tick is 100ms. Wait for this long plus a short additional buffer.
-TICK_DURATION = 0.11
+TICK_DURATION = 0.125
 
 @pytest.fixture(scope="module")
 def server() -> ThreadingOSCUDPServer:

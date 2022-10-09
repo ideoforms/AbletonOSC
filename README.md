@@ -93,8 +93,8 @@ These messages are sent to the client automatically when the song state changes.
 | /live/track/set/panning | track_id, panning | | Set track panning |
 | /live/track/get/send | track_id, send_id | value | Query track send |
 | /live/track/set/send | track_id, send_id, value | | Set track send |
-| /live/track/get/clips_name | track_id | [name, ....] | Query all clip names on track  |
-| /live/track/get/clips_length | track_id | [length, ...] | Query all clip lengths on track |
+| /live/track/get/clips/name | track_id | [name, ....] | Query all clip names on track  |
+| /live/track/get/clips/length | track_id | [length, ...] | Query all clip lengths on track |
 | /live/track/get/num_devices | track_id | num_devices | Query the number of devices on the track  |
 | /live/track/get/devices/name | track_id | [name, ...] | Query all device names on track |
 | /live/track/get/devices/type | track_id | [type, ...] | Query all devices types on track |
@@ -129,6 +129,10 @@ See **Device API** for details on type/class_name.
 | /live/clip/set/name | track_id, clip_id, name | | Set clip name |
 | /live/clip/get/gain | track_id, clip_id | gain | Get clip gain |
 | /live/clip/set/gain | track_id, clip_id, gain | | Set clip gain |
+| /live/clip/get/pitch_coarse | track_id, clip_id | semitones | Get clip coarse re-pitch |
+| /live/clip/set/pitch_coarse | track_id, clip_id, semitones | | Set clip coarse re-pitch |
+| /live/clip/get/pitch_fine | track_id, clip_id | cents | Get clip fine re-pitch |
+| /live/clip/set/pitch_fine | track_id, clip_id, cents| | Set clip fine re-pitch |
 | /live/clip/get/file_path | track_id, clip_id | file_path | Get clip file path |
 | /live/clip/get/is_audio_clip | track_id, clip_id | is_audio_clip | Query whether clip is audio |
 | /live/clip/get/is_midi_clip | track_id, clip_id | is_midi_clip | Query whether clip is MIDI |

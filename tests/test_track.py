@@ -40,3 +40,32 @@ def test_track_property_solo(client, server):
 
 def test_track_property_name(client, server):
     _test_track_property(client, server, 2, "name", ["Test", "Track"])
+
+#--------------------------------------------------------------------------------
+# Test track properties - clips
+#--------------------------------------------------------------------------------
+
+def test_track_clips(client, server):
+    track_id = 0
+    client.send_message("/live/clip_slot/create_clip", (track_id, 0, 4))
+    client.send_message("/live/clip_slot/create_clip", (track_id, 1, 2))
+    client.send_message("/live/clip/set/name", (track_id, 0, "Alpha"))
+    client.send_message("/live/clip/set/name", (track_id, 1, "Beta"))
+
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/track/get/clips/name", (track_id,),
+                           fn=lambda *params: params == ("Alpha", "Beta"))
+    assert query_and_await(client, server, "/live/track/get/clips/length", (track_id,),
+                           fn=lambda *params: params == (4, 2))
+
+    client.send_message("/live/clip_slot/delete_clip", (track_id, 0))
+    client.send_message("/live/clip_slot/delete_clip", (track_id, 1))
+
+#--------------------------------------------------------------------------------
+# Test track properties - devices
+#--------------------------------------------------------------------------------
+
+def test_track_devices(client, server):
+    track_id = 0
+    assert query_and_await(client, server, "/live/track/get/num_devices", (track_id,),
+                           fn=lambda *params: params[0] == 0)

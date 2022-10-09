@@ -38,20 +38,25 @@ class TrackHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/track/set/%s" % prop,
                                         create_track_callback(self._set, prop))
 
+        #--------------------------------------------------------------------------------
+        # Volume, panning and send are properties of the track's mixer_device so
+        # can't be formulated as normal callbacks that reference properties of track
+        #--------------------------------------------------------------------------------
         def track_get_volume(track, params: Tuple[Any] = ()):
-            return (track.mixer_device.volume.value,)
+            return track.mixer_device.volume.value,
 
         def track_set_volume(track, params: Tuple[Any] = ()):
             track.mixer_device.volume.value = params[0]
 
         def track_get_panning(track, params: Tuple[Any] = ()):
-            return (track.mixer_device.panning.value,)
+            return track.mixer_device.panning.value,
 
         def track_set_panning(track, params: Tuple[Any] = ()):
             track.mixer_device.panning.value = params[0]
 
         def track_get_send(track, params: Tuple[Any] = ()):
-            return track.mixer_device.sends[params[0]]
+            send_id, = params
+            return track.mixer_device.sends[send_id].value,
 
         def track_set_send(track, params: Tuple[Any] = ()):
             send_id, value = params
@@ -67,6 +72,7 @@ class TrackHandler(AbletonOSCHandler):
 
         def track_get_clip_names(track, params: Tuple[Any]):
             return tuple(clip_slot.clip.name if clip_slot.clip else None for clip_slot in track.clip_slots)
+
         def track_get_clip_lengths(track, params: Tuple[Any]):
             return tuple(clip_slot.clip.length if clip_slot.clip else None for clip_slot in track.clip_slots)
 
@@ -78,12 +84,16 @@ class TrackHandler(AbletonOSCHandler):
 
         def track_get_num_devices(track, params: Tuple[Any]):
             return len(track.devices),
+
         def track_get_device_names(track, params: Tuple[Any]):
             return tuple(device.name for device in track.devices)
+
         def track_get_device_types(track, params: Tuple[Any]):
             return tuple(device.type for device in track.devices)
+
         def track_get_device_class_names(track, params: Tuple[Any]):
             return tuple(device.class_name for device in track.devices)
+
         def track_get_device_can_have_chains(track, params: Tuple[Any]):
             return tuple(device.can_have_chains for device in track.devices)
 

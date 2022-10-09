@@ -28,6 +28,7 @@ def test_song_stop_all_clips(client, server):
     client.send_message("/live/clip_slot/create_clip", (1, 0, 4))
     client.send_message("/live/clip/fire", (0, 0))
     client.send_message("/live/clip/fire", (1, 0))
+    # Sometimes a wait >one tick is required here. Not sure why.
     wait_one_tick()
     wait_one_tick()
     assert query_and_await(client, server, "/live/clip/get/is_playing", (0, 0), lambda *params: params[0] is True)

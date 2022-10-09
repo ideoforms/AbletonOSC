@@ -11,6 +11,42 @@ def test_song_play(client, server):
     assert query_and_await(client, server, "/live/song/get/is_playing", (),
                            lambda *params: params[0] is False)
 
+def test_song_beat(client, server):
+    client.send_message("/live/song/stop_playing", [])
+    client.send_message("/live/song/start_playing", [])
+    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 0, timeout=1.0)
+    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 1, timeout=1.0)
+    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 2, timeout=1.0)
+    client.send_message("/live/song/stop_playing", [])
+    wait_one_tick()
+    client.send_message("/live/song/continue_playing", [])
+    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 3, timeout=1.0)
+    client.send_message("/live/song/stop_playing", [])
+
+def test_song_stop_all_clips(client, server):
+    client.send_message("/live/clip_slot/create_clip", (0, 0, 4))
+    client.send_message("/live/clip_slot/create_clip", (1, 0, 4))
+    client.send_message("/live/clip/fire", (0, 0))
+    client.send_message("/live/clip/fire", (1, 0))
+    wait_one_tick()
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/clip/get/is_playing", (0, 0), lambda *params: params[0] is True)
+    assert query_and_await(client, server, "/live/clip/get/is_playing", (1, 0), lambda *params: params[0] is True)
+
+    client.send_message("/live/song/stop_playing", [])
+    client.send_message("/live/song/stop_all_clips", [])
+    wait_one_tick()
+    wait_one_tick()
+    assert query_and_await(client, server, "/live/clip/get/is_playing", (0, 0), lambda *params: params[0] is False)
+    assert query_and_await(client, server, "/live/clip/get/is_playing", (1, 0), lambda *params: params[0] is False)
+
+    client.send_message("/live/clip_slot/delete_clip", (0, 0))
+    client.send_message("/live/clip_slot/delete_clip", (1, 0))
+
+#--------------------------------------------------------------------------------
+# Test song properties
+#--------------------------------------------------------------------------------
+
 def _test_song_property(client, server, property, values):
     for value in values:
         print("Testing property %s, value: %s" % (property, value))
@@ -18,12 +54,6 @@ def _test_song_property(client, server, property, values):
         wait_one_tick()
         assert query_and_await(client, server, "/live/song/get/%s" % property,
                                fn=lambda *params: params[0] == value)
-
-def test_song_property_tempo(client, server):
-    _test_song_property(client, server, "tempo", [125.5, 120])
-
-def test_song_property_metronome(client, server):
-    _test_song_property(client, server, "metronome", [1, 0])
 
 def test_song_property_arrangement_overdub(client, server):
     _test_song_property(client, server, "arrangement_overdub", [1, 0])
@@ -51,6 +81,9 @@ def test_song_property_loop_length(client, server):
 def test_song_property_loop_start(client, server):
     _test_song_property(client, server, "loop_start", [2, 1])
 
+def test_song_property_metronome(client, server):
+    _test_song_property(client, server, "metronome", [1, 0])
+
 def test_song_property_midi_recording_quantization(client, server):
     _test_song_property(client, server, "midi_recording_quantization", [1, 0])
 
@@ -69,14 +102,6 @@ def test_song_property_punch_out(client, server):
 def test_song_property_record_mode(client, server):
     _test_song_property(client, server, "record_mode", [1, 0])
 
-def test_song_beat(client, server):
-    client.send_message("/live/song/stop_playing", [])
-    client.send_message("/live/song/start_playing", [])
-    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 0, timeout=1.0)
-    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 1, timeout=1.0)
-    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 2, timeout=1.0)
-    client.send_message("/live/song/stop_playing", [])
-    wait_one_tick()
-    client.send_message("/live/song/continue_playing", [])
-    assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 3, timeout=1.0)
-    client.send_message("/live/song/stop_playing", [])
+def test_song_property_tempo(client, server):
+    _test_song_property(client, server, "tempo", [125.5, 120])
+

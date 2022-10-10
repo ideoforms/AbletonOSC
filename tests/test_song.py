@@ -1,4 +1,5 @@
 from . import client, server, query_and_await, await_reply, wait_one_tick
+import threading
 
 #--------------------------------------------------------------------------------
 # Test song start/stop
@@ -26,6 +27,7 @@ def test_song_beat(client, server):
     client.send_message("/live/song/continue_playing", [])
     assert await_reply(server, "/live/song/beat", lambda *params: params[0] == 3, timeout=1.0)
     client.send_message("/live/song/stop_playing", [])
+    wait_one_tick()
 
 def test_song_stop_all_clips(client, server):
     client.send_message("/live/clip_slot/create_clip", (0, 0, 4))
@@ -47,6 +49,33 @@ def test_song_stop_all_clips(client, server):
 
     client.send_message("/live/clip_slot/delete_clip", (0, 0))
     client.send_message("/live/clip_slot/delete_clip", (1, 0))
+
+#--------------------------------------------------------------------------------
+# Test song listeners
+#--------------------------------------------------------------------------------
+
+def test_song_listen_is_playing(client, server):
+    client.send_message("/live/song/start_listen/is_playing", [])
+
+    event = threading.Event()
+    def cb(address: str, *params) -> None:
+        if params[0] is True:
+            event.set()
+    handler = server.dispatcher.map("/live/song/get/is_playing", cb)
+    client.send_message("/live/song/start_playing", [])
+    assert event.wait(0.25)
+    server.dispatcher.unmap("/live/song/get/is_playing", handler)
+
+    event = threading.Event()
+    def cb(address: str, *params) -> None:
+        if params[0] is False:
+            event.set()
+    handler = server.dispatcher.map("/live/song/get/is_playing", cb)
+    client.send_message("/live/song/stop_playing", [])
+    assert event.wait(0.25)
+    server.dispatcher.unmap("/live/song/get/is_playing", handler)
+
+    client.send_message("/live/song/stop_listen/is_playing", [])
 
 #--------------------------------------------------------------------------------
 # Test song properties

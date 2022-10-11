@@ -55,6 +55,7 @@ def test_song_stop_all_clips(client, server):
 #--------------------------------------------------------------------------------
 
 def test_song_listen_is_playing(client, server):
+    client.send_message("/live/song/stop_playing", [])
     client.send_message("/live/song/start_listen/is_playing", [])
 
     event = threading.Event()
@@ -76,6 +77,22 @@ def test_song_listen_is_playing(client, server):
     server.dispatcher.unmap("/live/song/get/is_playing", handler)
 
     client.send_message("/live/song/stop_listen/is_playing", [])
+
+def test_song_listen_tempo(client, server):
+    client.send_message("/live/song/set/tempo", [120])
+    client.send_message("/live/song/start_listen/tempo", [])
+
+    for value in [81, 120]:
+        event = threading.Event()
+        def cb(address: str, *params) -> None:
+            if params[0] == value:
+                event.set()
+        handler = server.dispatcher.map("/live/song/get/tempo", cb)
+        client.send_message("/live/song/set/tempo", [value])
+        assert event.wait(0.25)
+        server.dispatcher.unmap("/live/song/get/tempo", handler)
+
+    client.send_message("/live/song/stop_listen/tempo", [])
 
 #--------------------------------------------------------------------------------
 # Test song properties

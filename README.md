@@ -43,32 +43,32 @@ These messages are sent to the client automatically when the application state c
 
 ## Song API
 
-| Address                            | Query params | Response params | Description                                                         |
-|:-----------------------------------|:-------------|:----------------|:--------------------------------------------------------------------|
-| /live/song/start_playing           |              |                 | Start session playback                                              |
-| /live/song/stop_playing            |              |                 | Stop session playback                                               |
-| /live/song/continue_playing        |              |                 | Resume session playback                                             |
-| /live/song/stop_all_clips          |              |                 | Stop all clips from playing                                         |
-| /live/song/create_audio_track      | index        |                 | Create a new audio track at the specified index (-1 = end of list)  |
-| /live/song/create_midi_track       | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)   |
-| /live/song/create_return_track     | index        |                 | Create a new return track at the specified index (-1 = end of list) |
-| /live/song/get/num_scenes          |              | num_scenes      | Query the number of scenes                                          | 
-| /live/song/get/num_tracks          |              | num_tracks      | Query the number of tracks                                          | 
-| /live/song/create_scene            | index        |                 | Create a new scene at the specified index (-1 = end of list)        |
-| /live/song/delete_scene            | scene_index  |                 | Delete a scene                                                      |
-| /live/song/delete_return_track     | track_index  |                 | Delete a return track                                               |
-| /live/song/delete_track            | track_index  |                 | Delete a track                                                      |
-| /live/song/get/is_playing          |              | is_playing      | Query whether the song is currently playing                         |
-| /live/song/start_listen/is_playing |              |                 | Start a listener that sends a notification when is_playing changes  |
-| /live/song/stop_listen/is_playing  |              |                 | Stop the above listener                                             |
-| /live/song/get/tempo               |              | tempo_bpm       | Query song tempo                                                    |
-| /live/song/set/tempo               | tempo_bpm    |                 | Set song tempo                                                      |
-| /live/song/start_listen/tempo      |              |                 | Start a listener that sends a notification when tempo changes       |
-| /live/song/stop_listen/tempo       |              |                 | Stop the above listener                                             |
-| /live/song/get/metronome           |              | metronome_on    | Query metronome on/off                                              |
-| /live/song/set/metronome           | metronome_on |                 | Set metronome on/off                                                |
-| /live/song/start_listen/metronome  |              |                 | Start a listener that sends a notification when metronome changes   |
-| /live/song/stop_listen/metronome   |              |                 | Stop the above listener                                             |
+| Address                            | Query params | Response params | Description                                                                                  |
+|:-----------------------------------|:-------------|:----------------|:---------------------------------------------------------------------------------------------|
+| /live/song/start_playing           |              |                 | Start session playback                                                                       |
+| /live/song/stop_playing            |              |                 | Stop session playback                                                                        |
+| /live/song/continue_playing        |              |                 | Resume session playback                                                                      |
+| /live/song/stop_all_clips          |              |                 | Stop all clips from playing                                                                  |
+| /live/song/create_audio_track      | index        |                 | Create a new audio track at the specified index (-1 = end of list)                           |
+| /live/song/create_midi_track       | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                            |
+| /live/song/create_return_track     | index        |                 | Create a new return track at the specified index (-1 = end of list)                          |
+| /live/song/get/num_scenes          |              | num_scenes      | Query the number of scenes                                                                   | 
+| /live/song/get/num_tracks          |              | num_tracks      | Query the number of tracks                                                                   | 
+| /live/song/create_scene            | index        |                 | Create a new scene at the specified index (-1 = end of list)                                 |
+| /live/song/delete_scene            | scene_index  |                 | Delete a scene                                                                               |
+| /live/song/delete_return_track     | track_index  |                 | Delete a return track                                                                        |
+| /live/song/delete_track            | track_index  |                 | Delete a track                                                                               |
+| /live/song/get/is_playing          |              | is_playing      | Query whether the song is currently playing                                                  |
+| /live/song/start_listen/is_playing |              |                 | Start a listener that sends a message to `/live/song/get/is_playing` when is_playing changes |
+| /live/song/stop_listen/is_playing  |              |                 | Stop the above listener                                                                      |
+| /live/song/get/tempo               |              | tempo_bpm       | Query song tempo                                                                             |
+| /live/song/set/tempo               | tempo_bpm    |                 | Set song tempo                                                                               |
+| /live/song/start_listen/tempo      |              |                 | Start a listener that sends a to `/live/song/get/tempo` tempo changes                        |
+| /live/song/stop_listen/tempo       |              |                 | Stop the above listener                                                                      |
+| /live/song/get/metronome           |              | metronome_on    | Query metronome on/off                                                                       |
+| /live/song/set/metronome           | metronome_on |                 | Set metronome on/off                                                                         |
+| /live/song/start_listen/metronome  |              |                 | Start a listener that sends a message to `/live/song/get/metronome` when metronome changes   |
+| /live/song/stop_listen/metronome   |              |                 | Stop the above listener                                                                      |
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
 

@@ -4,7 +4,7 @@ import threading
 from pythonosc.udp_client import SimpleUDPClient
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
-from typing import Callable
+from typing import Callable, Iterable
 
 CLIENT_PORT = 11000
 SERVER_PORT = 11001
@@ -12,64 +12,94 @@ SERVER_PORT = 11001
 # Live tick is 100ms. Wait for this long plus a short additional buffer.
 TICK_DURATION = 0.125
 
-@pytest.fixture(scope="module")
-def server() -> ThreadingOSCUDPServer:
-    dispatcher = Dispatcher()
-    server = ThreadingOSCUDPServer(("127.0.0.1", SERVER_PORT), dispatcher)
-    server_thread = threading.Thread(target=server.serve_forever)
-    server_thread.daemon = True
-    server_thread.start()
-    yield server
+class AbletonOSCClient:
+    def __init__(self):
+        dispatcher = Dispatcher()
+        dispatcher.set_default_handler(self.handle_osc)
+        self.server = ThreadingOSCUDPServer(("127.0.0.1", SERVER_PORT), dispatcher)
+        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread.daemon = True
+        self.server_thread.start()
+        self.client = SimpleUDPClient("127.0.0.1", CLIENT_PORT)
+        self.address_handlers = {}
 
-    server.shutdown()
-    server_thread.join()
+    def handle_osc(self, address, *params):
+        if address in self.address_handlers:
+            self.address_handlers[address](params)
 
-@pytest.fixture(scope="module")
-def client() -> SimpleUDPClient:
-    return SimpleUDPClient("127.0.0.1", CLIENT_PORT)
+    def stop(self):
+        self.server.shutdown()
+        self.server_thread.join()
+        self.server = None
 
-def query_and_await(client: SimpleUDPClient,
-                    server: ThreadingOSCUDPServer,
+    def send_message(self,
+                     address: str,
+                     params: Iterable = ()):
+        self.client.send_message(address, params)
+
+    def add_handler(self,
                     address: str,
-                    params: tuple = (),
                     fn: Callable = None):
-    client.send_message(address, params)
-    return await_reply(server, address, fn)
+        self.address_handlers[address] = fn
 
-def await_reply(server: ThreadingOSCUDPServer, address: str, fn: Callable = None, timeout: float = TICK_DURATION):
-    """
-    Awaits a reply from the given `address`, and optionally asserts that the function `fn`
-    returns True when called with the returned OSC parameters.
+    def remove_handler(self,
+                       address: str):
+        del self.address_handlers[address]
 
-    Args:
-        server: OSC server
-        address: OSC query (and reply) address
-        fn: Optional assertion function
-        timeout: Maximum number of seconds to wait for a successful reply
+    def await_reply(self,
+                    address: str,
+                    fn: Callable = None,
+                    timeout: float = TICK_DURATION):
+        """
+        Awaits a reply from the given `address`, and optionally asserts that the function `fn`
+        returns True when called with the returned OSC parameters.
 
-    Returns:
-        True if the reply is received within the timeout period and the assertion succeeds,
-        False otherwise
+        Args:
+            address: OSC query (and reply) address
+            fn: Optional assertion function
+            timeout: Maximum number of seconds to wait for a successful reply
 
-    """
-    event = threading.Event()
+        Returns:
+            True if the reply is received within the timeout period and the assertion succeeds,
+            False otherwise
 
-    def received_response(address: str, *params):
-        print("Received reply: %s (%s)" % (address, params))
-        if fn is None or fn(*params):
-            nonlocal event
-            event.set()
-        nonlocal handler
-        server.dispatcher.unmap(address, handler)
-        #--------------------------------------------------------------------------------
-        # handler reference must be cleared for GC to occur, which allows the server
-        # to be shutdown cleanly.
-        #--------------------------------------------------------------------------------
-        handler = None
+        """
+        _event = threading.Event()
 
-    handler = server.dispatcher.map(address, received_response)
-    event.wait(timeout)
-    return event.is_set()
+        def received_response(params):
+            print("Received response: %s" % str(params))
+            nonlocal _event
+            if fn is None or fn(params):
+                _event.set()
+
+        self.add_handler(address, received_response)
+        _event.wait(timeout)
+        self.remove_handler(address)
+        return _event.is_set()
+
+    def query_and_await(self,
+                        address: str,
+                        params: tuple = (),
+                        fn: Callable = None,
+                        timeout = TICK_DURATION):
+        _event = threading.Event()
+
+        def received_response(params):
+            nonlocal _event
+            if fn is None or fn(params):
+                _event.set()
+
+        self.add_handler(address, received_response)
+        self.send_message(address, params)
+        _event.wait(timeout)
+        self.remove_handler(address)
+        return _event.is_set()
+
+@pytest.fixture(scope="module")
+def client() -> AbletonOSCClient:
+    client = AbletonOSCClient()
+    yield client
+    client.stop()
 
 def wait_one_tick():
     """

@@ -54,8 +54,8 @@ def test_clip_property_pitch_fine(client):
 def test_clip_add_notes(client):
     client.send_message("/live/clip_slot/create_clip", [0, 0, 4.0])
     wait_one_tick()
-    client.send_message("/live/clip/add_new_note", [0, 0, 60, 0.0, 0.25, 64, False])
-    client.send_message("/live/clip/add_new_note", [0, 0, 67, 0.25, 0.5, 32, False])
+    client.send_message("/live/clip/add/notes", [0, 0, 60, 0.0, 0.25, 64, False])
+    client.send_message("/live/clip/add/notes", [0, 0, 67, 0.25, 0.5, 32, False])
 
     def check_notes(params):
         assert params[:5] == (60, 0.0, 0.25, 64, False)

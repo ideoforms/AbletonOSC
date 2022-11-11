@@ -97,11 +97,22 @@ class TrackHandler(AbletonOSCHandler):
         def track_get_clip_lengths(track, params: Tuple[Any]):
             return tuple(clip_slot.clip.length if clip_slot.clip else None for clip_slot in track.clip_slots)
 
+        def track_get_arrangement_clip_names(track, params: Tuple[Any]):
+            return tuple(clip.name for clip in track.arrangement_clips)
+
+        def track_get_arrangement_clip_lengths(track, params: Tuple[Any]):
+            return tuple(clip.length for clip in track.arrangement_clips)
+
+        def track_get_arrangement_clip_start_times(track, params: Tuple[Any]):
+            return tuple(clip.start_time for clip in track.arrangement_clips)
         """
         Returns a list of clip properties, or Nil if clip is empty
         """
         self.osc_server.add_handler("/live/track/get/clips/name", create_track_callback(track_get_clip_names))
         self.osc_server.add_handler("/live/track/get/clips/length", create_track_callback(track_get_clip_lengths))
+        self.osc_server.add_handler("/live/track/get/arrangement_clips/name", create_track_callback(track_get_arrangement_clip_names))
+        self.osc_server.add_handler("/live/track/get/arrangement_clips/length", create_track_callback(track_get_arrangement_clip_lengths))
+        self.osc_server.add_handler("/live/track/get/arrangement_clips/start_time", create_track_callback(track_get_arrangement_clip_start_times))
 
         def track_get_num_devices(track, params: Tuple[Any]):
             return len(track.devices),

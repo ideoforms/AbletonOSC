@@ -4,8 +4,8 @@ AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) int
 control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the
 older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the
 entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API
-([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive
-control over Live's control interfaces using the same naming structure and object hierarchy as LOM.
+([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive control
+over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
 It is currently (2022-11-11) a work-in-progress. Many major APIs are now exposed.
 
@@ -27,10 +27,11 @@ AbletonOSC listens for OSC messages on port **11000**, and sends replies on port
 
 ## Application API
 
-| Address | Query params | Response params              | Description                                                                  |
-| :------ | :----------- |:-----------------------------|:-----------------------------------------------------------------------------|
-| /live/test | | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test |
-| /live/application/get/version | | major_version, minor_version | Query Live's version                                                         |
+| Address | Query params | Response params              | Description                                                                      |
+| :------ | :----------- |:-----------------------------|:---------------------------------------------------------------------------------|
+| /live/test | | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test     |
+| /live/application/get/version | | major_version, minor_version | Query Live's version                                                             |
+| /live/reload| |                              | Initiates a live reload of the AbletonOSC server code. Used in development only. |
 
 ### Application status messages
 
@@ -92,29 +93,32 @@ These messages are sent to the client automatically when the song state changes.
 
 ## Track API
 
-| Address                            | Query params             | Response params | Description                              |
-|:-----------------------------------|:-------------------------|:----------------|:-----------------------------------------|
-| /live/track/stop_all_clips         | track_id                 |                 | Stop all clips on track                  |
-| /live/track/get/color              | track_id                 | color           | Query track color                        |
-| /live/track/set/color              | track_id, color          |                 | Set track color                          |
-| /live/track/get/mute               | track_id                 | mute            | Query track mute on/off                  |
-| /live/track/set/mute               | track_id, mute           |                 | Set track mute on/off                    |
-| /live/track/get/solo               | track_id                 | solo            | Query track solo on/off                  |
-| /live/track/set/solo               | track_id, solo           |                 | Set track solo on/off                    |
-| /live/track/get/name               | track_id                 | name            | Query track name                         |
-| /live/track/set/name               | track_id, name           |                 | Set track name                           |
-| /live/track/get/volume             | track_id                 | volume          | Query track volume                       |
-| /live/track/set/volume             | track_id, volume         |                 | Set track volume                         |
-| /live/track/get/panning            | track_id                 | panning         | Query track panning                      |
-| /live/track/set/panning            | track_id, panning        |                 | Set track panning                        |
-| /live/track/get/send               | track_id, send_id        | value           | Query track send                         |
-| /live/track/set/send               | track_id, send_id, value |                 | Set track send                           |
-| /live/track/get/clips/name         | track_id                 | [name, ....]    | Query all clip names on track            |
-| /live/track/get/clips/length       | track_id                 | [length, ...]   | Query all clip lengths on track          |
-| /live/track/get/num_devices        | track_id                 | num_devices     | Query the number of devices on the track |
-| /live/track/get/devices/name       | track_id                 | [name, ...]     | Query all device names on track          |
-| /live/track/get/devices/type       | track_id                 | [type, ...]     | Query all devices types on track         |
-| /live/track/get/devices/class_name | track_id                 | [class, ...]    | Query all device class names on track    |
+| Address                                      | Query params             | Response params   | Description                                      |
+|:---------------------------------------------|:-------------------------|:------------------|:-------------------------------------------------|
+| /live/track/stop_all_clips                   | track_id                 |                   | Stop all clips on track                          |
+| /live/track/get/color                        | track_id                 | color             | Query track color                                |
+| /live/track/set/color                        | track_id, color          |                   | Set track color                                  |
+| /live/track/get/mute                         | track_id                 | mute              | Query track mute on/off                          |
+| /live/track/set/mute                         | track_id, mute           |                   | Set track mute on/off                            |
+| /live/track/get/solo                         | track_id                 | solo              | Query track solo on/off                          |
+| /live/track/set/solo                         | track_id, solo           |                   | Set track solo on/off                            |
+| /live/track/get/name                         | track_id                 | name              | Query track name                                 |
+| /live/track/set/name                         | track_id, name           |                   | Set track name                                   |
+| /live/track/get/volume                       | track_id                 | volume            | Query track volume                               |
+| /live/track/set/volume                       | track_id, volume         |                   | Set track volume                                 |
+| /live/track/get/panning                      | track_id                 | panning           | Query track panning                              |
+| /live/track/set/panning                      | track_id, panning        |                   | Set track panning                                |
+| /live/track/get/send                         | track_id, send_id        | value             | Query track send                                 |
+| /live/track/set/send                         | track_id, send_id, value |                   | Set track send                                   |
+| /live/track/get/clips/name                   | track_id                 | [name, ....]      | Query all clip names on track                    |
+| /live/track/get/clips/length                 | track_id                 | [length, ...]     | Query all clip lengths on track                  |
+| /live/track/get/arrangement_clips/name       | track_id                 | [name, ....]      | Query all arrangement view clip names on track   |
+| /live/track/get/arrangement_clips/length     | track_id                 | [length, ...]     | Query all arrangement view clip lengths on track |
+| /live/track/get/arrangement_clips/start_time | track_id                 | [start_time, ...] | Query all arrangement view clip times on track   |
+| /live/track/get/num_devices                  | track_id                 | num_devices       | Query the number of devices on the track         |
+| /live/track/get/devices/name                 | track_id                 | [name, ...]       | Query all device names on track                  |
+| /live/track/get/devices/type                 | track_id                 | [type, ...]       | Query all devices types on track                 |
+| /live/track/get/devices/class_name           | track_id                 | [class, ...]      | Query all device class names on track            |
 
 See **Device API** for details on type/class_name.
  

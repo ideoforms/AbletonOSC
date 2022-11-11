@@ -110,7 +110,7 @@ def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     client.send_message("/live/song/set/tempo", [125.0])
     tempo = client.query_and_return("/live/song/get/tempo")
-    print(tempo)
+    print("Got song tempo: %.1f" % tempo)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Client for AbletonOSC")

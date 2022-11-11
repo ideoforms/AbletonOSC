@@ -57,18 +57,27 @@ class ClipHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/clip/set/%s" % prop,
                                         create_clip_callback(self._set_property, prop))
 
-        def clip_add_new_note(clip, params: Tuple[Any] = ()):
-            pitch, start_time, duration, velocity, mute = params
-            note = Live.Clip.MidiNoteSpecification(start_time=start_time,
-                                                   duration=duration,
-                                                   pitch=pitch,
-                                                   velocity=velocity,
-                                                   mute=mute)
-            clip.add_new_notes((note,))
-
-        self.osc_server.add_handler("/live/clip/add_new_note", create_clip_callback(clip_add_new_note))
-
         def clip_get_notes(clip, params: Tuple[Any] = ()):
             notes = clip.get_notes(0, 0, clip.length, 127)
             return (item for sublist in notes for item in sublist)
+
+        def clip_add_notes(clip, params: Tuple[Any] = ()):
+            notes = []
+            for offset in range(0, len(params), 5):
+                pitch, start_time, duration, velocity, mute = params[offset:offset+5]
+                note = Live.Clip.MidiNoteSpecification(start_time=start_time,
+                                                       duration=duration,
+                                                       pitch=pitch,
+                                                       velocity=velocity,
+                                                       mute=mute)
+                notes.append(note)
+            clip.add_new_notes(tuple(notes))
+
+        def clip_remove_notes(clip, params: Tuple[Any] = ()):
+            start_pitch, pitch_span, start_time, time_span = params
+            clip.remove_notes_extended(start_pitch, pitch_span, start_time, time_span)
+
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
+        self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
+        self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
+

@@ -71,6 +71,8 @@ These messages are sent to the client automatically when the application state c
 | /live/song/set/metronome           | metronome_on |                 | Set metronome on/off                                                                         |
 | /live/song/start_listen/metronome  |              |                 | Start a listener that sends a message to `/live/song/get/metronome` when metronome changes   |
 | /live/song/stop_listen/metronome   |              |                 | Stop the above listener                                                                      |
+| /live/song/get/cue_points          |              | name, time, ... | Query a list of the song's cue points                                                        |
+ | /live/song/cue_point/jump          | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points)     |      
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
 

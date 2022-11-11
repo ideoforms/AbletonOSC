@@ -72,12 +72,31 @@ class SongHandler(AbletonOSCHandler):
         def song_get_num_scenes(song, params: Tuple[Any] = ()):
             return len(song.scenes),
 
-        # TODO num_tracks listener
         self.osc_server.add_handler("/live/song/get/num_tracks", partial(song_get_num_tracks, self.song))
         self.osc_server.add_handler("/live/song/get/num_scenes", partial(song_get_num_scenes, self.song))
 
-        self.last_song_time = -1.0
+        def song_get_cue_points(song, params: Tuple[Any] = ()):
+            cue_points = song.cue_points
+            cue_point_pairs = [(cue_point.name, cue_point.time) for cue_point in cue_points]
+            rv = (element for pair in cue_point_pairs for element in pair)
+            return rv
+        self.osc_server.add_handler("/live/song/get/cue_points", partial(song_get_cue_points, self.song))
 
+        def song_jump_to_cue_point(song, params: Tuple[Any] = ()):
+            cue_point_index = params[0]
+            if isinstance(cue_point_index, str):
+                for cue_point in song.cue_points:
+                    if cue_point.name == cue_point_index:
+                        cue_point.jump()
+            elif isinstance(cue_point_index, int):
+                cue_point = song.cue_points[cue_point_index]
+                cue_point.jump()
+        self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
+
+        #--------------------------------------------------------------------------------
+        # /live/song/beat listener
+        #--------------------------------------------------------------------------------
+        self.last_song_time = -1.0
         def song_time_changed():
             # If song has rewound or skipped to next beat, sent a /live/beat message
             if (self.song.current_song_time < self.last_song_time) or \

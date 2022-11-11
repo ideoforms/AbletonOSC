@@ -11,14 +11,21 @@ TICK_DURATION = 0.125
 
 class AbletonOSCClient:
     def __init__(self, hostname="127.0.0.1", port=REMOTE_PORT, client_port=LOCAL_PORT):
+        """
+        Create a client to connect to an Ableton OSC instance.
+        Args:
+            hostname: The remote host to connect to.
+            port: The remote port to connect to. Defaults to 11000, the default AbletonOSC port.
+            client_port: The local port to bind to. Defaults to 11001, the default AbletonOSC reply port.
+        """
         dispatcher = Dispatcher()
         dispatcher.set_default_handler(self.handle_osc)
-        self.server = ThreadingOSCUDPServer((hostname, client_port), dispatcher)
+        self.server = ThreadingOSCUDPServer(("0.0.0.0", client_port), dispatcher)
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.daemon = True
         self.server_thread.start()
         self.address_handlers = {}
-        self.client = SimpleUDPClient("127.0.0.1", port)
+        self.client = SimpleUDPClient(hostname, port)
 
     def handle_osc(self, address, *params):
         if address in self.address_handlers:

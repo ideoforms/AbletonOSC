@@ -9,9 +9,11 @@ import logging
 import traceback
 
 class OSCServer:
-    def __init__(self, local_addr=('127.0.0.1', OSC_LISTEN_PORT), remote_addr=('127.0.0.1', OSC_RESPONSE_PORT)):
+    def __init__(self,
+                 local_addr: Tuple[str, int] = ('0.0.0.0', OSC_LISTEN_PORT),
+                 remote_addr: Tuple[str, int] = ('127.0.0.1', OSC_RESPONSE_PORT)):
         """
-        Class that handles OSC server and client responsibilitiess
+        Class that handles OSC server and client responsibilities
 
         Implemented because pythonosc's OSC server causes a beachball when handling
         incoming messages. To investigate, as it would be ultimately better not to have
@@ -19,6 +21,7 @@ class OSCServer:
         """
         self._local_addr = local_addr
         self._remote_addr = remote_addr
+        self._response_port = remote_addr[1]
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.setblocking(0)
@@ -26,8 +29,8 @@ class OSCServer:
         self._callbacks = {}
 
         self.logger = logging.getLogger("abletonosc")
-        self.logger.info("Starting OSC server (local %s, remote %s)",
-                         str(self._local_addr), str(self._remote_addr))
+        self.logger.info("Starting OSC server (local %s, response port %d)",
+                         str(self._local_addr), self._response_port)
 
     def add_handler(self, address: str, handler: Callable):
         self._callbacks[address] = handler
@@ -35,7 +38,10 @@ class OSCServer:
     def clear_handlers(self):
         self._callbacks = {}
 
-    def send(self, address: str, params: Tuple[Any] = ()) -> None:
+    def send(self,
+             address: str,
+             params: Tuple[Any] = (),
+             remote_addr: Tuple = None) -> None:
         """
         Send an OSC message.
 
@@ -49,7 +55,9 @@ class OSCServer:
 
         try:
             msg = msg_builder.build()
-            self._socket.sendto(msg.dgram, self._remote_addr)
+            if remote_addr is None:
+                remote_addr = self._remote_addr
+            self._socket.sendto(msg.dgram, remote_addr)
         except BuildError:
             self.logger.info("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
 
@@ -59,7 +67,7 @@ class OSCServer:
         """
         try:
             while True:
-                data, addr = self._socket.recvfrom(65536)
+                data, remote_addr = self._socket.recvfrom(65536)
                 try:
                     message = OscMessage(data)
 
@@ -68,7 +76,11 @@ class OSCServer:
                         rv = callback(message.params)
 
                         if rv is not None:
-                            self.send(message.address, rv)
+                            remote_hostname, _ = remote_addr
+                            response_addr = (remote_hostname, self._response_port)
+                            self.send(address=message.address,
+                                      params=rv,
+                                      remote_addr=response_addr)
                     else:
                         self.logger.info("AbletonOSC: Unknown OSC address: %s" % message.address)
                 except ParseError:

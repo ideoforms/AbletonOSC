@@ -23,7 +23,7 @@ To install the script:
 
 # Usage
 
-AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**.
+AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**. Replies will be sent to the same IP as the originating message.
 
 ## Application API
 

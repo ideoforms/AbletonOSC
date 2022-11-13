@@ -1,22 +1,30 @@
-from typing import Tuple, Callable, Any
+from typing import Tuple, Callable, Any, Optional
 from .handler import AbletonOSCHandler
 import Live
 
 class ClipHandler(AbletonOSCHandler):
     def init_api(self):
-        def create_clip_callback(func, *args):
+        def create_clip_callback(func, *args, pass_clip_index=False):
             """
             Creates a callback that expects the following set of arguments:
               (track_index, clip_index, *args)
 
             The callback then extracts the relevant `Clip` object from the current Song,
             and calls `func` with this `Clip` object plus any additional *args.
+
+            pass_clip_index is a bit of an ugly hack, although seems like the lesser of
+            evils for scenarios where the track/clip index is needed (as a clip is unable
+            to query its own index). Other alternatives include _always_ passing track/clip
+            index to the callback, but this adds arg clutter to every single callback.
             """
             def clip_callback(params: Tuple[Any]) -> Callable:
                 track_index, clip_index = params[:2]
                 track = self.song.tracks[track_index]
                 clip = track.clip_slots[clip_index].clip
-                return func(clip, *args, params[2:])
+                if pass_clip_index:
+                    return func((track_index, clip_index), *args, params[2:])
+                else:
+                    return func(clip, *args, params[2:])
 
             return clip_callback
 
@@ -31,7 +39,8 @@ class ClipHandler(AbletonOSCHandler):
             "is_midi_clip",
             "is_audio_clip",
             "is_playing",
-            "is_recording"
+            "is_recording",
+            "playing_position"
         ]
         properties_rw = [
             "color",
@@ -81,3 +90,29 @@ class ClipHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
         self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
 
+        # TODO: tidy up and generalise this
+        self.clip_listeners = {}
+        def clip_add_playing_position_listener(track_clip_index, params: Tuple[Any] = ()):
+            track_index, clip_index = track_clip_index
+            clip = self.song.tracks[track_index].clip_slots[clip_index].clip
+
+            def playing_position_changed_callback():
+                osc_address = "/live/clip/get/playing_position"
+                self.osc_server.send(osc_address, (track_index, clip_index, clip.playing_position))
+
+            clip_remove_playing_position_listener(track_clip_index)
+            clip.add_playing_position_listener(playing_position_changed_callback)
+            self.clip_listeners[track_clip_index] = playing_position_changed_callback
+
+        def clip_remove_playing_position_listener(track_clip_index, params: Tuple[Any] = ()):
+            track_index, clip_index = track_clip_index
+            clip = self.song.tracks[track_index].clip_slots[clip_index].clip
+
+            if track_clip_index in self.clip_listeners.keys():
+                clip.remove_playing_position_listener(self.clip_listeners[track_clip_index])
+                del self.clip_listeners[track_clip_index]
+
+        self.osc_server.add_handler("/live/clip/start_listen/playing_position",
+                                    create_clip_callback(clip_add_playing_position_listener, pass_clip_index=True))
+        self.osc_server.add_handler("/live/clip/stop_listen/playing_position",
+                                    create_clip_callback(clip_remove_playing_position_listener, pass_clip_index=True))

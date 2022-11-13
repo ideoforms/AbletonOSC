@@ -39,7 +39,6 @@ class AbletonOSCHandler(Component):
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))
             osc_address = "/live/song/get/%s" % prop
-            self.logger.info("Sending to %s" % osc_address)
             self.osc_server.send(osc_address, (value,))
 
         if prop in self.listener_functions:

@@ -3,22 +3,22 @@
 It lets you access easily to OscMessage and OscBundle instances in the packet.
 """
 
-import collections
 import time
 
 from .parsing import osc_types
 from . import osc_bundle
 from . import osc_message
 
-from typing import Union, List
+from typing import Union, List, NamedTuple
 
 # A namedtuple as returned my the _timed_msg_of_bundle function.
 # 1) the system time at which the message should be executed
 #    in seconds since the epoch.
 # 2) the actual message.
-TimedMessage = collections.namedtuple(
-    typename='TimedMessage',
-    field_names=('time', 'message'))
+TimedMessage = NamedTuple('TimedMessage', [
+    ('time', float),
+    ('message', osc_message.OscMessage),
+])
 
 
 def _timed_msg_of_bundle(bundle: osc_bundle.OscBundle, now: float) -> List[TimedMessage]:

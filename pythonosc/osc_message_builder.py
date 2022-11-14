@@ -3,7 +3,11 @@
 from . import osc_message
 from .parsing import osc_types
 
-from typing import List, Tuple, Union, Any
+from typing import List, Tuple, Union, Any, Optional
+
+
+ArgValue = Union[str, bytes, bool, int, float, osc_types.MidiPacket, list]
+
 
 class BuildError(Exception):
     """Error raised when an incomplete message is trying to be built."""
@@ -15,6 +19,7 @@ class OscMessageBuilder(object):
     ARG_TYPE_FLOAT = "f"
     ARG_TYPE_DOUBLE = "d"
     ARG_TYPE_INT = "i"
+    ARG_TYPE_INT64 = "h"
     ARG_TYPE_STRING = "s"
     ARG_TYPE_BLOB = "b"
     ARG_TYPE_RGBA = "r"
@@ -27,7 +32,7 @@ class OscMessageBuilder(object):
     ARG_TYPE_ARRAY_STOP = "]"
 
     _SUPPORTED_ARG_TYPES = (
-        ARG_TYPE_FLOAT, ARG_TYPE_DOUBLE, ARG_TYPE_INT, ARG_TYPE_BLOB, ARG_TYPE_STRING,
+        ARG_TYPE_FLOAT, ARG_TYPE_DOUBLE, ARG_TYPE_INT, ARG_TYPE_INT64, ARG_TYPE_BLOB, ARG_TYPE_STRING,
         ARG_TYPE_RGBA, ARG_TYPE_MIDI, ARG_TYPE_TRUE, ARG_TYPE_FALSE, ARG_TYPE_NIL)
 
     def __init__(self, address: str=None) -> None:
@@ -37,10 +42,10 @@ class OscMessageBuilder(object):
           - address: The osc address to send this message to.
         """
         self._address = address
-        self._args = []
+        self._args = []  # type: List[Tuple[str, Union[ArgValue, None]]]
 
     @property
-    def address(self) -> str:
+    def address(self) -> Optional[str]:
         """Returns the OSC address this message will be sent to."""
         return self._address
 
@@ -50,7 +55,7 @@ class OscMessageBuilder(object):
         self._address = value
 
     @property
-    def args(self) -> List[Tuple[str, Union[str, bytes, bool, int, float, tuple, list]]]:   # TODO: Make 'tuple' more specific for it is a MIDI packet
+    def args(self) -> List[Tuple[str, Union[ArgValue, None]]]:
         """Returns the (type, value) arguments list of this message."""
         return self._args
 
@@ -64,7 +69,7 @@ class OscMessageBuilder(object):
             return True
         return False
 
-    def add_arg(self, arg_value: Union[str, bytes, bool, int, float, tuple, list], arg_type: str=None) -> None:     # TODO: Make 'tuple' more specific for it is a MIDI packet
+    def add_arg(self, arg_value: ArgValue, arg_type: str=None) -> None:
         """Add a typed argument to this message.
 
         Args:
@@ -82,13 +87,15 @@ class OscMessageBuilder(object):
             arg_type = self._get_arg_type(arg_value)
         if isinstance(arg_type, list):
             self._args.append((self.ARG_TYPE_ARRAY_START, None))
-            for v, t in zip(arg_value, arg_type):
+            for v, t in zip(arg_value, arg_type):  # type: ignore[var-annotated, arg-type]
                 self.add_arg(v, t)
             self._args.append((self.ARG_TYPE_ARRAY_STOP, None))
         else:
             self._args.append((arg_type, arg_value))
 
-    def _get_arg_type(self, arg_value: Union[str, bytes, bool, int, float, tuple, list]) -> str:    # TODO: Make 'tuple' more specific for it is a MIDI packet
+    # The return type here is actually Union[str, List[<self>]], however there
+    # is no annotation for a recursive type like this.
+    def _get_arg_type(self, arg_value: ArgValue) -> Union[str, Any]:
         """Guess the type of a value.
 
         Args:
@@ -97,7 +104,7 @@ class OscMessageBuilder(object):
           - ValueError: if the type is not supported.
         """
         if isinstance(arg_value, str):
-            arg_type = self.ARG_TYPE_STRING
+            arg_type = self.ARG_TYPE_STRING  # type: Union[str, Any]
         elif isinstance(arg_value, bytes):
             arg_type = self.ARG_TYPE_BLOB
         elif arg_value is True:
@@ -105,7 +112,10 @@ class OscMessageBuilder(object):
         elif arg_value is False:
             arg_type = self.ARG_TYPE_FALSE
         elif isinstance(arg_value, int):
-            arg_type = self.ARG_TYPE_INT
+            if arg_value.bit_length() > 32:
+                arg_type = self.ARG_TYPE_INT64
+            else:
+                arg_type = self.ARG_TYPE_INT
         elif isinstance(arg_value, float):
             arg_type = self.ARG_TYPE_FLOAT
         elif isinstance(arg_value, tuple) and len(arg_value) == 4:
@@ -143,19 +153,21 @@ class OscMessageBuilder(object):
             dgram += osc_types.write_string(',' + arg_types)
             for arg_type, value in self._args:
                 if arg_type == self.ARG_TYPE_STRING:
-                    dgram += osc_types.write_string(value)
+                    dgram += osc_types.write_string(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_INT:
-                    dgram += osc_types.write_int(value)
+                    dgram += osc_types.write_int(value)  # type: ignore[arg-type]
+                elif arg_type == self.ARG_TYPE_INT64:
+                    dgram += osc_types.write_int64(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_FLOAT:
-                    dgram += osc_types.write_float(value)
+                    dgram += osc_types.write_float(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_DOUBLE:
-                    dgram += osc_types.write_double(value)
+                    dgram += osc_types.write_double(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_BLOB:
-                    dgram += osc_types.write_blob(value)
+                    dgram += osc_types.write_blob(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_RGBA:
-                    dgram += osc_types.write_rgba(value)
+                    dgram += osc_types.write_rgba(value)  # type: ignore[arg-type]
                 elif arg_type == self.ARG_TYPE_MIDI:
-                    dgram += osc_types.write_midi(value)
+                    dgram += osc_types.write_midi(value)  # type: ignore[arg-type]
                 elif arg_type in (self.ARG_TYPE_TRUE,
                                   self.ARG_TYPE_FALSE,
                                   self.ARG_TYPE_ARRAY_START,

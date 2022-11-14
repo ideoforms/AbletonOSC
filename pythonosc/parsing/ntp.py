@@ -3,8 +3,8 @@
 import datetime
 import struct
 import time
-import collections
 
+from typing import NamedTuple
 
 # 63 zero bits followed by a one in the least signifigant bit is a special
 # case meaning "immediately."
@@ -21,9 +21,10 @@ _NTP_EPOCH = datetime.date(1900, 1, 1)
 _NTP_DELTA = (_SYSTEM_EPOCH - _NTP_EPOCH).days * 24 * 3600
 
 
-Timestamp = collections.namedtuple(
-    typename='Timetag',
-    field_names=('seconds', 'fraction'))
+Timestamp = NamedTuple('Timestamp', [
+    ('seconds', int),
+    ('fraction', int),
+])
 
 
 class NtpError(Exception):

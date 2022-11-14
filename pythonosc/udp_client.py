@@ -1,9 +1,13 @@
 """UDP Clients for sending OSC messages to an OSC server"""
 
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError: # python 3.5
+    from collections import Iterable
+
 import socket
 
-from .osc_message_builder import OscMessageBuilder
+from .osc_message_builder import OscMessageBuilder, ArgValue
 from .osc_message import OscMessage
 from .osc_bundle import OscBundle
 
@@ -33,7 +37,7 @@ class UDPClient(object):
                 continue
             break
 
-        self._sock.setblocking(0)
+        self._sock.setblocking(False)
         if allow_broadcast:
             self._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self._address = address
@@ -51,7 +55,7 @@ class UDPClient(object):
 class SimpleUDPClient(UDPClient):
     """Simple OSC client that automatically builds :class:`OscMessage` from arguments"""
 
-    def send_message(self, address: str, value: Union[int, float, bytes, str, bool, tuple, list]) -> None:
+    def send_message(self, address: str, value: ArgValue) -> None:
         """Build :class:`OscMessage` from arguments and send to server
 
         Args:

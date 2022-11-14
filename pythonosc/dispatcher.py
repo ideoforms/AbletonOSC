@@ -6,8 +6,7 @@ import logging
 import re
 import time
 from . import osc_packet
-from typing import overload, List, Union, Any, Generator, Tuple
-from types import FunctionType
+from typing import overload, List, Union, Any, Generator, Tuple, Callable, Optional, DefaultDict
 from .osc_message import OscMessage
 
 
@@ -19,7 +18,7 @@ class Handler(object):
     message if any were passed.
     """
 
-    def __init__(self, _callback: FunctionType, _args: Union[Any, List[Any]],
+    def __init__(self, _callback: Callable, _args: Union[Any, List[Any]],
                  _needs_reply_address: bool = False) -> None:
         """
         Args:
@@ -32,13 +31,13 @@ class Handler(object):
         self.needs_reply_address = _needs_reply_address
 
     # needed for test module
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         return (type(self) == type(other) and
                 self.callback == other.callback and
                 self.args == other.args and
                 self.needs_reply_address == other.needs_reply_address)
 
-    def invoke(self, client_address: str, message: OscMessage) -> None:
+    def invoke(self, client_address: Tuple[str, int], message: OscMessage) -> None:
         """Invokes the associated callback function
 
         Args:
@@ -64,10 +63,10 @@ class Dispatcher(object):
     """
 
     def __init__(self) -> None:
-        self._map = collections.defaultdict(list)
-        self._default_handler = None
+        self._map = collections.defaultdict(list)  # type: DefaultDict[str, List[Handler]]
+        self._default_handler = None  # type: Optional[Handler]
 
-    def map(self, address: str, handler: FunctionType, *args: Union[Any, List[Any]],
+    def map(self, address: str, handler: Callable, *args: Union[Any, List[Any]],
             needs_reply_address: bool = False) -> Handler:
         """Map an address to a handler
 
@@ -108,7 +107,7 @@ class Dispatcher(object):
         pass
 
     @overload
-    def unmap(self, address: str, handler: FunctionType, *args: Union[Any, List[Any]],
+    def unmap(self, address: str, handler: Callable, *args: Union[Any, List[Any]],
               needs_reply_address: bool = False) -> None:
         """Remove an already mapped handler from an address
 
@@ -133,7 +132,7 @@ class Dispatcher(object):
             if str(e) == "list.remove(x): x not in list":
                 raise ValueError("Address '%s' doesn't have handler '%s' mapped to it" % (address, handler)) from e
 
-    def handlers_for_address(self, address_pattern: str) -> Generator[None, Handler, None]:
+    def handlers_for_address(self, address_pattern: str) -> Generator[Handler, None, None]:
         """Yields handlers matching an address
 
 
@@ -195,7 +194,7 @@ class Dispatcher(object):
         except osc_packet.ParseError:
             pass
 
-    def set_default_handler(self, handler: FunctionType, needs_reply_address: bool = False) -> None:
+    def set_default_handler(self, handler: Callable, needs_reply_address: bool = False) -> None:
         """Sets the default handler
 
         The default handler is invoked every time no other handler is mapped to an address.

@@ -3,7 +3,7 @@ import logging
 from . import osc_message
 from .parsing import osc_types
 
-from typing import Any, Iterator
+from typing import Any, Iterator, List, Union
 
 _BUNDLE_PREFIX = b"#bundle\x00"
 
@@ -37,10 +37,8 @@ class OscBundle(object):
         # Get the contents as a list of OscBundle and OscMessage.
         self._contents = self._parse_contents(index)
 
-    # Return type is actually List[OscBundle], but that would require import annotations from __future__, which is
-    # python 3.7+ only.
-    def _parse_contents(self, index: int) -> Any:
-        contents = []
+    def _parse_contents(self, index: int) -> List[Union['OscBundle', osc_message.OscMessage]]:
+        contents = []  # type: List[Union[OscBundle, osc_message.OscMessage]]
 
         try:
             # An OSC Bundle Element consists of its size and its contents.
@@ -61,7 +59,7 @@ class OscBundle(object):
                     contents.append(osc_message.OscMessage(content_dgram))
                 else:
                     logging.warning(
-                        "Could not identify content type of dgram %s" % content_dgram)
+                        "Could not identify content type of dgram %r" % content_dgram)
         except (osc_types.ParseError, osc_message.ParseError, IndexError) as e:
             raise ParseError("Could not parse a content datagram: %s" % e)
 
@@ -73,7 +71,7 @@ class OscBundle(object):
         return dgram.startswith(_BUNDLE_PREFIX)
 
     @property
-    def timestamp(self) -> int:
+    def timestamp(self) -> float:
         """Returns the timestamp associated with this bundle."""
         return self._timestamp
 
@@ -92,7 +90,7 @@ class OscBundle(object):
         """Returns the datagram from which this bundle was built."""
         return self._dgram
 
-    def content(self, index) -> Any:
+    def content(self, index: int) -> Any:
         """Returns the bundle's content 0-indexed."""
         return self._contents[index]
 

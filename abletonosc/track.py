@@ -97,6 +97,9 @@ class TrackHandler(AbletonOSCHandler):
         def track_get_clip_lengths(track, params: Tuple[Any]):
             return tuple(clip_slot.clip.length if clip_slot.clip else None for clip_slot in track.clip_slots)
 
+        def track_get_clip_colors(track, params: Tuple[Any]):
+            return tuple(clip_slot.clip.color if clip_slot.clip else None for clip_slot in track.clip_slots)
+
         def track_get_arrangement_clip_names(track, params: Tuple[Any]):
             return tuple(clip.name for clip in track.arrangement_clips)
 
@@ -110,6 +113,7 @@ class TrackHandler(AbletonOSCHandler):
         """
         self.osc_server.add_handler("/live/track/get/clips/name", create_track_callback(track_get_clip_names))
         self.osc_server.add_handler("/live/track/get/clips/length", create_track_callback(track_get_clip_lengths))
+        self.osc_server.add_handler("/live/track/get/clips/color", create_track_callback(track_get_clip_colors))
         self.osc_server.add_handler("/live/track/get/arrangement_clips/name", create_track_callback(track_get_arrangement_clip_names))
         self.osc_server.add_handler("/live/track/get/arrangement_clips/length", create_track_callback(track_get_arrangement_clip_lengths))
         self.osc_server.add_handler("/live/track/get/arrangement_clips/start_time", create_track_callback(track_get_arrangement_clip_start_times))

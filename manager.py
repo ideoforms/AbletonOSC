@@ -10,16 +10,12 @@ import os
 
 logger = logging.getLogger("abletonosc")
 
-if sys.platform == "darwin":
-    # On macOS, put logs in /tmp
-    tmp_dir = "/tmp"
-else:
-    # On Windows, put logs in c:\temp
-    tmp_dir = "c:\\temp"
-
-if os.path.exists(tmp_dir):
-    # If temp dir exists, create logger
-    log_path = os.path.join(tmp_dir, "abletonosc.log")
+def start_logging():
+    module_path = os.path.dirname(os.path.realpath(__file__))
+    log_dir = os.path.join(module_path, "logs")
+    if not os.path.exists(log_dir):
+        os.mkdir(log_dir, 0o755)
+    log_path = os.path.join(log_dir, "abletonosc.log")
     file_handler = logging.FileHandler(log_path)
     file_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
@@ -98,3 +94,5 @@ class Manager(ControlSurface):
         logger.info("Disconnecting...")
         self.osc_server.shutdown()
         super().disconnect()
+
+start_logging()

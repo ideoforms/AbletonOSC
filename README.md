@@ -19,7 +19,8 @@ To install the script:
 - Restart Live
 - In `Preferences > MIDI`, add the new AbletonOSC Control Surface that should appear. Live should display a message
   saying "AbletonOSC: Listening for OSC on port 11000"
-- On macOS, an activity log will be created at `/tmp/abletonosc.log`
+
+Activity logs will be output to a `logs` subdirectory.
 
 # Usage
 
@@ -135,6 +136,8 @@ See **Device API** for details on type/class_name.
 | /live/clip_slot/get/has_clip        | track_id, clip_id                  |                 | Query whether the slot has a clip        |
 | /live/clip_slot/get/has_stop_button | track_id, clip_id                  | has_stop_button | Query whether the slot has a stop button |
 | /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button |                 | Add or remove stop button                |
+
+# TODO: Add more properties and methods
 
 ---
 

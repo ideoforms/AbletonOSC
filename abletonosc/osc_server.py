@@ -68,6 +68,13 @@ class OSCServer:
         try:
             while True:
                 data, remote_addr = self._socket.recvfrom(65536)
+                #--------------------------------------------------------------------------------
+                # Update the default reply address to the most recent client. Used when
+                # sending (e.g) /live/song/beat messages and listen updates.
+                #
+                # This is slightly ugly and prevents registering listeners from different IPs.
+                #--------------------------------------------------------------------------------
+                self._remote_addr = (remote_addr[0], OSC_RESPONSE_PORT)
                 try:
                     message = OscMessage(data)
 

@@ -3,6 +3,10 @@ from .handler import AbletonOSCHandler
 import Live
 
 class ClipHandler(AbletonOSCHandler):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.class_identifier = "clip"
+
     def init_api(self):
         def create_clip_callback(func, *args, pass_clip_index=False):
             """

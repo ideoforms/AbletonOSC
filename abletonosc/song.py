@@ -3,6 +3,10 @@ from typing import Tuple, Any
 from .handler import AbletonOSCHandler
 
 class SongHandler(AbletonOSCHandler):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.class_identifier = "song"
+
     def init_api(self):
         #--------------------------------------------------------------------------------
         # Init callbacks for Set: methods

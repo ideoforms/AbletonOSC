@@ -2,6 +2,10 @@ from typing import Tuple, Any
 from .handler import AbletonOSCHandler
 
 class TrackHandler(AbletonOSCHandler):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.class_identifier = "track"
+
     def init_api(self):
         def create_track_callback(func, *args):
             def track_callback(params: Tuple[Any]):

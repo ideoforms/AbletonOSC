@@ -1,5 +1,4 @@
-from . import client, wait_one_tick
-import threading
+from . import client, wait_one_tick, TICK_DURATION
 
 #--------------------------------------------------------------------------------
 # Test song start/stop
@@ -54,53 +53,22 @@ def test_song_stop_all_clips(client):
 # Test song listeners
 #--------------------------------------------------------------------------------
 
-import pytest
-
-@pytest.mark.skip()
 def test_song_listen_is_playing(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/start_listen/is_playing")
-
-    event = threading.Event()
-
-    def cb(address: str, params) -> None:
-        if params[0] is True:
-            event.set()
-
-    handler = server.dispatcher.map("/live/song/get/is_playing", cb)
     client.send_message("/live/song/start_playing")
-    assert event.wait(0.25)
-    server.dispatcher.unmap("/live/song/get/is_playing", handler)
-
-    event = threading.Event()
-
-    def cb(address: str, params) -> None:
-        if params[0] is False:
-            event.set()
-
-    handler = server.dispatcher.map("/live/song/get/is_playing", cb)
+    assert client.await_reply("/live/song/get/is_playing", lambda params: params[0] is True, TICK_DURATION * 2)
     client.send_message("/live/song/stop_playing")
-    assert event.wait(0.25)
-    server.dispatcher.unmap("/live/song/get/is_playing", handler)
-
+    assert client.await_reply("/live/song/get/is_playing", lambda params: params[0] is False, TICK_DURATION * 2)
     client.send_message("/live/song/stop_listen/is_playing")
 
-@pytest.mark.skip()
 def test_song_listen_tempo(client):
     client.send_message("/live/song/set/tempo", [120])
     client.send_message("/live/song/start_listen/tempo")
 
     for value in [81, 120]:
-        event = threading.Event()
-
-        def cb(address: str, params) -> None:
-            if params[0] == value:
-                event.set()
-
-        handler = server.dispatcher.map("/live/song/get/tempo", cb)
         client.send_message("/live/song/set/tempo", [value])
-        assert event.wait(0.25)
-        server.dispatcher.unmap("/live/song/get/tempo", handler)
+        assert client.await_reply("/live/song/get/tempo", lambda params: params[0] == value, TICK_DURATION * 2)
 
     client.send_message("/live/song/stop_listen/tempo")
 
@@ -110,7 +78,6 @@ def test_song_listen_tempo(client):
 
 def _test_song_property(client, property, values):
     for value in values:
-        print("Testing property %s, value: %s" % (property, value))
         client.send_message("/live/song/set/%s" % property, [value])
         wait_one_tick()
         assert client.query_and_await("/live/song/get/%s" % property,

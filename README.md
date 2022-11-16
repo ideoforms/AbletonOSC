@@ -14,8 +14,9 @@ It is currently (2022-11-11) a work-in-progress. Many major APIs are now exposed
 To install the script:
 
 - Clone this repo, or download/unzip and rename AbletonOSC-master to AbletonOSC
-- Move the AbletonOSC folder to the MIDI Remote Scripts folder inside the Ableton
-  application: `/Applications/Ableton Live*.app/Contents/App-Resources/MIDI Remote Scripts`
+- Install it following the instructions on Ableton's [Installing third-party remote scripts](https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts) doc, copying the script to:
+  - **Windows**: \Users\[username]\Documents\Ableton\User Library\Remote Scripts
+  - **macOS**: Macintosh HD/Users/[username]/Music/Ableton/User Library/Remote Scripts
 - Restart Live
 - In `Preferences > MIDI`, add the new AbletonOSC Control Surface that should appear. Live should display a message
   saying "AbletonOSC: Listening for OSC on port 11000"
@@ -172,6 +173,7 @@ See **Device API** for details on Device type/class_names.
 | /live/clip/get/is_midi_clip              | track_id, clip_id                                                   | is_midi_clip                                                        | Query whether clip is MIDI                                                                                                                           |
 | /live/clip/get/is_playing                | track_id, clip_id                                                   | is_playing                                                          | Query whether clip is playing                                                                                                                        |
 | /live/clip/get/is_recording              | track_id, clip_id                                                   | is_recording                                                        | Query whether clip is recording                                                                                                                      |
+| /live/clip/get/playing_position          | track_id, clip_id                                                   | playing_position                                                    | Get clip's playing position                                                                                                                          |
 | /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                     | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position     |
 | /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                     | Stop listening for clip's playing position.                                                                                                          |
 

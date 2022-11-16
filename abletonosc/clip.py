@@ -44,6 +44,7 @@ class ClipHandler(AbletonOSCHandler):
             "is_audio_clip",
             "is_playing",
             "is_recording",
+            "length",
             "playing_position"
         ]
         properties_rw = [

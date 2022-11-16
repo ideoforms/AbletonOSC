@@ -32,10 +32,12 @@ class AbletonOSCHandler(Component):
         setattr(target, prop, params[0])
 
     def _get_property(self, target, prop, params: Optional[Tuple[Any]] = ()) -> Tuple[Any]:
-        self.logger.info("Getting property: %s" % prop)
-        return getattr(target, prop),
+        value = getattr(target, prop)
+        self.logger.info("Getting property: %s = %s" % (prop, value))
+        return value,
 
     def _start_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
+        self.logger.info("Starting listening for %s: %s" % (self.class_identifier, prop))
         def property_changed_callback():
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))

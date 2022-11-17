@@ -53,7 +53,8 @@ class ClipHandler(AbletonOSCHandler):
             "name",
             "pitch_coarse",
             "pitch_fine",
-            "looping"
+            "looping",
+            "warping"
         ]
 
         for method in methods:

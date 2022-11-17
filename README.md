@@ -14,9 +14,11 @@ It is currently (2022-11-11) a work-in-progress. Many major APIs are now exposed
 To install the script:
 
 - Clone this repo, or download/unzip and rename AbletonOSC-master to AbletonOSC
-- Install it following the instructions on Ableton's [Installing third-party remote scripts](https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts) doc, copying the script to:
-  - **Windows**: \Users\[username]\Documents\Ableton\User Library\Remote Scripts
-  - **macOS**: Macintosh HD/Users/[username]/Music/Ableton/User Library/Remote Scripts
+- Install it following the instructions on
+  Ableton's [Installing third-party remote scripts](https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts)
+  doc, copying the script to:
+    - **Windows**: `\Users\[username]\Documents\Ableton\User Library\Remote Scripts`
+    - **macOS**: `Macintosh HD/Users/[username]/Music/Ableton/User Library/Remote Scripts`
 - Restart Live
 - In `Preferences > MIDI`, add the new AbletonOSC Control Surface that should appear. Live should display a message
   saying "AbletonOSC: Listening for OSC on port 11000"
@@ -25,7 +27,8 @@ Activity logs will be output to a `logs` subdirectory.
 
 # Usage
 
-AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**. Replies will be sent to the same IP as the originating message.
+AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**. Replies will be sent to the
+same IP as the originating message.
 
 ## Application API
 
@@ -55,7 +58,7 @@ These messages are sent to the client automatically when the application state c
 | /live/song/stop_all_clips          |              |                 | Stop all clips from playing                                                                  |
 | /live/song/create_audio_track      | index        |                 | Create a new audio track at the specified index (-1 = end of list)                           |
 | /live/song/create_midi_track       | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                            |
-| /live/song/create_return_track     | index        |                 | Create a new return track at the specified index (-1 = end of list)                          |
+| /live/song/create_return_track     |              |                 | Create a new return track                                                                    |
 | /live/song/get/num_scenes          |              | num_scenes      | Query the number of scenes                                                                   | 
 | /live/song/get/num_tracks          |              | num_tracks      | Query the number of tracks                                                                   | 
 | /live/song/create_scene            | index        |                 | Create a new scene at the specified index (-1 = end of list)                                 |
@@ -74,7 +77,7 @@ These messages are sent to the client automatically when the application state c
 | /live/song/start_listen/metronome  |              |                 | Start a listener that sends a message to `/live/song/get/metronome` when metronome changes   |
 | /live/song/stop_listen/metronome   |              |                 | Stop the above listener                                                                      |
 | /live/song/get/cue_points          |              | name, time, ... | Query a list of the song's cue points                                                        |
- | /live/song/cue_point/jump          | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points)     |      
+| /live/song/cue_point/jump          | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points)     |      
 
 Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
 

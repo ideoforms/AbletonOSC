@@ -1,6 +1,13 @@
 import time
 import pytest
 
+#--------------------------------------------------------------------------------
+# Add . to the path so that pythonosc can be imported, enabling unit testing
+# without any external dependencies
+#--------------------------------------------------------------------------------
+import sys
+sys.path.append(".")
+
 from ..client import AbletonOSCClient, TICK_DURATION
 
 # Live tick is 100ms. Wait for this long plus a short additional buffer.

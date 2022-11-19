@@ -71,6 +71,7 @@ class AbletonOSCClient:
         _event = threading.Event()
 
         def received_response(params):
+            print("Received response: %s %s" % (address, str(params)))
             nonlocal rv
             nonlocal _event
             rv = params

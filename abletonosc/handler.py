@@ -42,22 +42,24 @@ class AbletonOSCHandler(Component):
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))
             osc_address = "/live/%s/get/%s" % (self.class_identifier, prop)
-            self.osc_server.send(osc_address, (value,))
+            self.osc_server.send(osc_address, (*params, value,))
 
-        if prop in self.listener_functions:
-            self._stop_listen(target, prop)
+        listener_key = (prop, tuple(params))
+        if listener_key in self.listener_functions:
+            self._stop_listen(target, prop, params)
 
         add_listener_function_name = "add_%s_listener" % prop
         add_listener_function = getattr(target, add_listener_function_name)
         add_listener_function(property_changed_callback)
-        self.listener_functions[prop] = property_changed_callback
+        self.listener_functions[listener_key] = property_changed_callback
 
     def _stop_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
-        if prop in self.listener_functions:
-            listener_function = self.listener_functions[prop]
+        listener_key = (prop, tuple(params))
+        if listener_key in self.listener_functions:
+            listener_function = self.listener_functions[listener_key]
             remove_listener_function_name = "remove_%s_listener" % prop
             remove_listener_function = getattr(target, remove_listener_function_name)
             remove_listener_function(listener_function)
-            del self.listener_functions[prop]
+            del self.listener_functions[listener_key]
         else:
-            self.logger.warning("No listener function found for property: %s" % prop)
+            self.logger.warning("No listener function found for property: %s (%s)" % (prop, str(params)))

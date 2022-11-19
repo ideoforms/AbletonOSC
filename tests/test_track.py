@@ -1,5 +1,6 @@
 from . import client, wait_one_tick, TICK_DURATION
 import pytest
+import itertools
 
 def test_track_get_send(client):
     track_id = 2
@@ -71,18 +72,25 @@ def test_track_devices(client):
 #--------------------------------------------------------------------------------
 
 def test_track_listen_playing_slot_index(client):
-    track_id = 0
     # 1/16th quantize
     client.send_message("/live/song/set/clip_trigger_quantization", (11,))
-    client.send_message("/live/clip_slot/create_clip", (track_id, 0, 4))
-    client.send_message("/live/clip_slot/create_clip", (track_id, 1, 4))
+    for track_id, clip_id in itertools.product((0, 1), (0, 1)):
+        client.send_message("/live/clip_slot/create_clip", (track_id, clip_id, 4))
 
-    client.send_message("/live/track/start_listen/playing_slot_index", (track_id,))
-    client.send_message("/live/clip_slot/fire", (track_id, 0))
-    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0,)
-    client.send_message("/live/clip_slot/fire", (track_id, 1))
-    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1,)
-    client.send_message("/live/track/stop_listen/playing_slot_index", (track_id,))
+    client.send_message("/live/track/start_listen/playing_slot_index", (0,))
+    client.send_message("/live/track/start_listen/playing_slot_index", (1,))
 
-    client.send_message("/live/clip_slot/delete_clip", (track_id, 0))
-    client.send_message("/live/clip_slot/delete_clip", (track_id, 1))
+    client.send_message("/live/clip_slot/fire", (0, 0))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, 0,)
+    client.send_message("/live/clip_slot/fire", (0, 1))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, 1,)
+    client.send_message("/live/clip_slot/fire", (1, 1))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1, 1,)
+    client.send_message("/live/clip_slot/fire", (1, 0))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1, 0,)
+
+    client.send_message("/live/track/stop_listen/playing_slot_index", (0,))
+    client.send_message("/live/track/stop_listen/playing_slot_index", (1,))
+
+    for track_id, clip_id in itertools.product((0, 1), (0, 1)):
+        client.send_message("/live/clip_slot/delete_clip", (track_id, clip_id))

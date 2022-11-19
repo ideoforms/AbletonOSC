@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple, Any, Callable
 from .handler import AbletonOSCHandler
 
 class TrackHandler(AbletonOSCHandler):
@@ -7,14 +7,16 @@ class TrackHandler(AbletonOSCHandler):
         self.class_identifier = "track"
 
     def init_api(self):
-        def create_track_callback(func, *args, include_track_id=False):
+        def create_track_callback(func: Callable,
+                                  *args,
+                                  include_track_id: bool = False):
             def track_callback(params: Tuple[Any]):
                 track_index = params[0]
                 track = self.song.tracks[track_index]
                 if include_track_id:
-                    return func(track, *args, params[0:])
+                    return func(track, *args, tuple(params[0:]))
                 else:
-                    return func(track, *args, params[1:])
+                    return func(track, *args, tuple(params[1:]))
 
             return track_callback
 
@@ -53,9 +55,9 @@ class TrackHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/track/get/%s" % prop,
                                         create_track_callback(self._get_property, prop))
             self.osc_server.add_handler("/live/track/start_listen/%s" % prop,
-                                        create_track_callback(self._start_listen, prop, include_track_id=False))
+                                        create_track_callback(self._start_listen, prop, include_track_id=True))
             self.osc_server.add_handler("/live/track/stop_listen/%s" % prop,
-                                        create_track_callback(self._stop_listen, prop, include_track_id=False))
+                                        create_track_callback(self._stop_listen, prop, include_track_id=True))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/track/set/%s" % prop,
                                         create_track_callback(self._set_property, prop))
@@ -115,6 +117,7 @@ class TrackHandler(AbletonOSCHandler):
 
         def track_get_arrangement_clip_start_times(track, params: Tuple[Any]):
             return tuple(clip.start_time for clip in track.arrangement_clips)
+
         """
         Returns a list of clip properties, or Nil if clip is empty
         """

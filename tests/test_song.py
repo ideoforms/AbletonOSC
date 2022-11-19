@@ -16,7 +16,8 @@ def test_song_play(client):
 def test_song_beat(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/start_playing")
-    assert client.await_message("/live/song/beat", timeout=1.0) == (0,)
+    wait_one_tick()
+    wait_one_tick()
     assert client.await_message("/live/song/beat", timeout=1.0) == (1,)
     assert client.await_message("/live/song/beat", timeout=1.0) == (2,)
     client.send_message("/live/song/stop_playing")

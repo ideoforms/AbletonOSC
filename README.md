@@ -100,38 +100,38 @@ These messages are sent to the client automatically when the song state changes.
 
 ## Track API
 
-| Address                                      | Query params             | Response params   | Description                                      |
-|:---------------------------------------------|:-------------------------|:------------------|:-------------------------------------------------|
-| /live/track/stop_all_clips                   | track_id                 |                   | Stop all clips on track                          |
-| /live/track/get/color                        | track_id                 | color             | Query track color                                |
-| /live/track/set/color                        | track_id, color          |                   | Set track color                                  |
-| /live/track/get/mute                         | track_id                 | mute              | Query track mute on/off                          |
-| /live/track/set/mute                         | track_id, mute           |                   | Set track mute on/off                            |
-| /live/track/get/solo                         | track_id                 | solo              | Query track solo on/off                          |
-| /live/track/set/solo                         | track_id, solo           |                   | Set track solo on/off                            |
-| /live/track/get/name                         | track_id                 | name              | Query track name                                 |
-| /live/track/set/name                         | track_id, name           |                   | Set track name                                   |
-| /live/track/get/volume                       | track_id                 | volume            | Query track volume                               |
-| /live/track/set/volume                       | track_id, volume         |                   | Set track volume                                 |
-| /live/track/get/panning                      | track_id                 | panning           | Query track panning                              |
-| /live/track/set/panning                      | track_id, panning        |                   | Set track panning                                |
-| /live/track/get/send                         | track_id, send_id        | value             | Query track send                                 |
-| /live/track/set/send                         | track_id, send_id, value |                   | Set track send                                   |
-| /live/track/get/playing_slot_index           | track_id                 | index             | Query currently-playing slot                     |
-| /live/track/start_listen/playing_slot_index  | track_id                 |                   | Start listening to currently-playing slot        |
-| /live/track/stop_listen/playing_slot_index   | track_id                 |                   | Stop listening to currently-playing slot         |
-| /live/track/get/fired_slot_index             | track_id                 | index             | Query fired slot                                 |
-| /live/track/start_listen/fired_slot_index    | track_id                 |                   | Start listening to fired slot                    |
-| /live/track/stop_listen/fired_slot_index     | track_id                 |                   | Stop listening to fired slot                     |
-| /live/track/get/clips/name                   | track_id                 | [name, ....]      | Query all clip names on track                    |
-| /live/track/get/clips/length                 | track_id                 | [length, ...]     | Query all clip lengths on track                  |
-| /live/track/get/arrangement_clips/name       | track_id                 | [name, ....]      | Query all arrangement view clip names on track   |
-| /live/track/get/arrangement_clips/length     | track_id                 | [length, ...]     | Query all arrangement view clip lengths on track |
-| /live/track/get/arrangement_clips/start_time | track_id                 | [start_time, ...] | Query all arrangement view clip times on track   |
-| /live/track/get/num_devices                  | track_id                 | num_devices       | Query the number of devices on the track         |
-| /live/track/get/devices/name                 | track_id                 | [name, ...]       | Query all device names on track                  |
-| /live/track/get/devices/type                 | track_id                 | [type, ...]       | Query all devices types on track                 |
-| /live/track/get/devices/class_name           | track_id                 | [class, ...]      | Query all device class names on track            |
+| Address                                      | Query params             | Response params   | Description                                                                        |
+|:---------------------------------------------|:-------------------------|:------------------|:-----------------------------------------------------------------------------------|
+| /live/track/stop_all_clips                   | track_id                 |                   | Stop all clips on track                                                            |
+| /live/track/get/color                        | track_id                 | color             | Query track color                                                                  |
+| /live/track/set/color                        | track_id, color          |                   | Set track color                                                                    |
+| /live/track/get/mute                         | track_id                 | mute              | Query track mute on/off                                                            |
+| /live/track/set/mute                         | track_id, mute           |                   | Set track mute on/off                                                              |
+| /live/track/get/solo                         | track_id                 | solo              | Query track solo on/off                                                            |
+| /live/track/set/solo                         | track_id, solo           |                   | Set track solo on/off                                                              |
+| /live/track/get/name                         | track_id                 | name              | Query track name                                                                   |
+| /live/track/set/name                         | track_id, name           |                   | Set track name                                                                     |
+| /live/track/get/volume                       | track_id                 | volume            | Query track volume                                                                 |
+| /live/track/set/volume                       | track_id, volume         |                   | Set track volume                                                                   |
+| /live/track/get/panning                      | track_id                 | panning           | Query track panning                                                                |
+| /live/track/set/panning                      | track_id, panning        |                   | Set track panning                                                                  |
+| /live/track/get/send                         | track_id, send_id        | value             | Query track send                                                                   |
+| /live/track/set/send                         | track_id, send_id, value |                   | Set track send                                                                     |
+| /live/track/get/playing_slot_index           | track_id                 | index             | Query currently-playing slot                                                       |
+| /live/track/start_listen/playing_slot_index  | track_id                 | track_id, index   | Start listening to currently-playing slot. Replies include the track_id and index. |
+| /live/track/stop_listen/playing_slot_index   | track_id                 |                   | Stop listening to currently-playing slot                                           |
+| /live/track/get/fired_slot_index             | track_id                 | index             | Query fired slot                                                                   |
+| /live/track/start_listen/fired_slot_index    | track_id                 | track_id, index   | Start listening to fired slot. Replies include the track_id and index.             |
+| /live/track/stop_listen/fired_slot_index     | track_id                 |                   | Stop listening to fired slot                                                       |
+| /live/track/get/clips/name                   | track_id                 | [name, ....]      | Query all clip names on track                                                      |
+| /live/track/get/clips/length                 | track_id                 | [length, ...]     | Query all clip lengths on track                                                    |
+| /live/track/get/arrangement_clips/name       | track_id                 | [name, ....]      | Query all arrangement view clip names on track                                     |
+| /live/track/get/arrangement_clips/length     | track_id                 | [length, ...]     | Query all arrangement view clip lengths on track                                   |
+| /live/track/get/arrangement_clips/start_time | track_id                 | [start_time, ...] | Query all arrangement view clip times on track                                     |
+| /live/track/get/num_devices                  | track_id                 | num_devices       | Query the number of devices on the track                                           |
+| /live/track/get/devices/name                 | track_id                 | [name, ...]       | Query all device names on track                                                    |
+| /live/track/get/devices/type                 | track_id                 | [type, ...]       | Query all devices types on track                                                   |
+| /live/track/get/devices/class_name           | track_id                 | [class, ...]      | Query all device class names on track                                              |
 
 See **Device API** for details on Device type/class_names.
  

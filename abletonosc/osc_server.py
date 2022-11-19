@@ -40,22 +40,35 @@ class OSCServer:
         self.logger.info("Starting OSC server (local %s, response port %d)",
                          str(self._local_addr), self._response_port)
 
-    def add_handler(self, address: str, handler: Callable):
+    def add_handler(self, address: str, handler: Callable) -> None:
+        """
+        Add an OSC handler.
+
+        Args:
+            address: The OSC address string
+            handler: A handler function, with signature:
+                     params: Tuple[Any, ...]
+        """
         self._callbacks[address] = handler
 
-    def clear_handlers(self):
+    def clear_handlers(self) -> None:
+        """
+        Remove all existing OSC handlers.
+        """
         self._callbacks = {}
 
     def send(self,
              address: str,
              params: Tuple = (),
-             remote_addr: Tuple = None) -> None:
+             remote_addr: Tuple[str, int] = None) -> None:
         """
         Send an OSC message.
 
         Args:
             address: The OSC address (e.g. /frequency)
             params: A tuple of zero or more OSC params
+            remote_addr: The remote address to send to, as a 2-tuple (hostname, port).
+                         If None, uses the default remote address.
         """
         msg_builder = OscMessageBuilder(address)
         for param in params:
@@ -104,10 +117,20 @@ class OSCServer:
 
         except socket.error as e:
             if e.errno == errno.ECONNRESET:
+                #--------------------------------------------------------------------------------
+                # This benign error seems to occur on startup on Windows
+                #--------------------------------------------------------------------------------
                 self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
             elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
+                #--------------------------------------------------------------------------------
+                # Another benign Windows networking error, throw when no data is received
+                # on a call to recvfrom() on a non-blocking socket
+                #--------------------------------------------------------------------------------
                 pass
             else:
+                #--------------------------------------------------------------------------------
+                # Something more serious has happened
+                #--------------------------------------------------------------------------------
                 self.logger.info("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
 
         except Exception as e:

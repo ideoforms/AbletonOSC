@@ -81,42 +81,34 @@ class AbletonOSCClient:
         self.remove_handler(address)
         return _event.is_set()
 
-    def query_and_await(self,
-                        address: str,
-                        params: tuple = (),
-                        fn: Callable = None,
-                        timeout: float = TICK_DURATION):
-        _event = threading.Event()
-
-        def received_response(params):
-            nonlocal _event
-            if fn is None or fn(params):
-                _event.set()
-
-        self.add_handler(address, received_response)
-        self.send_message(address, params)
-        _event.wait(timeout)
-        self.remove_handler(address)
-        return _event.is_set()
-
     def query(self,
               address: str,
               params: tuple = (),
               timeout: float = TICK_DURATION):
         rv = None
 
-        def set_rv(values):
-            nonlocal rv
-            rv = values
+        _event = threading.Event()
 
-        self.query_and_await(address, params, set_rv, timeout)
+        def received_response(params):
+            nonlocal rv
+            nonlocal _event
+            rv = params
+            _event.set()
+
+        self.add_handler(address, received_response)
+        self.send_message(address, params)
+        _event.wait(timeout)
+        self.remove_handler(address)
+        if not _event.is_set():
+            raise RuntimeError("No response received to query: %s" % address)
+
         return rv
 
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     client.send_message("/live/song/set/tempo", [125.0])
     tempo = client.query("/live/song/get/tempo")
-    print("Got song tempo: %.1f" % tempo)
+    print("Got song tempo: %.1f" % tempo[0])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Client for AbletonOSC")

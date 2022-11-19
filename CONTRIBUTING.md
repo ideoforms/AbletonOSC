@@ -2,7 +2,10 @@
 
 ## Tests
 
-For unit tests to pass, Live must be configured with default audio input and output devices.
+For unit tests to pass:
+
+- Live must be configured with default audio input and output devices, and
+- Live must be started with a blank default set
 
 To run unit tests, `pip3 install pytest`, start Live, change to the `AbletonOSC` directory, and run:
 
@@ -20,7 +23,7 @@ To reload the codebase, send an OSC message to `/live/reload`.
 
 Logging can be performed from any of the AbletonOSCHandler classes via the `self.logger` property.
 
-AbletonOSC logs events to `/tmp/abletonosc.log` on macOS, or `c:\temp\abletonosc.log` on Windows.
+AbletonOSC logs internal events to `logs/abletonosc.log` relative to the AbletonOSC directory.
 
 ## Debugging compile-time issues
 

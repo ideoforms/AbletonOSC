@@ -13,12 +13,20 @@ class OSCServer:
                  local_addr: Tuple[str, int] = ('0.0.0.0', OSC_LISTEN_PORT),
                  remote_addr: Tuple[str, int] = ('127.0.0.1', OSC_RESPONSE_PORT)):
         """
-        Class that handles OSC server and client responsibilities
+        Class that handles OSC server responsibilities, including support for sending
+        reply messages.
 
         Implemented because pythonosc's OSC server causes a beachball when handling
         incoming messages. To investigate, as it would be ultimately better not to have
         to roll our own.
+
+        Args:
+            local_addr: Local address and port to listen on.
+                        By default, binds to the wildcard address 0.0.0.0, which means listening on
+                        every available local IPv4 interface (including 127.0.0.1).
+            remote_addr: Remote address to send replies to, by default. Can be overridden in send().
         """
+
         self._local_addr = local_addr
         self._remote_addr = remote_addr
         self._response_port = remote_addr[1]

@@ -1,7 +1,7 @@
-# AbletonOSC: Control Ableton Live 11+ with OSC
+# AbletonOSC: Control Ableton Live 11 with OSC
 
 AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to
-control [Ableton Live 11+](https://www.ableton.com/en/live/). Building on ideas from the
+control [Ableton Live 11](https://www.ableton.com/en/live/). Building on ideas from the
 older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the
 entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API
 ([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive control
@@ -32,6 +32,9 @@ same IP as the originating message.
 
 ## Application API
 
+<details>
+<summary><b>Documentation</b>: Application API</summary>
+
 | Address                       | Query params | Response params              | Description                                                                      |
 |:------------------------------|:-------------|:-----------------------------|:---------------------------------------------------------------------------------|
 | /live/test                    |              | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test     |
@@ -46,9 +49,16 @@ These messages are sent to the client automatically when the application state c
 |:--------------|:----------------|:----------------------------------------------------------|
 | /live/startup |                 | Sent to the client application when AbletonOSC is started |
 
+</details>
+
 ---
 
 ## Song API
+
+Represents the top-level Song object. Used to start/stop playback, create/modify scenes, create/jump to cue points, and set global parameters (tempo, metronome).
+
+<details>
+<summary><b>Documentation</b>: Song API</summary>
 
 | Address                            | Query params | Response params | Description                                                                                  |
 |:-----------------------------------|:-------------|:----------------|:---------------------------------------------------------------------------------------------|
@@ -96,9 +106,16 @@ These messages are sent to the client automatically when the song state changes.
 |:----------------|:----------------|:---------------------------------------------------------------------|
 | /live/song/beat | beat_number     | Sent to the client application on each beat when the song is playing |
 
+</details>
+
 ---
 
 ## Track API
+
+Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
+
+<details>
+<summary><b>Documentation</b>: Track API</summary>
 
 | Address                                      | Query params             | Response params   | Description                                                                        |
 |:---------------------------------------------|:-------------------------|:------------------|:-----------------------------------------------------------------------------------|
@@ -135,9 +152,16 @@ These messages are sent to the client automatically when the song state changes.
 
 See **Device API** for details on Device type/class_names.
  
+</details>
+
 ---
 
 ## Clip Slot API
+
+A Clip Slot represents a container for a clip. It is used to create and delete clips, and query their existence.
+
+<details>
+<summary><b>Documentation</b>: Clip Slot API</summary>
 
 | Address                             | Query params                       | Response params | Description                              |
 |:------------------------------------|:-----------------------------------|:----------------|:-----------------------------------------|
@@ -149,9 +173,16 @@ See **Device API** for details on Device type/class_names.
 
 # TODO: Add more properties and methods
 
+</details>
+
 ---
 
 ## Clip API
+
+Represents an audio or MIDI clip. Can be used to start/stop clips, and query/modify their notes, name, gain, pitch, color, playing state/position, etc.
+
+<details>
+<summary><b>Documentation</b>: Clip API</summary>
 
 | Address                                  | Query params                                                        | Response params                                                     | Description                                                                                                                                          |
 |:-----------------------------------------|:--------------------------------------------------------------------|:--------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -179,10 +210,16 @@ See **Device API** for details on Device type/class_names.
 | /live/clip/get/playing_position          | track_id, clip_id                                                   | playing_position                                                    | Get clip's playing position                                                                                                                          |
 | /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                     | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position     |
 | /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                     | Stop listening for clip's playing position.                                                                                                          |
+</details>
 
 ---
 
 ## Device API
+
+Represents an instrument or effect.
+
+<details>
+<summary><b>Documentation</b>: Device API</summary>
 
 | Address                           | Query params                             | Response params | Description                                           |
 |:----------------------------------|:-----------------------------------------|:----------------|:------------------------------------------------------|
@@ -204,6 +241,8 @@ For devices:
 - `type` is 0 = audio_effect, 1 = instrument, 2 = midi_effect
 - `class_name` is the Live instrument/effect name, e.g. Operator, Reverb. For external plugins and racks, can be
   AuPluginDevice, PluginDevice, InstrumentGroupDevice...
+
+</details>
 
  ---
 

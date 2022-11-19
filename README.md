@@ -66,6 +66,8 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 | /live/song/stop_playing            |              |                 | Stop session playback                                                                        |
 | /live/song/continue_playing        |              |                 | Resume session playback                                                                      |
 | /live/song/stop_all_clips          |              |                 | Stop all clips from playing                                                                  |
+| /live/song/undo                    |              |                 | Undo the last operation                                                                      |
+| /live/song/redo                    |              |                 | Redo the last undone operation                                                               |
 | /live/song/create_audio_track      | index        |                 | Create a new audio track at the specified index (-1 = end of list)                           |
 | /live/song/create_midi_track       | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                            |
 | /live/song/create_return_track     |              |                 | Create a new return track                                                                    |

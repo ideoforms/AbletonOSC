@@ -99,24 +99,23 @@ class AbletonOSCClient:
         self.remove_handler(address)
         return _event.is_set()
 
-    def query_and_return(self,
-                         address: str,
-                         params: tuple = (),
-                         timeout: float = TICK_DURATION):
+    def query(self,
+              address: str,
+              params: tuple = (),
+              timeout: float = TICK_DURATION):
         rv = None
+
         def set_rv(values):
             nonlocal rv
             rv = values
+
         self.query_and_await(address, params, set_rv, timeout)
-        if rv is not None and len(rv) == 1:
-            return rv[0]
-        else:
-            return rv
+        return rv
 
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     client.send_message("/live/song/set/tempo", [125.0])
-    tempo = client.query_and_return("/live/song/get/tempo")
+    tempo = client.query("/live/song/get/tempo")
     print("Got song tempo: %.1f" % tempo)
 
 if __name__ == "__main__":

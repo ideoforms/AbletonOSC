@@ -32,35 +32,34 @@ def _create_test_clips(client):
 def _test_clip_property(client, track_id, clip_id, property, values):
     for value in values:
         print("Testing clip property %s, value: %s" % (property, value))
-        client.send_message("/live/clip/set/%s" % property, [track_id, clip_id, value])
+        client.send_message("/live/clip/set/%s" % property, (track_id, clip_id, value))
         wait_one_tick()
-        assert client.query_and_await("/live/clip/get/%s" % property, (track_id, clip_id),
-                                      fn=lambda params: params[0] == value)
+        assert client.query("/live/clip/get/%s" % property, (track_id, clip_id)) == (value,)
 
 def test_clip_property_name(client):
-    _test_clip_property(client, 0, 0, "name", ["Alpha", "Beta"])
+    _test_clip_property(client, 0, 0, "name", ("Alpha", "Beta"))
 
 def test_clip_property_color(client):
-    _test_clip_property(client, 0, 0, "color", [0x001AFF2F, 0x001A2F96])
+    _test_clip_property(client, 0, 0, "color", (0x001AFF2F, 0x001A2F96))
 
 def test_clip_property_gain(client):
-    _test_clip_property(client, 2, 0, "gain", [0.5, 1.0])
+    _test_clip_property(client, 2, 0, "gain", (0.5, 1.0))
 
 def test_clip_property_pitch_coarse(client):
-    _test_clip_property(client, 2, 0, "pitch_coarse", [4, 0])
+    _test_clip_property(client, 2, 0, "pitch_coarse", (4, 0))
 
 def test_clip_property_pitch_fine(client):
-    _test_clip_property(client, 2, 0, "pitch_fine", [0.5, 0.0])
+    _test_clip_property(client, 2, 0, "pitch_fine", (0.5, 0.0))
 
 def test_clip_add_notes(client):
-    client.send_message("/live/clip/add/notes", [0, 0,
+    client.send_message("/live/clip/add/notes", (0, 0,
                                                  60, 0.0, 0.25, 64, False,
-                                                 67, 0.25, 0.5, 32, False])
+                                                 67, 0.25, 0.5, 32, False))
 
     def check_notes(params):
         assert params[:5] == (60, 0.0, 0.25, 64, False)
         assert params[5:10] == (67, 0.25, 0.5, 32, False)
         return True
 
-    client.send_message("/live/clip/get/notes", [0, 0])
+    client.send_message("/live/clip/get/notes", (0, 0))
     assert client.await_reply("/live/clip/get/notes", check_notes)

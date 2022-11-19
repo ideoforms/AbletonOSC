@@ -7,13 +7,11 @@ from . import client, wait_one_tick, TICK_DURATION
 def test_song_play(client):
     client.send_message("/live/song/start_playing")
     wait_one_tick()
-    assert client.query_and_await("/live/song/get/is_playing", (),
-                                  lambda params: params[0] is True)
+    assert client.query("/live/song/get/is_playing") == (True,)
 
     client.send_message("/live/song/stop_playing")
     wait_one_tick()
-    assert client.query_and_await("/live/song/get/is_playing", (),
-                                  lambda params: params[0] is False)
+    assert client.query("/live/song/get/is_playing") == (False,)
 
 def test_song_beat(client):
     client.send_message("/live/song/stop_playing")
@@ -36,15 +34,15 @@ def test_song_stop_all_clips(client):
     # Sometimes a wait >one tick is required here. Not sure why.
     wait_one_tick()
     wait_one_tick()
-    assert client.query_and_await("/live/clip/get/is_playing", (0, 0), lambda params: params[0] is True)
-    assert client.query_and_await("/live/clip/get/is_playing", (1, 0), lambda params: params[0] is True)
+    assert client.query("/live/clip/get/is_playing", (0, 0)) == (True,)
+    assert client.query("/live/clip/get/is_playing", (1, 0)) == (True,)
 
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/stop_all_clips")
     wait_one_tick()
     wait_one_tick()
-    assert client.query_and_await("/live/clip/get/is_playing", (0, 0), lambda params: params[0] is False)
-    assert client.query_and_await("/live/clip/get/is_playing", (1, 0), lambda params: params[0] is False)
+    assert client.query("/live/clip/get/is_playing", (0, 0)) == (False,)
+    assert client.query("/live/clip/get/is_playing", (1, 0)) == (False,)
 
     client.send_message("/live/clip_slot/delete_clip", (0, 0))
     client.send_message("/live/clip_slot/delete_clip", (1, 0))

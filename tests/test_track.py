@@ -8,8 +8,7 @@ def test_track_get_send(client):
     for value in [0.5, 0.0]:
         client.send_message("/live/track/set/send", [track_id, send_id, value])
         wait_one_tick()
-        assert client.query_and_await("/live/track/get/send", (track_id, send_id),
-                                      lambda params: params[0] == value)
+        assert client.query("/live/track/get/send", (track_id, send_id)) == (value,)
 
 #--------------------------------------------------------------------------------
 # Test track properties
@@ -20,8 +19,7 @@ def _test_track_property(client, track_id, property, values):
         print("Testing property %s, value: %s" % (property, value))
         client.send_message("/live/track/set/%s" % property, [track_id, value])
         wait_one_tick()
-        assert client.query_and_await("/live/track/get/%s" % property, [track_id],
-                                      fn=lambda params: params[0] == value)
+        assert client.query("/live/track/get/%s" % property, [track_id]) == (value,)
 
 def test_track_property_panning(client):
     _test_track_property(client, 2, "panning", [0.5, 0.0])
@@ -54,10 +52,8 @@ def test_track_clips(client):
     client.send_message("/live/clip/set/name", (track_id, 1, "Beta"))
 
     wait_one_tick()
-    assert client.query_and_await("/live/track/get/clips/name", (track_id,),
-                                  fn=lambda params: params == ("Alpha", "Beta"))
-    assert client.query_and_await("/live/track/get/clips/length", (track_id,),
-                                  fn=lambda params: params == (4, 2))
+    assert client.query("/live/track/get/clips/name", (track_id,)) == ("Alpha", "Beta")
+    assert client.query("/live/track/get/clips/length", (track_id,)) == (4, 2)
 
     client.send_message("/live/clip_slot/delete_clip", (track_id, 0))
     client.send_message("/live/clip_slot/delete_clip", (track_id, 1))
@@ -68,8 +64,7 @@ def test_track_clips(client):
 
 def test_track_devices(client):
     track_id = 0
-    assert client.query_and_await("/live/track/get/num_devices", (track_id,),
-                                  fn=lambda params: params[0] == 0)
+    assert client.query("/live/track/get/num_devices", (track_id,)) == (0,)
 
 #--------------------------------------------------------------------------------
 # Test track properties - listeners

@@ -79,9 +79,9 @@ def test_track_listen_playing_slot_index(client):
 
     client.send_message("/live/track/start_listen/playing_slot_index", (track_id,))
     client.send_message("/live/clip_slot/fire", (track_id, 0))
-    assert client.await_reply("/live/track/get/playing_slot_index", lambda params: params[0] == 0, TICK_DURATION * 2)
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0,)
     client.send_message("/live/clip_slot/fire", (track_id, 1))
-    assert client.await_reply("/live/track/get/playing_slot_index", lambda params: params[0] == 1, TICK_DURATION * 2)
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1,)
     client.send_message("/live/track/stop_listen/playing_slot_index", (track_id,))
 
     client.send_message("/live/clip_slot/delete_clip", (track_id, 0))

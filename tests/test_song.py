@@ -16,13 +16,13 @@ def test_song_play(client):
 def test_song_beat(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/start_playing")
-    assert client.await_reply("/live/song/beat", lambda params: params[0] == 0, timeout=1.0)
-    assert client.await_reply("/live/song/beat", lambda params: params[0] == 1, timeout=1.0)
-    assert client.await_reply("/live/song/beat", lambda params: params[0] == 2, timeout=1.0)
+    assert client.await_message("/live/song/beat", timeout=1.0) == (0,)
+    assert client.await_message("/live/song/beat", timeout=1.0) == (1,)
+    assert client.await_message("/live/song/beat", timeout=1.0) == (2,)
     client.send_message("/live/song/stop_playing")
     wait_one_tick()
     client.send_message("/live/song/continue_playing")
-    assert client.await_reply("/live/song/beat", lambda params: params[0] == 3, timeout=1.0)
+    assert client.await_message("/live/song/beat", timeout=1.0) == (3,)
     client.send_message("/live/song/stop_playing")
     wait_one_tick()
 
@@ -55,9 +55,9 @@ def test_song_listen_is_playing(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/start_listen/is_playing")
     client.send_message("/live/song/start_playing")
-    assert client.await_reply("/live/song/get/is_playing", lambda params: params[0] is True, TICK_DURATION * 2)
+    assert client.await_message("/live/song/get/is_playing", TICK_DURATION * 2) == (True,)
     client.send_message("/live/song/stop_playing")
-    assert client.await_reply("/live/song/get/is_playing", lambda params: params[0] is False, TICK_DURATION * 2)
+    assert client.await_message("/live/song/get/is_playing", TICK_DURATION * 2) == (False,)
     client.send_message("/live/song/stop_listen/is_playing")
 
 def test_song_listen_tempo(client):
@@ -66,7 +66,7 @@ def test_song_listen_tempo(client):
 
     for value in [81, 120]:
         client.send_message("/live/song/set/tempo", [value])
-        assert client.await_reply("/live/song/get/tempo", lambda params: params[0] == value, TICK_DURATION * 2)
+        assert client.await_message("/live/song/get/tempo", TICK_DURATION * 2) == (value,)
 
     client.send_message("/live/song/stop_listen/tempo")
 

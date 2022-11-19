@@ -23,20 +23,20 @@ class AbletonOSCHandler(Component):
     #--------------------------------------------------------------------------------
     # Generic callbacks
     #--------------------------------------------------------------------------------
-    def _call_method(self, target, method, params: Optional[Tuple[Any]] = ()):
+    def _call_method(self, target, method, params: Optional[Tuple] = ()):
         self.logger.info("Calling method: %s (params %s)" % (method, str(params)))
         getattr(target, method)(*params)
 
-    def _set_property(self, target, prop, params: Tuple[Any]) -> None:
+    def _set_property(self, target, prop, params: Tuple) -> None:
         self.logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
         setattr(target, prop, params[0])
 
-    def _get_property(self, target, prop, params: Optional[Tuple[Any]] = ()) -> Tuple[Any]:
+    def _get_property(self, target, prop, params: Optional[Tuple] = ()) -> Tuple[Any]:
         value = getattr(target, prop)
         self.logger.info("Getting property: %s = %s" % (prop, value))
         return value,
 
-    def _start_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
+    def _start_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
         self.logger.info("Starting listening for %s: %s" % (self.class_identifier, prop))
         def property_changed_callback():
             value = getattr(target, prop)

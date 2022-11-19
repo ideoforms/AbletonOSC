@@ -48,7 +48,7 @@ class OSCServer:
 
     def send(self,
              address: str,
-             params: Tuple[Any] = (),
+             params: Tuple = (),
              remote_addr: Tuple = None) -> None:
         """
         Send an OSC message.

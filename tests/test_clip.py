@@ -56,10 +56,6 @@ def test_clip_add_notes(client):
                                                  60, 0.0, 0.25, 64, False,
                                                  67, 0.25, 0.5, 32, False))
 
-    def check_notes(params):
-        assert params[:5] == (60, 0.0, 0.25, 64, False)
-        assert params[5:10] == (67, 0.25, 0.5, 32, False)
-        return True
-
     client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_reply("/live/clip/get/notes", check_notes)
+    assert client.await_message("/live/clip/get/notes") == (60, 0.0, 0.25, 64, False,
+                                                            67, 0.25, 0.5, 32, False)

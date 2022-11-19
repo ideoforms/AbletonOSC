@@ -50,9 +50,8 @@ class AbletonOSCClient:
                        address: str):
         del self.address_handlers[address]
 
-    def await_reply(self,
+    def await_message(self,
                     address: str,
-                    fn: Callable = None,
                     timeout: float = TICK_DURATION):
         """
         Awaits a reply from the given `address`, and optionally asserts that the function `fn`
@@ -68,25 +67,27 @@ class AbletonOSCClient:
             False otherwise
 
         """
+        rv = None
         _event = threading.Event()
 
         def received_response(params):
-            print("Received response: %s" % str(params))
+            nonlocal rv
             nonlocal _event
-            if fn is None or fn(params):
-                _event.set()
+            rv = params
+            _event.set()
 
         self.add_handler(address, received_response)
         _event.wait(timeout)
         self.remove_handler(address)
-        return _event.is_set()
+        if not _event.is_set():
+            raise RuntimeError("No response received to query: %s" % address)
+        return rv
 
     def query(self,
               address: str,
               params: tuple = (),
               timeout: float = TICK_DURATION):
         rv = None
-
         _event = threading.Event()
 
         def received_response(params):
@@ -101,7 +102,6 @@ class AbletonOSCClient:
         self.remove_handler(address)
         if not _event.is_set():
             raise RuntimeError("No response received to query: %s" % address)
-
         return rv
 
 def main(args):

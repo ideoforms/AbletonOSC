@@ -5,7 +5,6 @@ from . import abletonosc
 import importlib
 import traceback
 import logging
-import sys
 import os
 
 logger = logging.getLogger("abletonosc")

@@ -101,10 +101,14 @@ class SongHandler(AbletonOSCHandler):
         # /live/song/beat listener
         #--------------------------------------------------------------------------------
         self.last_song_time = -1.0
-        def song_time_changed():
-            # If song has rewound or skipped to next beat, sent a /live/beat message
-            if (self.song.current_song_time < self.last_song_time) or \
-                    (int(self.song.current_song_time) > int(self.last_song_time)):
-                self.osc_server.send("/live/song/beat", (int(self.song.current_song_time),))
-            self.last_song_time = self.song.current_song_time
-        self.song.add_current_song_time_listener(song_time_changed)
+        self.song.add_current_song_time_listener(self.song_time_changed)
+
+    def song_time_changed(self):
+        # If song has rewound or skipped to next beat, sent a /live/beat message
+        if (self.song.current_song_time < self.last_song_time) or \
+                (int(self.song.current_song_time) > int(self.last_song_time)):
+            self.osc_server.send("/live/song/beat", (int(self.song.current_song_time),))
+        self.last_song_time = self.song.current_song_time
+
+    def clear_api(self):
+        self.song.remove_current_song_time_listener(self.song_time_changed)

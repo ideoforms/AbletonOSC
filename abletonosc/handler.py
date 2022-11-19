@@ -24,20 +24,19 @@ class AbletonOSCHandler(Component):
     # Generic callbacks
     #--------------------------------------------------------------------------------
     def _call_method(self, target, method, params: Optional[Tuple] = ()):
-        self.logger.info("Calling method: %s (params %s)" % (method, str(params)))
+        self.logger.info("Calling method for %s: %s (params %s)" % (self.class_identifier, method, str(params)))
         getattr(target, method)(*params)
 
     def _set_property(self, target, prop, params: Tuple) -> None:
-        self.logger.info("Setting property: %s (new value %s)" % (prop, params[0]))
+        self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
         setattr(target, prop, params[0])
 
     def _get_property(self, target, prop, params: Optional[Tuple] = ()) -> Tuple[Any]:
         value = getattr(target, prop)
-        self.logger.info("Getting property: %s = %s" % (prop, value))
+        self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, value))
         return value,
 
     def _start_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
-        self.logger.info("Starting listening for %s: %s" % (self.class_identifier, prop))
         def property_changed_callback():
             value = getattr(target, prop)
             self.logger.info("Property %s changed: %s" % (prop, value))
@@ -48,6 +47,7 @@ class AbletonOSCHandler(Component):
         if listener_key in self.listener_functions:
             self._stop_listen(target, prop, params)
 
+        self.logger.info("Adding listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
         add_listener_function_name = "add_%s_listener" % prop
         add_listener_function = getattr(target, add_listener_function_name)
         add_listener_function(property_changed_callback)
@@ -56,6 +56,7 @@ class AbletonOSCHandler(Component):
     def _stop_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         listener_key = (prop, tuple(params))
         if listener_key in self.listener_functions:
+            self.logger.info("Removing listener for %s %s, property %s" % (self.class_identifier, str(params), prop))
             listener_function = self.listener_functions[listener_key]
             remove_listener_function_name = "remove_%s_listener" % prop
             remove_listener_function = getattr(target, remove_listener_function_name)

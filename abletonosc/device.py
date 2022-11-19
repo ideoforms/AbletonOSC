@@ -2,6 +2,10 @@ from typing import Tuple, Any
 from .handler import AbletonOSCHandler
 
 class DeviceHandler(AbletonOSCHandler):
+    def __init__(self, manager):
+        super().__init__(manager)
+        self.class_identifier = "device"
+
     def init_api(self):
         def create_device_callback(func, *args):
             def device_callback(params: Tuple[Any]):

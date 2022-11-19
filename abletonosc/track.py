@@ -66,13 +66,13 @@ class TrackHandler(AbletonOSCHandler):
         # Volume, panning and send are properties of the track's mixer_device so
         # can't be formulated as normal callbacks that reference properties of track
         #--------------------------------------------------------------------------------
-        def track_get_volume(track, params: Tuple[Any] = ()):
+        def track_get_volume(track, _):
             return track.mixer_device.volume.value,
 
         def track_set_volume(track, params: Tuple[Any] = ()):
             track.mixer_device.volume.value = params[0]
 
-        def track_get_panning(track, params: Tuple[Any] = ()):
+        def track_get_panning(track, _):
             return track.mixer_device.panning.value,
 
         def track_set_panning(track, params: Tuple[Any] = ()):
@@ -100,22 +100,22 @@ class TrackHandler(AbletonOSCHandler):
 
         self.osc_server.add_handler("/live/track/delete_clip", create_track_callback(track_delete_clip))
 
-        def track_get_clip_names(track, params: Tuple[Any]):
+        def track_get_clip_names(track, _):
             return tuple(clip_slot.clip.name if clip_slot.clip else None for clip_slot in track.clip_slots)
 
-        def track_get_clip_lengths(track, params: Tuple[Any]):
+        def track_get_clip_lengths(track, _):
             return tuple(clip_slot.clip.length if clip_slot.clip else None for clip_slot in track.clip_slots)
 
-        def track_get_clip_colors(track, params: Tuple[Any]):
+        def track_get_clip_colors(track, _):
             return tuple(clip_slot.clip.color if clip_slot.clip else None for clip_slot in track.clip_slots)
 
-        def track_get_arrangement_clip_names(track, params: Tuple[Any]):
+        def track_get_arrangement_clip_names(track, _):
             return tuple(clip.name for clip in track.arrangement_clips)
 
-        def track_get_arrangement_clip_lengths(track, params: Tuple[Any]):
+        def track_get_arrangement_clip_lengths(track, _):
             return tuple(clip.length for clip in track.arrangement_clips)
 
-        def track_get_arrangement_clip_start_times(track, params: Tuple[Any]):
+        def track_get_arrangement_clip_start_times(track, _):
             return tuple(clip.start_time for clip in track.arrangement_clips)
 
         """
@@ -128,19 +128,19 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/get/arrangement_clips/length", create_track_callback(track_get_arrangement_clip_lengths))
         self.osc_server.add_handler("/live/track/get/arrangement_clips/start_time", create_track_callback(track_get_arrangement_clip_start_times))
 
-        def track_get_num_devices(track, params: Tuple[Any]):
+        def track_get_num_devices(track, _):
             return len(track.devices),
 
-        def track_get_device_names(track, params: Tuple[Any]):
+        def track_get_device_names(track, _):
             return tuple(device.name for device in track.devices)
 
-        def track_get_device_types(track, params: Tuple[Any]):
+        def track_get_device_types(track, _):
             return tuple(device.type for device in track.devices)
 
-        def track_get_device_class_names(track, params: Tuple[Any]):
+        def track_get_device_class_names(track, _):
             return tuple(device.class_name for device in track.devices)
 
-        def track_get_device_can_have_chains(track, params: Tuple[Any]):
+        def track_get_device_can_have_chains(track, _):
             return tuple(device.can_have_chains for device in track.devices)
 
         """

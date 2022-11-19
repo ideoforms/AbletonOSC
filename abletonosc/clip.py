@@ -74,7 +74,7 @@ class ClipHandler(AbletonOSCHandler):
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
             notes = clip.get_notes(0, 0, clip.length, 127)
-            return (item for sublist in notes for item in sublist)
+            return tuple(item for sublist in notes for item in sublist)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):
             notes = []

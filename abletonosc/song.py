@@ -71,19 +71,13 @@ class SongHandler(AbletonOSCHandler):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
 
-        def song_get_num_tracks(song, params: Tuple[Any] = ()):
-            return len(song.tracks),
-        def song_get_num_scenes(song, params: Tuple[Any] = ()):
-            return len(song.scenes),
-
-        self.osc_server.add_handler("/live/song/get/num_tracks", partial(song_get_num_tracks, self.song))
-        self.osc_server.add_handler("/live/song/get/num_scenes", partial(song_get_num_scenes, self.song))
+        self.osc_server.add_handler("/live/song/get/num_tracks", lambda _: (len(self.song.tracks),))
+        self.osc_server.add_handler("/live/song/get/num_scenes", lambda _: (len(self.song.scenes),))
 
         def song_get_cue_points(song, params: Tuple[Any] = ()):
             cue_points = song.cue_points
             cue_point_pairs = [(cue_point.name, cue_point.time) for cue_point in cue_points]
-            rv = (element for pair in cue_point_pairs for element in pair)
-            return rv
+            return (element for pair in cue_point_pairs for element in pair)
         self.osc_server.add_handler("/live/song/get/cue_points", partial(song_get_cue_points, self.song))
 
         def song_jump_to_cue_point(song, params: Tuple[Any] = ()):
@@ -104,7 +98,9 @@ class SongHandler(AbletonOSCHandler):
         self.song.add_current_song_time_listener(self.song_time_changed)
 
     def song_time_changed(self):
+        #--------------------------------------------------------------------------------
         # If song has rewound or skipped to next beat, sent a /live/beat message
+        #--------------------------------------------------------------------------------
         if (self.song.current_song_time < self.last_song_time) or \
                 (int(self.song.current_song_time) > int(self.last_song_time)):
             self.osc_server.send("/live/song/beat", (int(self.song.current_song_time),))

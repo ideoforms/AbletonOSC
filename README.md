@@ -1,5 +1,7 @@
 # AbletonOSC: Control Ableton Live 11 with OSC
 
+[![stability-alpha](https://img.shields.io/badge/stability-alpha-f4d03f.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#alpha)
+
 AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to
 control [Ableton Live 11](https://www.ableton.com/en/live/). Building on ideas from the
 older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the
@@ -7,7 +9,7 @@ entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object
 ([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive control
 over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
-It is currently (2022-11-11) a work-in-progress. Many major APIs are now exposed.
+AbletonOSC is currently (2022-11-20) a work-in-progress, and APIs may be subject to change. Many major APIs are now exposed.
 
 # Installation
 

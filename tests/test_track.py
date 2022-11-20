@@ -53,8 +53,10 @@ def test_track_clips(client):
     client.send_message("/live/clip/set/name", (track_id, 1, "Beta"))
 
     wait_one_tick()
-    assert client.query("/live/track/get/clips/name", (track_id,)) == ("Alpha", "Beta")
-    assert client.query("/live/track/get/clips/length", (track_id,)) == (4, 2)
+    assert client.query("/live/track/get/clips/name", (track_id,)) == ("Alpha", "Beta", None, None,
+                                                                       None, None, None, None)
+    assert client.query("/live/track/get/clips/length", (track_id,)) == (4, 2, None, None,
+                                                                         None, None, None, None)
 
     client.send_message("/live/clip_slot/delete_clip", (track_id, 0))
     client.send_message("/live/clip_slot/delete_clip", (track_id, 1))
@@ -82,10 +84,13 @@ def test_track_listen_playing_slot_index(client):
 
     client.send_message("/live/clip_slot/fire", (0, 0))
     assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, 0,)
+
     client.send_message("/live/clip_slot/fire", (0, 1))
     assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, 1,)
+
     client.send_message("/live/clip_slot/fire", (1, 1))
     assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1, 1,)
+
     client.send_message("/live/clip_slot/fire", (1, 0))
     assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1, 0,)
 

@@ -7,7 +7,12 @@ from typing import Callable, Iterable
 
 REMOTE_PORT = 11000
 LOCAL_PORT = 11001
-TICK_DURATION = 0.125
+
+#--------------------------------------------------------------------------------
+# An Ableton Live tick is 100ms. This constant is typically used for timeouts,
+# and factors in some extra time for processing overhead.
+#--------------------------------------------------------------------------------
+TICK_DURATION = 0.150
 
 class AbletonOSCClient:
     def __init__(self, hostname="127.0.0.1", port=REMOTE_PORT, client_port=LOCAL_PORT):

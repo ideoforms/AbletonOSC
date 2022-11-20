@@ -88,6 +88,9 @@ class OSCServer:
         """
         try:
             while True:
+                #--------------------------------------------------------------------------------
+                # Loop until no more data is available.
+                #--------------------------------------------------------------------------------
                 data, remote_addr = self._socket.recvfrom(65536)
                 #--------------------------------------------------------------------------------
                 # Update the default reply address to the most recent client. Used when
@@ -123,7 +126,7 @@ class OSCServer:
                 self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
             elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
                 #--------------------------------------------------------------------------------
-                # Another benign Windows networking error, throw when no data is received
+                # Another benign networking error, throw when no data is received
                 # on a call to recvfrom() on a non-blocking socket
                 #--------------------------------------------------------------------------------
                 pass

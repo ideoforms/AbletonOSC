@@ -59,7 +59,7 @@ class DeviceHandler(AbletonOSCHandler):
             return tuple(parameter.max for parameter in device.parameters)
 
         def device_set_parameters_value(device, params: Tuple[Any] = ()):
-            for index, value in params:
+            for index, value in enumerate(params):
                 device.parameters[index].value = value
 
         self.osc_server.add_handler("/live/device/get/num_parameters", create_device_callback(device_get_num_parameters))

@@ -313,9 +313,9 @@ Represents an instrument or effect.
 
 | Address                           | Query params                             | Response params                          | Description                                           |
 |:----------------------------------|:-----------------------------------------|:-----------------------------------------|:------------------------------------------------------|
-| /live/device/get/name             | track_id, device_id                      |                                          | Get device name                                       |
-| /live/device/get/class_name       | track_id, device_id                      |                                          | Get device class_name                                 |
-| /live/device/get/type             | track_id, device_id                      |                                          | Get device type                                       |
+| /live/device/get/name             | track_id, device_id                      | track_id, device_id, name                | Get device name                                       |
+| /live/device/get/class_name       | track_id, device_id                      | track_id, device_id, class_name          | Get device class_name                                 |
+| /live/device/get/type             | track_id, device_id                      | track_id, device_id, type                | Get device type                                       |
 | /live/device/get/num_parameters   | track_id, device_id                      | track_id, device_id, num_parameters      | Get the number of parameters exposed by the device    |
 | /live/device/get/parameters/name  | track_id, device_id                      | track_id, device_id, [name, ...]         | Get the list of parameter names exposed by the device |
 | /live/device/get/parameters/value | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter values                       |
@@ -328,7 +328,7 @@ Represents an instrument or effect.
 For devices:
 
 - `name` is the human-readable name
-- `type` is 0 = audio_effect, 1 = instrument, 2 = midi_effect
+- `type` is 1 = audio_effect, 2 = instrument, 4 = midi_effect
 - `class_name` is the Live instrument/effect name, e.g. Operator, Reverb. For external plugins and racks, can be
   AuPluginDevice, PluginDevice, InstrumentGroupDevice...
 

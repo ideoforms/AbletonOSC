@@ -257,7 +257,7 @@ For devices:
 
 # Utilities
 
-Included with the framework is a command-line console utility `run-console.py` that can be used as an easy way to send OSC queries to AbletonOSC. Example:
+Included with the framework is a command-line console utility `run-console.py`, which can be used as a quick and easy way to send OSC queries to AbletonOSC. Example:
 
 ```
 (1653)(AbletonOSC)$ ./run-console.py

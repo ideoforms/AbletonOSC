@@ -255,6 +255,21 @@ For devices:
 
  ---
 
+# Utilities
+
+Included with the framework is a command-line console utility `run-console.py` that can be used as an easy way to send OSC queries to AbletonOSC. Example:
+
+```
+(1653)(AbletonOSC)$ ./run-console.py
+AbletonOSC command console
+Usage: /live/osc/command [params]
+>>> /live/song/set/tempo 123.0
+>>> /live/song/get/tempo
+(123.0,)
+>>> /live/song/get/track_names
+('1-MIDI', '2-MIDI', '3-Audio', '4-Audio')
+```
+
 # Acknowledgements
 
 Thanks to [Stu Fisher](https://github.com/stufisher/) (and other authors) for LiveOSC, the spiritual predecessor to this

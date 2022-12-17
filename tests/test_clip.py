@@ -34,7 +34,7 @@ def _test_clip_property(client, track_id, clip_id, property, values):
         print("Testing clip property %s, value: %s" % (property, value))
         client.send_message("/live/clip/set/%s" % property, (track_id, clip_id, value))
         wait_one_tick()
-        assert client.query("/live/clip/get/%s" % property, (track_id, clip_id)) == (value,)
+        assert client.query("/live/clip/get/%s" % property, (track_id, clip_id)) == (track_id, clip_id, value,)
 
 def test_clip_property_name(client):
     _test_clip_property(client, 0, 0, "name", ("Alpha", "Beta"))
@@ -57,5 +57,6 @@ def test_clip_add_notes(client):
                                                  67, 0.25, 0.5, 32, False))
 
     client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (60, 0.0, 0.25, 64, False,
+    assert client.await_message("/live/clip/get/notes") == (0, 0,
+                                                            60, 0.0, 0.25, 64, False,
                                                             67, 0.25, 0.5, 32, False)

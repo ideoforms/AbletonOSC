@@ -21,14 +21,17 @@ class ClipHandler(AbletonOSCHandler):
             to query its own index). Other alternatives include _always_ passing track/clip
             index to the callback, but this adds arg clutter to every single callback.
             """
-            def clip_callback(params: Tuple[Any]) -> Callable:
+            def clip_callback(params: Tuple[Any]) -> Tuple:
                 track_index, clip_index = params[:2]
                 track = self.song.tracks[track_index]
                 clip = track.clip_slots[clip_index].clip
                 if pass_clip_index:
-                    return func((track_index, clip_index), *args, params[2:])
+                    rv = func((track_index, clip_index), *args, params[2:])
                 else:
-                    return func(clip, *args, params[2:])
+                    rv = func(clip, *args, params[2:])
+
+                if rv:
+                    return (track_index, clip_index, *rv)
 
             return clip_callback
 

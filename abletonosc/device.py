@@ -11,7 +11,9 @@ class DeviceHandler(AbletonOSCHandler):
             def device_callback(params: Tuple[Any]):
                 track_index, device_index = params[:2]
                 device = self.song.tracks[track_index].devices[device_index]
-                return func(device, *args, params[2:])
+                rv = func(device, *args, params[2:])
+                if rv:
+                    return (track_index, device_index, *rv)
 
             return device_callback
 
@@ -73,16 +75,15 @@ class DeviceHandler(AbletonOSCHandler):
         # Device: Get/set individual parameters
         #--------------------------------------------------------------------------------
         def device_get_parameter_value(device, params: Tuple[Any] = ()):
-            return device.parameters[params[0]].value,
+            return params[0], device.parameters[params[0]].value
 
         def device_set_parameter_value(device, params: Tuple[Any] = ()):
             param_id, param_value = params[:2]
             device.parameters[param_id].value = param_value
 
         def device_get_parameter_name(device, params: Tuple[Any] = ()):
-            return device.parameters[params[0]].name,
+            return params[0], device.parameters[params[0]].name
 
         self.osc_server.add_handler("/live/device/get/parameter/value", create_device_callback(device_get_parameter_value))
         self.osc_server.add_handler("/live/device/set/parameter/value", create_device_callback(device_set_parameter_value))
-
         self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))

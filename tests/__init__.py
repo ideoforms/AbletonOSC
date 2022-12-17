@@ -24,3 +24,7 @@ def wait_one_tick():
     Sleep for one Ableton Live tick (100ms).
     """
     time.sleep(TICK_DURATION)
+
+c = AbletonOSCClient()
+c.send_message("/live/reload")
+c.stop()

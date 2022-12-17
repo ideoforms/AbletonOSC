@@ -35,15 +35,15 @@ def test_song_stop_all_clips(client):
     # Sometimes a wait >one tick is required here. Not sure why.
     wait_one_tick()
     wait_one_tick()
-    assert client.query("/live/clip/get/is_playing", (0, 0)) == (True,)
-    assert client.query("/live/clip/get/is_playing", (1, 0)) == (True,)
+    assert client.query("/live/clip/get/is_playing", (0, 0)) == (0, 0, True,)
+    assert client.query("/live/clip/get/is_playing", (1, 0)) == (1, 0, True,)
 
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/stop_all_clips")
     wait_one_tick()
     wait_one_tick()
-    assert client.query("/live/clip/get/is_playing", (0, 0)) == (False,)
-    assert client.query("/live/clip/get/is_playing", (1, 0)) == (False,)
+    assert client.query("/live/clip/get/is_playing", (0, 0)) == (0, 0, False,)
+    assert client.query("/live/clip/get/is_playing", (1, 0)) == (1, 0, False,)
 
     client.send_message("/live/clip_slot/delete_clip", (0, 0))
     client.send_message("/live/clip_slot/delete_clip", (1, 0))
@@ -170,7 +170,7 @@ def test_song_duplicate_scene(client):
     client.send_message("/live/clip_slot/create_clip", [track_id, scene_id, 4])
     client.send_message("/live/song/duplicate_scene", [scene_id])
     wait_one_tick()
-    assert client.query("/live/clip/get/is_midi_clip", (track_id, scene_id + 1)) == (True,)
+    assert client.query("/live/clip/get/is_midi_clip", (track_id, scene_id + 1)) == (track_id, scene_id + 1, True,)
     client.send_message("/live/song/delete_scene", [scene_id + 1])
     client.send_message("/live/clip_slot/delete_clip", [0, scene_id])
 

@@ -11,7 +11,7 @@ class TrackHandler(AbletonOSCHandler):
                                   *args,
                                   include_track_id: bool = False):
             def track_callback(params: Tuple[Any]):
-                track_index = params[0]
+                track_index = int(params[0])
                 track = self.song.tracks[track_index]
                 if include_track_id:
                     rv = func(track, *args, tuple(params[0:]))

@@ -9,7 +9,7 @@ class ClipSlotHandler(AbletonOSCHandler):
     def init_api(self):
         def create_clip_slot_callback(func, *args):
             def clip_slot_callback(params: Tuple[Any]):
-                track_index, clip_index = params[:2]
+                track_index, clip_index = int(params[0]), int(params[1])
                 track = self.song.tracks[track_index]
                 clip_slot = track.clip_slots[clip_index]
                 return func(clip_slot, *args, params[2:])

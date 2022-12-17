@@ -19,7 +19,11 @@ def main(args):
     print("Usage: /live/osc/command [params]")
 
     while True:
-        command_str = input(">>> ")
+        try:
+            command_str = input(">>> ")
+        except EOFError:
+            print()
+            break
         command, *params_str = command_str.split(" ")
         params = []
         for part in params_str:

@@ -64,48 +64,91 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 <details>
 <summary><b>Documentation</b>: Song API</summary>
 
+### Song methods
+
+| Address                           | Query params | Response params | Description                                                                              |
+|:----------------------------------|:-------------|:----------------|:-----------------------------------------------------------------------------------------|
+| /live/song/continue_playing       |              |                 | Resume session playback                                                                  |
+| /live/song/create_audio_track     | index        |                 | Create a new audio track at the specified index (-1 = end of list)                       |
+| /live/song/create_midi_track      | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                        |
+| /live/song/create_return_track    |              |                 | Create a new return track                                                                |
+| /live/song/create_scene           | index        |                 | Create a new scene at the specified index (-1 = end of list)                             |
+| /live/song/cue_point/jump         | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points) |
+| /live/song/delete_scene           | scene_index  |                 | Delete a scene                                                                           |
+| /live/song/delete_return_track    | track_index  |                 | Delete a return track                                                                    |
+| /live/song/delete_track           | track_index  |                 | Delete a track                                                                           |
+| /live/song/duplicate_scene        | scene_index  |                 | Duplicate a scene                                                                        |
+| /live/song/duplicate_track        | track_index  |                 | Duplicate a track                                                                        |
+| /live/song/jump_by                | time         |                 | Jump song position by the specified time, in beats                                       |
+| /live/song/jump_to_next_cue       |              |                 | Jump to the next cue marker                                                              |      
+| /live/song/jump_to_prev_cue       |              |                 | Jump to the previous cue marker                                                          |      
+| /live/song/redo                   |              |                 | Redo the last undone operation                                                           |
+| /live/song/start_playing          |              |                 | Start session playback                                                                   |
+| /live/song/stop_playing           |              |                 | Stop session playback                                                                    |
+| /live/song/stop_all_clips         |              |                 | Stop all clips from playing                                                              |
+| /live/song/tap_tempo              |              |                 | Mimics a tap of the "Tap Tempo" button                                                   |
+| /live/song/trigger_session_record |              |                 | Triggers record in session mode                                                          |
+| /live/song/undo                   |              |                 | Undo the last operation                                                                  |
+
+### Song properties
+
+ - Changes for any Track property can be listened for by calling `/live/song/start_listen/<property>`
+ - Responses will be sent to `/live/song/get/<property>`, with parameters `<property_value>`
+ - For further information on these properties and their parameters, see documentation
+for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_object_model#Song).
+ 
+#### Getters
+
+| Address                                    | Query params | Response params             | Description                                       |
+|:-------------------------------------------|:-------------|:----------------------------|:--------------------------------------------------|
+| /live/song/get/arrangement_overdub         |              | arrangement_overdub         | Query whether arrangement overdub is on           |
+| /live/song/get/back_to_arranger            |              | back_to_arranger            | Query whether "back to arranger" is lit           |
+| /live/song/get/can_redo                    |              | can_redo                    | Query whether redo is available                   |
+| /live/song/get/can_undo                    |              | can_undo                    | Query whether undo is available                   |
+| /live/song/get/clip_trigger_quantization   |              | clip_trigger_quantization   | Query the current clip trigger quantization level |
+| /live/song/get/current_song_time           |              | current_song_time           | Query the current song time, in beats             |
+| /live/song/get/groove_amount               |              | groove_amount               | Query the current groove amount                   |
+| /live/song/get/is_playing                  |              | is_playing                  | Query whether the song is currently playing       |
+| /live/song/get/loop                        |              | loop                        | Query whether the song is currently looping       |
+| /live/song/get/loop_length                 |              | loop_length                 | Query the current loop length                     |
+| /live/song/get/loop_start                  |              | loop_start                  | Query the current loop start point                |
+| /live/song/get/metronome                   |              | metronome_on                | Query metronome on/off                            |
+| /live/song/get/midi_recording_quantization |              | midi_recording_quantization | Query the current MIDI recording quantization     |
+| /live/song/get/nudge_down                  |              | nudge_down                  | Query nudge down                                  |
+| /live/song/get/nudge_up                    |              | nudge_up                    | Query nudge up                                    |
+| /live/song/get/punch_in                    |              | punch_in                    | Query punch in                                    |
+| /live/song/get/punch_out                   |              | punch_out                   | Query punch out                                   |
+| /live/song/get/record_mode                 |              | record_mode                 | Query the current record mode                     |
+| /live/song/get/tempo                       |              | tempo_bpm                   | Query the current song tempo                      |
+
+#### Setters
+
+| Address                                    | Query params                | Response params | Description                                     |
+|:-------------------------------------------|:----------------------------|:----------------|:------------------------------------------------|
+| /live/song/set/arrangement_overdub         | arrangement_overdub         |                 | Set whether arrangement overdub is on           |
+| /live/song/set/back_to_arranger            | back_to_arranger            |                 | Set whether "back to arranger" is lit           |
+| /live/song/set/clip_trigger_quantization   | clip_trigger_quantization   |                 | Set the current clip trigger quantization level |
+| /live/song/set/current_song_time           | current_song_time           |                 | Set the current song time, in beats             |
+| /live/song/set/groove_amount               | groove_amount               |                 | Set the current groove amount                   |
+| /live/song/set/loop                        | loop                        |                 | Set whether the song is currently looping       |
+| /live/song/set/loop_length                 | loop_length                 |                 | Set the current loop length                     |
+| /live/song/set/loop_start                  | loop_start                  |                 | Set the current loop start point                |
+| /live/song/set/metronome                   | metronome_on                |                 | Set metronome on/off                            |
+| /live/song/set/midi_recording_quantization | midi_recording_quantization |                 | Set the current MIDI recording quantization     |
+| /live/song/set/nudge_down                  | nudge_down                  |                 | Set nudge down                                  |
+| /live/song/set/nudge_up                    | nudge_up                    |                 | Set nudge up                                    |
+| /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                    |
+| /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                   |
+| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
+| /live/song/set/tempo                       | tempo_bpm                   |                 | Set the current song tempo                      |
+
+### Song: Properties of cue points, scenes and tracks
+
 | Address                            | Query params | Response params | Description                                                                                  |
 |:-----------------------------------|:-------------|:----------------|:---------------------------------------------------------------------------------------------|
-| /live/song/start_playing           |              |                 | Start session playback                                                                       |
-| /live/song/stop_playing            |              |                 | Stop session playback                                                                        |
-| /live/song/continue_playing        |              |                 | Resume session playback                                                                      |
-| /live/song/stop_all_clips          |              |                 | Stop all clips from playing                                                                  |
-| /live/song/undo                    |              |                 | Undo the last operation                                                                      |
-| /live/song/redo                    |              |                 | Redo the last undone operation                                                               |
-| /live/song/create_audio_track      | index        |                 | Create a new audio track at the specified index (-1 = end of list)                           |
-| /live/song/create_midi_track       | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                            |
-| /live/song/create_return_track     |              |                 | Create a new return track                                                                    |
+| /live/song/get/cue_points          |              | name, time, ... | Query a list of the song's cue points                                                        |
 | /live/song/get/num_scenes          |              | num_scenes      | Query the number of scenes                                                                   | 
 | /live/song/get/num_tracks          |              | num_tracks      | Query the number of tracks                                                                   | 
-| /live/song/create_scene            | index        |                 | Create a new scene at the specified index (-1 = end of list)                                 |
-| /live/song/delete_scene            | scene_index  |                 | Delete a scene                                                                               |
-| /live/song/delete_return_track     | track_index  |                 | Delete a return track                                                                        |
-| /live/song/delete_track            | track_index  |                 | Delete a track                                                                               |
-| /live/song/get/is_playing          |              | is_playing      | Query whether the song is currently playing                                                  |
-| /live/song/start_listen/is_playing |              |                 | Start a listener that sends a message to `/live/song/get/is_playing` when is_playing changes |
-| /live/song/stop_listen/is_playing  |              |                 | Stop the above listener                                                                      |
-| /live/song/get/tempo               |              | tempo_bpm       | Query song tempo                                                                             |
-| /live/song/set/tempo               | tempo_bpm    |                 | Set song tempo                                                                               |
-| /live/song/start_listen/tempo      |              |                 | Start a listener that sends a to `/live/song/get/tempo` tempo changes                        |
-| /live/song/stop_listen/tempo       |              |                 | Stop the above listener                                                                      |
-| /live/song/get/metronome           |              | metronome_on    | Query metronome on/off                                                                       |
-| /live/song/set/metronome           | metronome_on |                 | Set metronome on/off                                                                         |
-| /live/song/start_listen/metronome  |              |                 | Start a listener that sends a message to `/live/song/get/metronome` when metronome changes   |
-| /live/song/stop_listen/metronome   |              |                 | Stop the above listener                                                                      |
-| /live/song/get/cue_points          |              | name, time, ... | Query a list of the song's cue points                                                        |
-| /live/song/jump_to_next_cue        |              |                 | Jump to the next cue marker                                                                  |      
-| /live/song/jump_to_prev_cue        |              |                 | Jump to the previous cue marker                                                              |      
-| /live/song/jump_by                 | time         |                 | Jump song position by the specified time, in beats                                           |
-| /live/song/cue_point/jump          | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points)     |
-
-Additional properties are exposed to `get`, `set`, `start_listen` and `stop_listen` in the same manner:
-
-- `arrangement_overdub`, `back_to_arranger`, `clip_trigger_quantization`, `current_song_time`, `groove_amount`, `loop`
-  , `loop_length`, `loop_start`,  `midi_recording_quantization`, `nudge_down`, `nudge_up`, `punch_in`, `punch_out`
-  , `record_mode`
-
-For further information on these properties and their parameters, see documentation
-for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_object_model#Song).
 
 ### Song status messages
 

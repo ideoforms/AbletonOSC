@@ -34,7 +34,7 @@ class SongHandler(AbletonOSCHandler):
             "tap_tempo",
             "trigger_session_record",
             "undo"
-        ]:
+            ]:
             callback = partial(self._call_method, self.song, method)
             self.osc_server.add_handler("/live/song/%s" % method, callback)
 
@@ -57,7 +57,6 @@ class SongHandler(AbletonOSCHandler):
             "punch_in",
             "punch_out",
             "record_mode",
-            "start_time",
             "tempo"
         ]
 
@@ -87,6 +86,8 @@ class SongHandler(AbletonOSCHandler):
                 track_index_min, track_index_max = 0, len(self.song.tracks)
             else:
                 track_index_min, track_index_max = params
+                if track_index_max == -1:
+                    track_index_max = len(self.song.tracks)
             return tuple(self.song.tracks[index].name for index in range(track_index_min, track_index_max))
         self.osc_server.add_handler("/live/song/get/track_names", song_get_track_names)
 

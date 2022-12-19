@@ -224,13 +224,14 @@ Represents an audio, MIDI, return or master track. Can be used to set track audi
 
 ### Track: Properties of multiple clips
 
-| Address                                      | Query params             | Response params             | Description                                                                        |
-|:---------------------------------------------|:-------------------------|:----------------------------|:-----------------------------------------------------------------------------------|
-| /live/track/get/clips/name                   | track_id                 | track_id, [name, ....]      | Query all clip names on track                                                      |
-| /live/track/get/clips/length                 | track_id                 | track_id, [length, ...]     | Query all clip lengths on track                                                    |
-| /live/track/get/arrangement_clips/name       | track_id                 | track_id, [name, ....]      | Query all arrangement view clip names on track                                     |
-| /live/track/get/arrangement_clips/length     | track_id                 | track_id, [length, ...]     | Query all arrangement view clip lengths on track                                   |
-| /live/track/get/arrangement_clips/start_time | track_id                 | track_id, [start_time, ...] | Query all arrangement view clip times on track                                     |
+| Address                                      | Query params             | Response params             | Description                                      |
+|:---------------------------------------------|:-------------------------|:----------------------------|:-------------------------------------------------|
+| /live/track/get/clips/name                   | track_id                 | track_id, [name, ....]      | Query all clip names on track                    |
+| /live/track/get/clips/length                 | track_id                 | track_id, [length, ...]     | Query all clip lengths on track                  |
+| /live/track/get/clips/color                  | track_id                 | track_id, [color, ...]      | Query all clip colors on track                   |
+| /live/track/get/arrangement_clips/name       | track_id                 | track_id, [name, ....]      | Query all arrangement view clip names on track   |
+| /live/track/get/arrangement_clips/length     | track_id                 | track_id, [length, ...]     | Query all arrangement view clip lengths on track |
+| /live/track/get/arrangement_clips/start_time | track_id                 | track_id, [start_time, ...] | Query all arrangement view clip times on track   |
 
 ### Track: Properties of devices
 | Address                                      | Query params             | Response params             | Description                                                                        |

@@ -35,7 +35,7 @@ class Manager(ControlSurface):
         class LiveOSCErrorLogHandler(logging.StreamHandler):
             def emit(handler, record):
                 message = record.getMessage()
-                message = message[message.index(":-") + 3:]
+                message = message[message.index(":") + 2:]
                 self.osc_server.send("/live/error", (message,))
         self.live_osc_error_handler = LiveOSCErrorLogHandler()
         self.live_osc_error_handler.setLevel(logging.ERROR)

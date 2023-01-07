@@ -14,4 +14,4 @@ def test_application_get_version(client):
 def test_application_error(client):
     client.send_message("/live/clip/get/color", (0, 10))
     response = client.await_message("/live/error")
-    assert response[0] == "Index out of range"
+    assert response[0] == "Error handling OSC message: Index out of range"

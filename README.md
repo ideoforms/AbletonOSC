@@ -145,11 +145,33 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 
 ### Song: Properties of cue points, scenes and tracks
 
-| Address                            | Query params | Response params | Description                                                                                  |
-|:-----------------------------------|:-------------|:----------------|:---------------------------------------------------------------------------------------------|
-| /live/song/get/cue_points          |              | name, time, ... | Query a list of the song's cue points                                                        |
-| /live/song/get/num_scenes          |              | num_scenes      | Query the number of scenes                                                                   | 
-| /live/song/get/num_tracks          |              | num_tracks      | Query the number of tracks                                                                   | 
+| Address                    | Query params | Response params        | Description                                                                 |
+|:---------------------------|:-------------|:-----------------------|:----------------------------------------------------------------------------|
+| /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
+| /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  | 
+| /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  | 
+| /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          | 
+| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. | 
+
+
+#### Querying track/clip data in bulk with /live/song/get/track_data
+
+It is often useful to be able to query data en masse about lots of different tracks and clips -- for example, when a set is first opened, to synchronise the state of your client with the Ableton set. This can be achieved with the `/live/song/get/track_data` API, which can query user-specified properties of multiple tracks and clips.
+
+Properties must be of the format `track.property_name` or `clip.property_name`.
+
+For example:
+```
+/live/song/get/track_data 0 12 track.name clip.name clip.length
+```
+
+Queries tracks 0..11, and returns a long list of values comprising:
+
+```
+[track_0_name, clip_0_0_name,   clip_0_1_name,   ... clip_0_7_name,
+               clip_1_0_length, clip_0_1_length, ... clip_0_7_length,
+ track_1_name, clip_1_0_name,   clip_1_1_name,   ... clip_1_7_name, ...]
+```
 
 ### Song status messages
 

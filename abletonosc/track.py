@@ -180,6 +180,10 @@ class TrackHandler(AbletonOSCHandler):
 
         parameter_object.add_value_listener(property_changed_callback)
         self.listener_functions[listener_key] = property_changed_callback
+        #--------------------------------------------------------------------------------
+        # Immediately send the current value
+        #--------------------------------------------------------------------------------
+        property_changed_callback()
 
     def _stop_mixer_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         parameter_object = getattr(target.mixer_device, prop)

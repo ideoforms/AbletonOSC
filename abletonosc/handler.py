@@ -52,6 +52,10 @@ class AbletonOSCHandler(Component):
         add_listener_function = getattr(target, add_listener_function_name)
         add_listener_function(property_changed_callback)
         self.listener_functions[listener_key] = property_changed_callback
+        #--------------------------------------------------------------------------------
+        # Immediately send the current value
+        #--------------------------------------------------------------------------------
+        property_changed_callback()
 
     def _stop_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         listener_key = (prop, tuple(params))

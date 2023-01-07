@@ -13,8 +13,9 @@ class ClipSlotHandler(AbletonOSCHandler):
                 track = self.song.tracks[track_index]
                 clip_slot = track.clip_slots[clip_index]
                 rv = func(clip_slot, *args, params[2:])
+                self.logger.info(track_index, clip_index, rv)
                 if rv:
-                    return (track, clip_slot, rv)
+                    return (track_index, clip_index, *rv)
 
             return clip_slot_callback
 

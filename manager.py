@@ -36,7 +36,11 @@ class Manager(ControlSurface):
             def emit(handler, record):
                 message = record.getMessage()
                 message = message[message.index(":") + 2:]
-                self.osc_server.send("/live/error", (message,))
+                try:
+                    self.osc_server.send("/live/error", (message,))
+                except OSError:
+                    # If the connection is dead, silently ignore errors as there's not much more we can do
+                    pass
         self.live_osc_error_handler = LiveOSCErrorLogHandler()
         self.live_osc_error_handler.setLevel(logging.ERROR)
         logger.addHandler(self.live_osc_error_handler)

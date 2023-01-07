@@ -55,6 +55,7 @@ def test_song_stop_all_clips(client):
 def test_song_listen_is_playing(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/start_listen/is_playing")
+    assert client.await_message("/live/song/get/is_playing", TICK_DURATION * 2) == (False,)
     client.send_message("/live/song/start_playing")
     assert client.await_message("/live/song/get/is_playing", TICK_DURATION * 2) == (True,)
     client.send_message("/live/song/stop_playing")
@@ -64,6 +65,7 @@ def test_song_listen_is_playing(client):
 def test_song_listen_tempo(client):
     client.send_message("/live/song/set/tempo", [120])
     client.send_message("/live/song/start_listen/tempo")
+    assert client.await_message("/live/song/get/tempo", TICK_DURATION * 2) == (120,)
 
     for value in [81, 120]:
         client.send_message("/live/song/set/tempo", [value])

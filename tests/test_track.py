@@ -82,7 +82,9 @@ def test_track_listen_playing_slot_index(client):
         client.send_message("/live/clip_slot/create_clip", (track_id, clip_id, 4))
 
     client.send_message("/live/track/start_listen/playing_slot_index", (0,))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, -1,)
     client.send_message("/live/track/start_listen/playing_slot_index", (1,))
+    assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (1, -1,)
 
     client.send_message("/live/clip_slot/fire", (0, 0))
     assert client.await_message("/live/track/get/playing_slot_index", TICK_DURATION * 2) == (0, 0,)

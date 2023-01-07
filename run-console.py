@@ -5,6 +5,7 @@
 # Takes OSC commands and parameters, and prints the return value.
 #--------------------------------------------------------------------------------
 
+import re
 import argparse
 import readline
 
@@ -24,6 +25,8 @@ readline.set_completer(completer.complete)
 
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
+    if args.verbose:
+        client.verbose = True
     client.send_message("/live/reload")
 
     readline.parse_and_bind('tab: complete')
@@ -36,6 +39,19 @@ def main(args):
         except EOFError:
             print()
             break
+
+        if not re.search("\\w", command_str):
+            #--------------------------------------------------------------------------------
+            # Command is empty
+            #--------------------------------------------------------------------------------
+            continue
+        if not re.search("^/", command_str):
+            #--------------------------------------------------------------------------------
+            # Command is invalid
+            #--------------------------------------------------------------------------------
+            print("OSC address must begin with a slash (/)")
+            continue
+
         command, *params_str = command_str.split(" ")
         params = []
         for part in params_str:
@@ -56,5 +72,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Console client for AbletonOSC. Takes OSC commands and parameters, and prints the return value.")
     parser.add_argument("--hostname", type=str, default="127.0.0.1")
     parser.add_argument("--port", type=str, default=11000)
+    parser.add_argument("--verbose", "-v", action="store_true", help="verbose mode: prints all OSC messages")
     args = parser.parse_args()
     main(args)

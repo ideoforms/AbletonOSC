@@ -80,7 +80,7 @@ class OSCServer:
                 remote_addr = self._remote_addr
             self._socket.sendto(msg.dgram, remote_addr)
         except BuildError:
-            self.logger.info("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
+            self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
 
     def process(self) -> None:
         """
@@ -114,9 +114,9 @@ class OSCServer:
                                       params=rv,
                                       remote_addr=response_addr)
                     else:
-                        self.logger.info("AbletonOSC: Unknown OSC address: %s" % message.address)
+                        self.logger.error("AbletonOSC: Unknown OSC address: %s" % message.address)
                 except ParseError:
-                    self.logger.info("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
+                    self.logger.error("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
 
         except socket.error as e:
             if e.errno == errno.ECONNRESET:
@@ -134,10 +134,11 @@ class OSCServer:
                 #--------------------------------------------------------------------------------
                 # Something more serious has happened
                 #--------------------------------------------------------------------------------
-                self.logger.info("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
+                self.logger.error("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
 
         except Exception as e:
-            self.logger.info("AbletonOSC: Error handling message: %s" % (traceback.format_exc()))
+            self.logger.error("AbletonOSC: Error handling OSC message:- %s" % e)
+            self.logger.warning("AbletonOSC: %s" % traceback.format_exc())
 
     def shutdown(self) -> None:
         """

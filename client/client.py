@@ -31,10 +31,13 @@ class AbletonOSCClient:
         self.server_thread.start()
         self.address_handlers = {}
         self.client = SimpleUDPClient(hostname, port)
+        self.verbose = False
 
     def handle_osc(self, address, *params):
         if address in self.address_handlers:
             self.address_handlers[address](params)
+        if self.verbose:
+            print(address, params)
 
     def stop(self):
         self.server.shutdown()

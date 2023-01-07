@@ -49,9 +49,10 @@ same IP as the originating message.
 
 These messages are sent to the client automatically when the application state changes.
 
-| Address       | Response params | Description                                               |
-|:--------------|:----------------|:----------------------------------------------------------|
-| /live/startup |                 | Sent to the client application when AbletonOSC is started |
+| Address       | Response params | Description                                                                                        |
+|:--------------|:----------------|:---------------------------------------------------------------------------------------------------|
+| /live/startup |                 | Sent to the client application when AbletonOSC is started                                          |
+| /live/error   | error_msg       | Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log |
 
 </details>
 

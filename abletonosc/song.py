@@ -34,7 +34,7 @@ class SongHandler(AbletonOSCHandler):
             "tap_tempo",
             "trigger_session_record",
             "undo"
-            ]:
+        ]:
             callback = partial(self._call_method, self.song, method)
             self.osc_server.add_handler("/live/song/%s" % method, callback)
 
@@ -114,12 +114,15 @@ class SongHandler(AbletonOSCHandler):
                 for prop in properties:
                     obj, property_name = prop.split(".")
                     if obj == "track":
-                        value = getattr(track, property_name)
-                        if isinstance(value, Live.Track.Track):
-                            #--------------------------------------------------------------------------------
-                            # Map Track objects to their track_index to return via OSC
-                            #--------------------------------------------------------------------------------
-                            value = list(self.song.tracks).index(value)
+                        if property_name == "num_devices":
+                            value = len(track.devices)
+                        else:
+                            value = getattr(track, property_name)
+                            if isinstance(value, Live.Track.Track):
+                                #--------------------------------------------------------------------------------
+                                # Map Track objects to their track_index to return via OSC
+                                #--------------------------------------------------------------------------------
+                                value = list(self.song.tracks).index(value)
                         rv.append(value)
                     elif obj == "clip":
                         for clip_slot in track.clip_slots:
@@ -127,6 +130,11 @@ class SongHandler(AbletonOSCHandler):
                                 rv.append(getattr(clip_slot.clip, property_name))
                             else:
                                 rv.append(None)
+                    elif obj == "device":
+                        for device in track.devices:
+                            rv.append(getattr(device, property_name))
+                    else:
+                        self.logger.error("Unknown object identifier in get/track_data: %s" % obj)
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 

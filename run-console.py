@@ -10,6 +10,18 @@ import readline
 
 from client import AbletonOSCClient
 
+class LiveAPICompleter:
+    def __init__(self, commands):
+        self.commands = commands
+
+    def complete(self, text, state):
+        results =  [x for x in self.commands if x.startswith(text)] + [None]
+        return results[state]
+
+words = ["horse", "hogan", "horrific"]
+completer = LiveAPICompleter(words)
+readline.set_completer(completer.complete)
+
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     client.send_message("/live/reload")

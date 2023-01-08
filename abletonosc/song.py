@@ -57,6 +57,8 @@ class SongHandler(AbletonOSCHandler):
             "punch_in",
             "punch_out",
             "record_mode",
+            "signature_denominator",
+            "signature_numerator",
             "tempo"
         ]
 

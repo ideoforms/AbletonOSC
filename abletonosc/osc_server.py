@@ -116,14 +116,21 @@ class OSCServer:
                                       remote_addr=response_addr)
                     elif "*" in message.address:
                         regex = message.address.replace("*", "[^/]+")
-                        self.logger.info(", ".join(self._callbacks.keys()))
                         for callback_address, callback in self._callbacks.items():
                             if re.match(regex, callback_address):
-                                self.logger.info(callback_address)
                                 try:
                                     rv = callback(message.params)
                                 except ValueError:
-                                    # Skip queries that require more arguments
+                                    #--------------------------------------------------------------------------------
+                                    # Don't throw errors for queries that require more arguments
+                                    # (e.g. /live/track/get/send with no args)
+                                    #--------------------------------------------------------------------------------
+                                    continue
+                                except AttributeError:
+                                    #--------------------------------------------------------------------------------
+                                    # Don't throw errors when trying to create listeners for properties that can't
+                                    # be listened for (e.g. can_be_armed, is_foldable)
+                                    #--------------------------------------------------------------------------------
                                     continue
                                 if rv is not None:
                                     assert isinstance(rv, tuple)

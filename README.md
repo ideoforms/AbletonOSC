@@ -120,6 +120,8 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/punch_in                    |              | punch_in                    | Query punch in                                    |
 | /live/song/get/punch_out                   |              | punch_out                   | Query punch out                                   |
 | /live/song/get/record_mode                 |              | record_mode                 | Query the current record mode                     |
+| /live/song/get/signature_denominator       |              | denominator                 | Query the current time signature's denominator    |
+| /live/song/get/signature_numerator         |              | numerator                   | Query the current time signature's numerator      |
 | /live/song/get/tempo                       |              | tempo_bpm                   | Query the current song tempo                      |
 
 #### Setters
@@ -140,6 +142,9 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/set/nudge_up                    | nudge_up                    |                 | Set nudge up                                    |
 | /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                    |
 | /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                   |
+| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
+| /live/song/set/signature_denominator       | signature_denominator       |                 | Set the time signature's denominator            |
+| /live/song/set/signature_numerator         | signature_numerator         |                 | Set the time signature's numerator              |
 | /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
 | /live/song/set/tempo                       | tempo_bpm                   |                 | Set the current song tempo                      |
 
@@ -335,19 +340,20 @@ Represents an instrument or effect.
 <details>
 <summary><b>Documentation</b>: Device API</summary>
 
-| Address                           | Query params                             | Response params                          | Description                                           |
-|:----------------------------------|:-----------------------------------------|:-----------------------------------------|:------------------------------------------------------|
-| /live/device/get/name             | track_id, device_id                      | track_id, device_id, name                | Get device name                                       |
-| /live/device/get/class_name       | track_id, device_id                      | track_id, device_id, class_name          | Get device class_name                                 |
-| /live/device/get/type             | track_id, device_id                      | track_id, device_id, type                | Get device type                                       |
-| /live/device/get/num_parameters   | track_id, device_id                      | track_id, device_id, num_parameters      | Get the number of parameters exposed by the device    |
-| /live/device/get/parameters/name  | track_id, device_id                      | track_id, device_id, [name, ...]         | Get the list of parameter names exposed by the device |
-| /live/device/get/parameters/value | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter values                       |
-| /live/device/get/parameters/min   | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter minimum values               |
-| /live/device/get/parameters/max   | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter maximum values               |
-| /live/device/set/parameters/value | track_id, device_id, value, value ...    |                                          | Set the device parameter values                       |
-| /live/device/get/parameter/value  | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get a device parameter value                          |
-| /live/device/set/parameter/value  | track_id, device_id, parameter_id, value |                                          | Set a device parameter value                          |
+| Address                                  | Query params                             | Response params                          | Description                                                                             |
+|:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|
+| /live/device/get/name                    | track_id, device_id                      | track_id, device_id, name                | Get device name                                                                         |
+| /live/device/get/class_name              | track_id, device_id                      | track_id, device_id, class_name          | Get device class_name                                                                   |
+| /live/device/get/type                    | track_id, device_id                      | track_id, device_id, type                | Get device type                                                                         |
+| /live/device/get/num_parameters          | track_id, device_id                      | track_id, device_id, num_parameters      | Get the number of parameters exposed by the device                                      |
+| /live/device/get/parameters/name         | track_id, device_id                      | track_id, device_id, [name, ...]         | Get the list of parameter names exposed by the device                                   |
+| /live/device/get/parameters/value        | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter values                                                         |
+| /live/device/get/parameters/min          | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter minimum values                                                 |
+| /live/device/get/parameters/max          | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter maximum values                                                 |
+| /live/device/get/parameters/is_quantized | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the list of is_quantized settings (i.e., whether the parameter must be an int/bool) |
+| /live/device/set/parameters/value        | track_id, device_id, value, value ...    |                                          | Set the device parameter values                                                         |
+| /live/device/get/parameter/value         | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get a device parameter value                                                            |
+| /live/device/set/parameter/value         | track_id, device_id, parameter_id, value |                                          | Set a device parameter value                                                            |
 
 For devices:
 

@@ -3,6 +3,7 @@ from .constants import OSC_LISTEN_PORT, OSC_RESPONSE_PORT
 from ..pythonosc.osc_message import OscMessage, ParseError
 from ..pythonosc.osc_message_builder import OscMessageBuilder, BuildError
 
+import re
 import errno
 import socket
 import logging
@@ -113,6 +114,24 @@ class OSCServer:
                             self.send(address=message.address,
                                       params=rv,
                                       remote_addr=response_addr)
+                    elif "*" in message.address:
+                        regex = message.address.replace("*", "[^/]+")
+                        self.logger.info(", ".join(self._callbacks.keys()))
+                        for callback_address, callback in self._callbacks.items():
+                            if re.match(regex, callback_address):
+                                self.logger.info(callback_address)
+                                try:
+                                    rv = callback(message.params)
+                                except ValueError:
+                                    # Skip queries that require more arguments
+                                    continue
+                                if rv is not None:
+                                    assert isinstance(rv, tuple)
+                                    remote_hostname, _ = remote_addr
+                                    response_addr = (remote_hostname, self._response_port)
+                                    self.send(address=callback_address,
+                                              params=rv,
+                                              remote_addr=response_addr)
                     else:
                         self.logger.error("AbletonOSC: Unknown OSC address: %s" % message.address)
                 except ParseError:

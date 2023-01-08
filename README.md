@@ -9,7 +9,7 @@ entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object
 ([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive control
 over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
-AbletonOSC is currently (2022-11-20) a work-in-progress, and APIs may be subject to change. Many major APIs are now exposed.
+AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject to change. Many major APIs are now exposed.
 
 **NOTE: Since 2022-12-17, all getters have been modified to return the ID of the object being queried as well as the return value**, for consistency with listeners. For example, `/live/clip/get/name` will return `track_id, clip_id, name`.
 
@@ -381,3 +381,9 @@ Thanks to [Stu Fisher](https://github.com/stufisher/) (and other authors) for Li
 library. Thanks to [Julien Bayle](https://structure-void.com/ableton-live-midi-remote-scripts/#liveAPI)
 and [NSUSpray](https://nsuspray.github.io/Live_API_Doc/) for providing XML API docs, based on original work
 by [Hans Petrov](http://remotescripts.blogspot.com/p/support-files.html).
+
+For code contributions and feedback, many thanks to:
+- Jörn Lengwenings ([Coupe70](https://github.com/Coupe70))
+- Bill Moser ([billmoser](https://github.com/billmoser))
+- [stevmills](https://github.com/stevmills)
+- Marco Buongiorno Nardelli ([marcobn](https://github.com/marcobn)) and Colin Stokes

@@ -194,6 +194,8 @@ These messages are sent to the client automatically when the song state changes.
 
 Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
 
+To query the properties of multiple tracks, see [Song: Properties of cue points, scenes and tracks](https://github.com/ideoforms/AbletonOSC#song-properties-of-cue-points-scenes-and-tracks).
+
 <details>
 <summary><b>Documentation</b>: Track API</summary>
 

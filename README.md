@@ -17,14 +17,14 @@ AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject
 
 To install the script:
 
-- Clone this repo, or download/unzip and rename AbletonOSC-master to AbletonOSC
+- [Download a zip of this repository](https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip), unzip its contents, and rename AbletonOSC-master to AbletonOSC
 - Install it following the instructions on
   Ableton's [Installing third-party remote scripts](https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts)
-  doc, copying the script to:
+  doc, by copying the `AbletonOSC` folder to:
     - **Windows**: `\Users\[username]\Documents\Ableton\User Library\Remote Scripts`
     - **macOS**: `Macintosh HD/Users/[username]/Music/Ableton/User Library/Remote Scripts`
 - Restart Live
-- In `Preferences > MIDI`, add the new AbletonOSC Control Surface that should appear. Live should display a message
+- In `Preferences > Link / Tempo / MIDI`, under the Control Surface dropdown, select the new "AbletonOSC" option. Live should display a message
   saying "AbletonOSC: Listening for OSC on port 11000"
 
 Activity logs will be output to a `logs` subdirectory.

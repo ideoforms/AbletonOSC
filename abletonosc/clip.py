@@ -35,7 +35,7 @@ class ClipHandler(AbletonOSCHandler):
                 else:
                     rv = func(clip, *args, params[2:])
 
-                if rv:
+                if rv is not None:
                     return (track_index, clip_index, *rv)
 
             return clip_callback

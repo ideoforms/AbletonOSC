@@ -154,6 +154,75 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/get/devices/class_name", create_track_callback(track_get_device_class_names))
         self.osc_server.add_handler("/live/track/get/devices/can_have_chains", create_track_callback(track_get_device_can_have_chains))
 
+        #--------------------------------------------------------------------------------
+        # Track: Output routing.
+        # An output route has a type (e.g. "Ext. Out") and a channel (e.g. "1/2").
+        # Since Live 10, both of these need to be set by reference to the appropriate
+        # item in the available_output_routing_types vector.
+        #--------------------------------------------------------------------------------
+        def track_get_available_output_routing_types(track, _):
+            return tuple([routing_type.display_name for routing_type in track.available_output_routing_types])
+        def track_get_available_output_routing_channels(track, _):
+            return tuple([routing_channel.display_name for routing_channel in track.available_output_routing_channels])
+        def track_get_output_routing_type(track, _):
+            return track.output_routing_type.display_name,
+        def track_set_output_routing_type(track, params):
+            type_name = str(params[0])
+            for routing_type in track.available_output_routing_types:
+                if routing_type.display_name == type_name:
+                    track.output_routing_type = routing_type
+                    return
+            self.logger.warning("Couldn't find output routing type: %s" % type_name)
+        def track_get_output_routing_channel(track, _):
+            return track.output_routing_channel.display_name,
+        def track_set_output_routing_channel(track, params):
+            channel_name = str(params[0])
+            for channel in track.available_output_routing_channels:
+                if channel.display_name == channel_name:
+                    track.output_routing_channel = channel
+                    return
+            self.logger.warning("Couldn't find output routing channel: %s" % channel_name)
+
+        self.osc_server.add_handler("/live/track/get/available_output_routing_types", create_track_callback(track_get_available_output_routing_types))
+        self.osc_server.add_handler("/live/track/get/available_output_routing_channels", create_track_callback(track_get_available_output_routing_channels))
+        self.osc_server.add_handler("/live/track/get/output_routing_type", create_track_callback(track_get_output_routing_type))
+        self.osc_server.add_handler("/live/track/set/output_routing_type", create_track_callback(track_set_output_routing_type))
+        self.osc_server.add_handler("/live/track/get/output_routing_channel", create_track_callback(track_get_output_routing_channel))
+        self.osc_server.add_handler("/live/track/set/output_routing_channel", create_track_callback(track_set_output_routing_channel))
+
+        #--------------------------------------------------------------------------------
+        # Track: Input routing.
+        #--------------------------------------------------------------------------------
+        def track_get_available_input_routing_types(track, _):
+            return tuple([routing_type.display_name for routing_type in track.available_input_routing_types])
+        def track_get_available_input_routing_channels(track, _):
+            return tuple([routing_channel.display_name for routing_channel in track.available_input_routing_channels])
+        def track_get_input_routing_type(track, _):
+            return track.input_routing_type.display_name,
+        def track_set_input_routing_type(track, params):
+            type_name = str(params[0])
+            for routing_type in track.available_input_routing_types:
+                if routing_type.display_name == type_name:
+                    track.input_routing_type = routing_type
+                    return
+            self.logger.warning("Couldn't find input routing type: %s" % type_name)
+        def track_get_input_routing_channel(track, _):
+            return track.input_routing_channel.display_name,
+        def track_set_input_routing_channel(track, params):
+            channel_name = str(params[0])
+            for channel in track.available_input_routing_channels:
+                if channel.display_name == channel_name:
+                    track.input_routing_channel = channel
+                    return
+            self.logger.warning("Couldn't find input routing channel: %s" % channel_name)
+
+        self.osc_server.add_handler("/live/track/get/available_input_routing_types", create_track_callback(track_get_available_input_routing_types))
+        self.osc_server.add_handler("/live/track/get/available_input_routing_channels", create_track_callback(track_get_available_input_routing_channels))
+        self.osc_server.add_handler("/live/track/get/input_routing_type", create_track_callback(track_get_input_routing_type))
+        self.osc_server.add_handler("/live/track/set/input_routing_type", create_track_callback(track_set_input_routing_type))
+        self.osc_server.add_handler("/live/track/get/input_routing_channel", create_track_callback(track_get_input_routing_channel))
+        self.osc_server.add_handler("/live/track/set/input_routing_channel", create_track_callback(track_set_input_routing_channel))
+
     def _set_mixer_property(self, target, prop, params: Tuple) -> None:
         parameter_object = getattr(target.mixer_device, prop)
         self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))

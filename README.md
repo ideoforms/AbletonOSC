@@ -212,29 +212,37 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 #### Getters
 
-| Address                                  | Query params      | Response params            | Description                                      |
-|:-----------------------------------------|:------------------|:---------------------------|:-------------------------------------------------|
-| /live/track/get/arm                      | track_id          | track_id, armed            | Query whether track is armed                     |
-| /live/track/get/can_be_armed             | track_id          | track_id, can_be_armed     | Query whether track can be armed                 |
-| /live/track/get/color                    | track_id          | track_id, color            | Query track color                                |
-| /live/track/get/color_index              | track_id          | track_id, color_index      | Query track color index                          |
-| /live/track/get/current_monitoring_state | track_id          | track_id, state            | Query current monitoring state (on/off)          |
-| /live/track/get/fired_slot_index         | track_id          | track_id, index            | Query currently-fired slot                       |
-| /live/track/get/fold_state               | track_id          | track_id, fold_state       | Query folded state (for groups)                  |
-| /live/track/get/has_audio_input          | track_id          | track_id, has_audio_input  | Query has_audio_input                            |
-| /live/track/get/has_audio_output         | track_id          | track_id, has_audio_output | Query has_audio_output                           |
-| /live/track/get/has_midi_input           | track_id          | track_id, has_midi_input   | Query has_midi_input                             |
-| /live/track/get/has_midi_output          | track_id          | track_id, has_midi_output  | Query has_midi_output                            |
-| /live/track/get/is_foldable              | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group |
-| /live/track/get/is_grouped               | track_id          | track_id, is_grouped       | Query whether track is in a group                |
-| /live/track/get/is_visible               | track_id          | track_id, is_visible       | Query whether track is visible                   |
-| /live/track/get/mute                     | track_id          | track_id, mute             | Query track mute on/off                          |
-| /live/track/get/name                     | track_id          | track_id, name             | Query track name                                 |
-| /live/track/get/panning                  | track_id          | track_id, panning          | Query track panning                              |
-| /live/track/get/playing_slot_index       | track_id          | track_id, index            | Query currently-playing slot                     |
-| /live/track/get/send                     | track_id, send_id | track_id, value            | Query track send                                 |
-| /live/track/get/solo                     | track_id          | track_id, solo             | Query track solo on/off                          |
-| /live/track/get/volume                   | track_id          | track_id, volume           | Query track volume                               |
+| Address                                           | Query params      | Response params            | Description                                      |
+|:--------------------------------------------------|:------------------|:---------------------------|:-------------------------------------------------|
+| /live/track/get/arm                               | track_id          | track_id, armed            | Query whether track is armed                     |
+| /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...     | List input channels (e.g. "1", "2", "1/2", ...)  |
+| /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...        | List input routes (e.g. "Ext. In", ...)          |
+| /live/track/get/available_output_routing_channels | track_id          | track_id, channel, ...     | List output channels (e.g. "1", "2", "1/2", ...) |
+| /live/track/get/available_output_routing_types    | track_id          | track_id, type, ...        | List output routes (e.g. "Ext. Out", ...)        |
+| /live/track/get/can_be_armed                      | track_id          | track_id, can_be_armed     | Query whether track can be armed                 |
+| /live/track/get/color                             | track_id          | track_id, color            | Query track color                                |
+| /live/track/get/color_index                       | track_id          | track_id, color_index      | Query track color index                          |
+| /live/track/get/current_monitoring_state          | track_id          | track_id, state            | Query current monitoring state (on/off)          |
+| /live/track/get/fired_slot_index                  | track_id          | track_id, index            | Query currently-fired slot                       |
+| /live/track/get/fold_state                        | track_id          | track_id, fold_state       | Query folded state (for groups)                  |
+| /live/track/get/has_audio_input                   | track_id          | track_id, has_audio_input  | Query has_audio_input                            |
+| /live/track/get/has_audio_output                  | track_id          | track_id, has_audio_output | Query has_audio_output                           |
+| /live/track/get/has_midi_input                    | track_id          | track_id, has_midi_input   | Query has_midi_input                             |
+| /live/track/get/has_midi_output                   | track_id          | track_id, has_midi_output  | Query has_midi_output                            |
+| /live/track/get/input_routing_channel             | track_id          | track_id, channel          | Query current input routing channel              |
+| /live/track/get/input_routing_type                | track_id          | track_id, type             | Query current input routing type                 |
+| /live/track/get/output_routing_channel            | track_id          | track_id, channel          | Query current output routing channel             |
+| /live/track/get/output_routing_type               | track_id          | track_id, type             | Query current output routing type                |
+| /live/track/get/is_foldable                       | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group |
+| /live/track/get/is_grouped                        | track_id          | track_id, is_grouped       | Query whether track is in a group                |
+| /live/track/get/is_visible                        | track_id          | track_id, is_visible       | Query whether track is visible                   |
+| /live/track/get/mute                              | track_id          | track_id, mute             | Query track mute on/off                          |
+| /live/track/get/name                              | track_id          | track_id, name             | Query track name                                 |
+| /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                              |
+| /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                     |
+| /live/track/get/send                              | track_id, send_id | track_id, value            | Query track send                                 |
+| /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                          |
+| /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                               |
 
 #### Setters
 
@@ -245,8 +253,12 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/set/color_index              | track_id, color_index    |                 | Set track color index      |
 | /live/track/set/current_monitoring_state | track_id, state          |                 | Set monitoring on/off      |
 | /live/track/set/fold_state               | track_id, fold_state     |                 | Set folded on/off          |
+| /live/track/set/input_routing_channel    | track_id, channel        |                 | Set input routing channel  |
+| /live/track/set/input_routing_type       | track_id, type           |                 | Set input routing type     |
 | /live/track/set/mute                     | track_id, mute           |                 | Set track mute on/off      |
 | /live/track/set/name                     | track_id, name           |                 | Set track name             |
+| /live/track/set/output_routing_channel   | track_id, channel        |                 | Set output routing channel |
+| /live/track/set/output_routing_type      | track_id, type           |                 | Set output routing type    |
 | /live/track/set/panning                  | track_id, panning        |                 | Set track panning          |
 | /live/track/set/send                     | track_id, send_id, value |                 | Set track send             |
 | /live/track/set/solo                     | track_id, solo           |                 | Set track solo on/off      |

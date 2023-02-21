@@ -232,6 +232,9 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/get/input_routing_channel             | track_id          | track_id, channel          | Query current input routing channel              |
 | /live/track/get/input_routing_type                | track_id          | track_id, type             | Query current input routing type                 |
 | /live/track/get/output_routing_channel            | track_id          | track_id, channel          | Query current output routing channel             |
+| /live/track/get/output_meter_left                 | track_id          | track_id, level            | Query current output level, left channel         |
+| /live/track/get/output_meter_level                | track_id          | track_id, level            | Query current output level, both channels        |
+| /live/track/get/output_meter_right                | track_id          | track_id, level            | Query current output level, right channel        |
 | /live/track/get/output_routing_type               | track_id          | track_id, type             | Query current output routing type                |
 | /live/track/get/is_foldable                       | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group |
 | /live/track/get/is_grouped                        | track_id          | track_id, is_grouped       | Query whether track is in a group                |

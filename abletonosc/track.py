@@ -38,6 +38,9 @@ class TrackHandler(AbletonOSCHandler):
             "is_foldable",
             "is_grouped",
             "is_visible",
+            "output_meter_level",
+            "output_meter_left",
+            "output_meter_right",
             "playing_slot_index",
         ]
         properties_rw = [

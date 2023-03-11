@@ -15,6 +15,8 @@ AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject
 
 # Installation
 
+AbletonOSC requires Ableton Live 11, and does not support earlier versions.
+
 To install the script:
 
 - [Download a zip of this repository](https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip), unzip its contents, and rename AbletonOSC-master to AbletonOSC

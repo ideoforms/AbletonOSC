@@ -15,6 +15,8 @@ AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject
 
 # Installation
 
+AbletonOSC requires Ableton Live 11, and does not support earlier versions.
+
 To install the script:
 
 - [Download a zip of this repository](https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip), unzip its contents, and rename AbletonOSC-master to AbletonOSC
@@ -325,7 +327,7 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 | /live/clip/fire                          | track_id, clip_id                                                   |                                                                                        | Start clip playback                                                                                                                                  |
 | /live/clip/stop                          | track_id, clip_id                                                   |                                                                                        | Stop clip playback                                                                                                                                   |
 | /live/clip/get/notes                     | track_id, clip_id                                                   | track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...] | Query the notes in a given clip.                                                                                                                     |
-| /live/clip/add/notes                     | track_id, clip_id, pitch, start_time, duration, velocity, mute, ... |                                                                                        | Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is on/off |
+| /live/clip/add/notes                     | track_id, clip_id, pitch, start_time, duration, velocity, mute, ... |                                                                                        | Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false |
 | /live/clip/remove/notes                  | start_pitch, pitch_span, start_time, time_span                      |                                                                                        | Remove notes from a clip in a given range of pitches and times.                                                                                      |
 | /live/clip/get/color                     | track_id, clip_id                                                   | track_id, clip_id, color                                                               | Get clip color                                                                                                                                       |
 | /live/clip/set/color                     | track_id, clip_id, color                                            |                                                                                        | Set clip color                                                                                                                                       |

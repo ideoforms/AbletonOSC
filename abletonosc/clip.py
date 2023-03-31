@@ -22,6 +22,7 @@ class ClipHandler(AbletonOSCHandler):
             to query its own index). Other alternatives include _always_ passing track/clip
             index to the callback, but this adds arg clutter to every single callback.
             """
+
             def clip_callback(params: Tuple[Any]) -> Tuple:
                 #--------------------------------------------------------------------------------
                 # Cast to int to support clients such as TouchOSC that, by default, pass all
@@ -87,7 +88,7 @@ class ClipHandler(AbletonOSCHandler):
         def clip_add_notes(clip, params: Tuple[Any] = ()):
             notes = []
             for offset in range(0, len(params), 5):
-                pitch, start_time, duration, velocity, mute = params[offset:offset+5]
+                pitch, start_time, duration, velocity, mute = params[offset:offset + 5]
                 note = Live.Clip.MidiNoteSpecification(start_time=start_time,
                                                        duration=duration,
                                                        pitch=pitch,
@@ -106,6 +107,7 @@ class ClipHandler(AbletonOSCHandler):
 
         # TODO: tidy up and generalise this
         self.clip_listeners = {}
+
         def clip_add_playing_position_listener(track_clip_index, params: Tuple[Any] = ()):
             track_index, clip_index = track_clip_index
             clip = self.song.tracks[track_index].clip_slots[clip_index].clip
@@ -134,20 +136,18 @@ class ClipHandler(AbletonOSCHandler):
         def note_name_to_midi(name):
             """ Maps a MIDI note name (D3, C#6) to a value.
             Assumes that middle C is C4. """
-            note_names = [
-                ["C"],
-                ["C#", "Db"],
-                ["D"],
-                ["D#", "Eb"],
-                ["E"],
-                ["F"],
-                ["F#", "Gb"],
-                ["G"],
-                ["G#", "Ab"],
-                ["A"],
-                ["A#", "Bb"],
-                ["B"]
-            ]
+            note_names = [["C"],
+                          ["C#", "Db"],
+                          ["D"],
+                          ["D#", "Eb"],
+                          ["E"],
+                          ["F"],
+                          ["F#", "Gb"],
+                          ["G"],
+                          ["G#", "Ab"],
+                          ["A"],
+                          ["A#", "Bb"],
+                          ["B"]]
 
             for index, names in enumerate(note_names):
                 if name in names:
@@ -155,6 +155,7 @@ class ClipHandler(AbletonOSCHandler):
             return None
 
         def clips_filter_handler(params: Tuple):
+            # TODO: Pre-cache clip notes
             note_indices = [note_name_to_midi(name) for name in params]
             regex = "([_-])([A-G][A-G#b1-9-]*)$"
 
@@ -164,7 +165,6 @@ class ClipHandler(AbletonOSCHandler):
                     if clip_slot.has_clip:
                         clip = clip_slot.clip
                         clip_name = clip.name
-                        self.logger.info(clip_name)
                         match = re.search(regex, clip_name)
                         if match:
                             clip_notes_str = match.group(2)
@@ -177,3 +177,17 @@ class ClipHandler(AbletonOSCHandler):
                                 clip.muted = True
 
         self.osc_server.add_handler("/live/clips/filter", clips_filter_handler)
+
+        def clips_unfilter_handler(params: Tuple):
+            track_start = params[0] if len(params) > 0 else 0
+            track_end = params[1] if len(params) > 1 else len(self.song.tracks)
+
+            self.logger.info("Unfiltering tracks: %d .. %d" % (track_start, track_end))
+            for track in self.song.tracks[track_start:track_end]:
+                for clip_slot in track.clip_slots:
+                    if clip_slot.has_clip:
+                        clip = clip_slot.clip
+                        clip.muted = False
+
+        self.osc_server.add_handler("/live/clips/unfilter", clips_unfilter_handler)
+

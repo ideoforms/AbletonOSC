@@ -62,7 +62,8 @@ class Manager(ControlSurface):
                 abletonosc.ClipHandler(self),
                 abletonosc.ClipSlotHandler(self),
                 abletonosc.TrackHandler(self),
-                abletonosc.DeviceHandler(self)
+                abletonosc.DeviceHandler(self),
+                abletonosc.ViewHandler(self)
             ]
 
     def clear_api(self):
@@ -91,6 +92,7 @@ class Manager(ControlSurface):
             importlib.reload(abletonosc.osc_server)
             importlib.reload(abletonosc.song)
             importlib.reload(abletonosc.track)
+            importlib.reload(abletonosc.view)
             importlib.reload(abletonosc)
         except Exception as e:
             exc = traceback.format_exc()

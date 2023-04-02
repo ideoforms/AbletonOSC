@@ -146,6 +146,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                    |
 | /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                   |
 | /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
+| /live/song/set/session_record              | session_record              |                 | Set whether session record is enabled           |
 | /live/song/set/signature_denominator       | signature_denominator       |                 | Set the time signature's denominator            |
 | /live/song/set/signature_numerator         | signature_numerator         |                 | Set the time signature's numerator              |
 | /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |

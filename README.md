@@ -122,6 +122,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/punch_in                    |              | punch_in                    | Query punch in                                    |
 | /live/song/get/punch_out                   |              | punch_out                   | Query punch out                                   |
 | /live/song/get/record_mode                 |              | record_mode                 | Query the current record mode                     |
+| /live/song/get/session_record              |              | session_record              | Query whether session record is enabled           |
 | /live/song/get/signature_denominator       |              | denominator                 | Query the current time signature's denominator    |
 | /live/song/get/signature_numerator         |              | numerator                   | Query the current time signature's numerator      |
 | /live/song/get/tempo                       |              | tempo_bpm                   | Query the current song tempo                      |

@@ -6,7 +6,7 @@ AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) int
 control [Ableton Live 11](https://www.ableton.com/en/live/). Building on ideas from the
 older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the
 entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API
-([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml), providing comprehensive control
+([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml)), providing comprehensive control
 over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
 AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject to change. Many major APIs are now exposed.
@@ -73,6 +73,7 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 
 | Address                           | Query params | Response params | Description                                                                              |
 |:----------------------------------|:-------------|:----------------|:-----------------------------------------------------------------------------------------|
+| /live/song/capture_midi           |              |                 | Capture midi                                                                             |
 | /live/song/continue_playing       |              |                 | Resume session playback                                                                  |
 | /live/song/create_audio_track     | index        |                 | Create a new audio track at the specified index (-1 = end of list)                       |
 | /live/song/create_midi_track      | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                        |
@@ -124,6 +125,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/punch_in                    |              | punch_in                    | Query punch in                                    |
 | /live/song/get/punch_out                   |              | punch_out                   | Query punch out                                   |
 | /live/song/get/record_mode                 |              | record_mode                 | Query the current record mode                     |
+| /live/song/get/session_record              |              | session_record              | Query whether session record is enabled           |
 | /live/song/get/signature_denominator       |              | denominator                 | Query the current time signature's denominator    |
 | /live/song/get/signature_numerator         |              | numerator                   | Query the current time signature's numerator      |
 | /live/song/get/tempo                       |              | tempo_bpm                   | Query the current song tempo                      |
@@ -147,6 +149,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                    |
 | /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                   |
 | /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
+| /live/song/set/session_record              | session_record              |                 | Set whether session record is enabled           |
 | /live/song/set/signature_denominator       | signature_denominator       |                 | Set the time signature's denominator            |
 | /live/song/set/signature_numerator         | signature_numerator         |                 | Set the time signature's numerator              |
 | /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
@@ -328,6 +331,7 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 |:-----------------------------------------|:--------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | /live/clip/fire                          | track_id, clip_id                                                   |                                                                                        | Start clip playback                                                                                                                                  |
 | /live/clip/stop                          | track_id, clip_id                                                   |                                                                                        | Stop clip playback                                                                                                                                   |
+| /live/clip/duplicate_loop                | track_id, clip_id                                                   |                                                                                        | Duplicates clip loop                                                                                                                                 |
 | /live/clip/get/notes                     | track_id, clip_id                                                   | track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...] | Query the notes in a given clip.                                                                                                                     |
 | /live/clip/add/notes                     | track_id, clip_id, pitch, start_time, duration, velocity, mute, ... |                                                                                        | Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false |
 | /live/clip/remove/notes                  | start_pitch, pitch_span, start_time, time_span                      |                                                                                        | Remove notes from a clip in a given range of pitches and times.                                                                                      |
@@ -350,6 +354,11 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 | /live/clip/get/playing_position          | track_id, clip_id                                                   | track_id, clip_id, playing_position                                                    | Get clip's playing position                                                                                                                          |
 | /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                                        | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position     |
 | /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                                        | Stop listening for clip's playing position.                                                                                                          |
+| /live/clip/get/loop_start                | track_id, clip_id                                                   | track_id, clip_id, loop_start                                                          | Get clip's loop start                                                                                                                                |
+| /live/clip/set/loop_start                | track_id, clip_id, loop_start                                       | track_id, clip_id, loop_start                                                          | Set clip's loop start                                                                                                                                |
+| /live/clip/get/loop_end                  | track_id, clip_id                                                   | track_id, clip_id, loop_end                                                            | Get clip's loop end                                                                                                                                  |
+| /live/clip/set/loop_end                  | track_id, clip_id, loop_end                                         | track_id, clip_id, loop_end                                                            | Set clip's loop end                                                                                                                                  |
+
 </details>
 
 ---
@@ -414,3 +423,4 @@ For code contributions and feedback, many thanks to:
 - Bill Moser ([billmoser](https://github.com/billmoser))
 - [stevmills](https://github.com/stevmills)
 - Marco Buongiorno Nardelli ([marcobn](https://github.com/marcobn)) and Colin Stokes
+- Mark Marijnissen ([markmarijnissen](https://github.com/markmarijnissen))

@@ -44,6 +44,15 @@ class AbletonOSCHandler(Component):
         return value,
 
     def _start_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
+        """
+        Start listening for the property named `prop` on the Live object `target`.
+        `params` is typically a tuple containing the track/clip index.
+
+        Args:
+            target: 
+            prop:
+            params:
+        """
         def property_changed_callback():
             value = getattr(target, prop)
             self.logger.info("Property %s changed of %s %s: %s" % (prop, self.class_identifier, str(params), value))

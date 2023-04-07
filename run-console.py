@@ -35,7 +35,7 @@ def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     if args.verbose:
         client.verbose = True
-    client.send_message("/live/reload")
+    client.send_message("/live/api/reload")
 
     readline.parse_and_bind('tab: complete')
     print("AbletonOSC command console")

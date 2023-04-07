@@ -12,7 +12,7 @@ class DeviceHandler(AbletonOSCHandler):
                 track_index, device_index = int(params[0]), int(params[1])
                 device = self.song.tracks[track_index].devices[device_index]
                 rv = func(device, *args, params[2:])
-                if rv:
+                if rv is not None:
                     return (track_index, device_index, *rv)
 
             return device_callback

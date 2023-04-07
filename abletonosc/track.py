@@ -19,7 +19,7 @@ class TrackHandler(AbletonOSCHandler):
                 else:
                     rv = func(track, *args, tuple(params[1:]))
 
-                if rv:
+                if rv is not None:
                     return (track_index, *rv)
 
             return track_callback

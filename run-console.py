@@ -6,8 +6,16 @@
 #--------------------------------------------------------------------------------
 
 import re
+import sys
 import argparse
-import readline
+
+try:
+    import readline
+except:
+    if sys.platform == "win32":
+        print("On Windows, run-console.py requires pyreadline3: pip install pyreadline3")
+    else:
+        raise
 
 from client import AbletonOSCClient
 

@@ -7,14 +7,19 @@ class ClipSlotHandler(AbletonOSCHandler):
         self.class_identifier = "clip_slot"
 
     def init_api(self):
-        def create_clip_slot_callback(func, *args):
+        def create_clip_slot_callback(func, *args, pass_clip_index=False):
             def clip_slot_callback(params: Tuple[Any]):
                 track_index, clip_index = int(params[0]), int(params[1])
                 track = self.song.tracks[track_index]
                 clip_slot = track.clip_slots[clip_index]
-                rv = func(clip_slot, *args, params[2:])
+
+                if pass_clip_index:
+                    rv = func((track_index, clip_index), *args, params[2:])
+                else:
+                    rv = func(clip_slot, *args, params[2:])
+
                 self.logger.info(track_index, clip_index, rv)
-                if rv:
+                if rv is not None:
                     return (track_index, clip_index, *rv)
 
             return clip_slot_callback
@@ -46,9 +51,9 @@ class ClipSlotHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/clip_slot/get/%s" % prop,
                                         create_clip_slot_callback(self._get_property, prop))
             self.osc_server.add_handler("/live/clip_slot/start_listen/%s" % prop,
-                                        create_clip_slot_callback(self._start_listen, prop))
+                                        create_clip_slot_callback(self._start_listen, prop, pass_clip_index=True))
             self.osc_server.add_handler("/live/clip_slot/stop_listen/%s" % prop,
-                                        create_clip_slot_callback(self._stop_listen, prop))
+                                        create_clip_slot_callback(self._stop_listen, prop, pass_clip_index=True))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/clip_slot/set/%s" % prop,
                                         create_clip_slot_callback(self._set_property, prop))

@@ -6,8 +6,16 @@
 #--------------------------------------------------------------------------------
 
 import re
+import sys
 import argparse
-import readline
+
+try:
+    import readline
+except:
+    if sys.platform == "win32":
+        print("On Windows, run-console.py requires pyreadline3: pip install pyreadline3")
+    else:
+        raise
 
 from client import AbletonOSCClient
 
@@ -27,7 +35,7 @@ def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     if args.verbose:
         client.verbose = True
-    client.send_message("/live/reload")
+    client.send_message("/live/api/reload")
 
     readline.parse_and_bind('tab: complete')
     print("AbletonOSC command console")

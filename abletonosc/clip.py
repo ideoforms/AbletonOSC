@@ -44,6 +44,7 @@ class ClipHandler(AbletonOSCHandler):
         methods = [
             "fire",
             "stop",
+            "duplicate_loop", 
             "remove_notes_by_id"
         ]
         properties_r = [
@@ -63,6 +64,8 @@ class ClipHandler(AbletonOSCHandler):
             "pitch_coarse",
             "pitch_fine",
             "looping",
+            "loop_start",
+            "loop_end",
             "warping"
         ]
 

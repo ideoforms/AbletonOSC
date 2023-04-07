@@ -416,7 +416,7 @@ Usage: /live/osc/command [params]
 Thanks to [Stu Fisher](https://github.com/stufisher/) (and other authors) for LiveOSC, the spiritual predecessor to this
 library. Thanks to [Julien Bayle](https://structure-void.com/ableton-live-midi-remote-scripts/#liveAPI)
 and [NSUSpray](https://nsuspray.github.io/Live_API_Doc/) for providing XML API docs, based on original work
-by [Hans Petrov](http://remotescripts.blogspot.com/p/support-files.html).
+by [Hanz Petrov](http://remotescripts.blogspot.com/p/support-files.html).
 
 For code contributions and feedback, many thanks to:
 - Jörn Lengwenings ([Coupe70](https://github.com/Coupe70))

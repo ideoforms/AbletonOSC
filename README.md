@@ -29,7 +29,7 @@ To install the script:
 - In `Preferences > Link / Tempo / MIDI`, under the Control Surface dropdown, select the new "AbletonOSC" option. Live should display a message
   saying "AbletonOSC: Listening for OSC on port 11000"
 
-Activity logs will be output to a `logs` subdirectory.
+Activity logs will be output to a `logs` subdirectory. Logging granularity can be controlled with `/live/api/set/log_level` (see [Application API](#application-api) below). 
 
 # Usage
 
@@ -41,11 +41,13 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 <details>
 <summary><b>Documentation</b>: Application API</summary>
 
-| Address                       | Query params | Response params              | Description                                                                      |
-|:------------------------------|:-------------|:-----------------------------|:---------------------------------------------------------------------------------|
-| /live/test                    |              | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test     |
-| /live/application/get/version |              | major_version, minor_version | Query Live's version                                                             |
-| /live/reload                  |              |                              | Initiates a live reload of the AbletonOSC server code. Used in development only. |
+| Address                       | Query params | Response params              | Description                                                                              |
+|:------------------------------|:-------------|:-----------------------------|:-----------------------------------------------------------------------------------------|
+| /live/test                    |              | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test             |
+| /live/application/get/version |              | major_version, minor_version | Query Live's version                                                                     |
+| /live/api/reload              |              |                              | Initiates a live reload of the AbletonOSC server code. Used in development only.         |
+| /live/api/get/log_level       |              | log_level                    | Returns the current log level. Default is `info`.                                        |
+| /live/api/set/log_level       | log_level    |                              | Set the log level, which can be one of: `debug`, `info`, `warning`, `error`, `critical`. |
 
 ### Application status messages
 
@@ -288,7 +290,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/get/devices/type                 | track_id                 | track_id, [type, ...]       | Query all devices types on track                                                   |
 | /live/track/get/devices/class_name           | track_id                 | track_id, [class, ...]      | Query all device class names on track                                              |
 
-See **Device API** for details on Device type/class_names.
+See [Device API](#device-api) for details on Device type/class_names.
  
 </details>
 

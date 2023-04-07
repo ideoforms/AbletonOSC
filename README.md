@@ -71,6 +71,7 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 
 | Address                           | Query params | Response params | Description                                                                              |
 |:----------------------------------|:-------------|:----------------|:-----------------------------------------------------------------------------------------|
+| /live/song/capture_midi           |              |                 | Capture midi                                                                             |
 | /live/song/continue_playing       |              |                 | Resume session playback                                                                  |
 | /live/song/create_audio_track     | index        |                 | Create a new audio track at the specified index (-1 = end of list)                       |
 | /live/song/create_midi_track      | index        |                 | Create a new MIDI track at the specified index (-1 = end of list)                        |

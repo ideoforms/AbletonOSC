@@ -14,6 +14,7 @@ class SongHandler(AbletonOSCHandler):
         # Callbacks for Song: methods
         #--------------------------------------------------------------------------------
         for method in [
+            "capture_midi",
             "continue_playing",
             "create_audio_track",
             "create_midi_track",

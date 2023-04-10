@@ -9,21 +9,13 @@ import os
 
 logger = logging.getLogger("abletonosc")
 
-def start_logging():
-    module_path = os.path.dirname(os.path.realpath(__file__))
-    log_dir = os.path.join(module_path, "logs")
-    if not os.path.exists(log_dir):
-        os.mkdir(log_dir, 0o755)
-    log_path = os.path.join(log_dir, "abletonosc.log")
-    file_handler = logging.FileHandler(log_path)
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
-
 class Manager(ControlSurface):
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
+
+        self.log_level = "info"
+        self.start_logging()
+
         self.handlers = []
         self.show_message("AbletonOSC: Listening for OSC on port %d" % abletonosc.OSC_LISTEN_PORT)
 
@@ -45,15 +37,36 @@ class Manager(ControlSurface):
         self.live_osc_error_handler.setLevel(logging.ERROR)
         logger.addHandler(self.live_osc_error_handler)
 
+    def start_logging(self):
+        module_path = os.path.dirname(os.path.realpath(__file__))
+        log_dir = os.path.join(module_path, "logs")
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir, 0o755)
+        log_path = os.path.join(log_dir, "abletonosc.log")
+        self.log_file_handler = logging.FileHandler(log_path)
+        self.log_file_handler.setLevel(self.log_level.upper())
+        formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
+        self.log_file_handler.setFormatter(formatter)
+        logger.addHandler(self.log_file_handler)
+
     def init_api(self):
         def test_callback(params):
             self.show_message("Received OSC OK")
             self.osc_server.send("/live/test", ("ok",))
         def reload_callback(params):
             self.reload_imports()
+        def get_log_level_callback(params):
+            return (self.log_level,)
+        def set_log_level_callback(params):
+            log_level = params[0]
+            assert log_level in ("debug", "info", "warning", "error", "critical")
+            self.log_level = log_level
+            self.log_file_handler.setLevel(self.log_level.upper())
 
         self.osc_server.add_handler("/live/test", test_callback)
-        self.osc_server.add_handler("/live/reload", reload_callback)
+        self.osc_server.add_handler("/live/api/reload", reload_callback)
+        self.osc_server.add_handler("/live/api/get/log_level", get_log_level_callback)
+        self.osc_server.add_handler("/live/api/set/log_level", set_log_level_callback)
 
         with self.component_guard():
             self.handlers = [
@@ -109,4 +122,4 @@ class Manager(ControlSurface):
         self.osc_server.shutdown()
         super().disconnect()
 
-start_logging()
+

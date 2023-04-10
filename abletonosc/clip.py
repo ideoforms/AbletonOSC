@@ -32,7 +32,7 @@ class ClipHandler(AbletonOSCHandler):
                 track = self.song.tracks[track_index]
                 clip = track.clip_slots[clip_index].clip
                 if pass_clip_index:
-                    rv = func((track_index, clip_index), *args, params[2:])
+                    rv = func(clip, *args, params[0:])
                 else:
                     rv = func(clip, *args, params[2:])
 
@@ -44,6 +44,7 @@ class ClipHandler(AbletonOSCHandler):
         methods = [
             "fire",
             "stop",
+            "duplicate_loop", 
             "remove_notes_by_id"
         ]
         properties_r = [
@@ -63,6 +64,8 @@ class ClipHandler(AbletonOSCHandler):
             "pitch_coarse",
             "pitch_fine",
             "looping",
+            "loop_start",
+            "loop_end",
             "warping"
         ]
 
@@ -74,9 +77,9 @@ class ClipHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/clip/get/%s" % prop,
                                         create_clip_callback(self._get_property, prop))
             self.osc_server.add_handler("/live/clip/start_listen/%s" % prop,
-                                        create_clip_callback(self._start_listen, prop))
+                                        create_clip_callback(self._start_listen, prop, pass_clip_index=True))
             self.osc_server.add_handler("/live/clip/stop_listen/%s" % prop,
-                                        create_clip_callback(self._stop_listen, prop))
+                                        create_clip_callback(self._stop_listen, prop, pass_clip_index=True))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/clip/set/%s" % prop,
                                         create_clip_callback(self._set_property, prop))

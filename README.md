@@ -54,7 +54,7 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 These messages are sent to the client automatically when the application state changes.
 
 | Address       | Response params | Description                                                                                        |
-|:--------------|:----------------|:---------------------------------------------------------------------------------------------------|
+| :------------ | :-------------- | :------------------------------------------------------------------------------------------------- |
 | /live/startup |                 | Sent to the client application when AbletonOSC is started                                          |
 | /live/error   | error_msg       | Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log |
 
@@ -86,8 +86,8 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 | /live/song/duplicate_scene        | scene_index  |                 | Duplicate a scene                                                                        |
 | /live/song/duplicate_track        | track_index  |                 | Duplicate a track                                                                        |
 | /live/song/jump_by                | time         |                 | Jump song position by the specified time, in beats                                       |
-| /live/song/jump_to_next_cue       |              |                 | Jump to the next cue marker                                                              |      
-| /live/song/jump_to_prev_cue       |              |                 | Jump to the previous cue marker                                                          |      
+| /live/song/jump_to_next_cue       |              |                 | Jump to the next cue marker                                                              |
+| /live/song/jump_to_prev_cue       |              |                 | Jump to the previous cue marker                                                          |
 | /live/song/redo                   |              |                 | Redo the last undone operation                                                           |
 | /live/song/start_playing          |              |                 | Start session playback                                                                   |
 | /live/song/stop_playing           |              |                 | Stop session playback                                                                    |
@@ -106,7 +106,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 #### Getters
 
 | Address                                    | Query params | Response params             | Description                                       |
-|:-------------------------------------------|:-------------|:----------------------------|:--------------------------------------------------|
+| :----------------------------------------- | :----------- | :-------------------------- | :------------------------------------------------ |
 | /live/song/get/arrangement_overdub         |              | arrangement_overdub         | Query whether arrangement overdub is on           |
 | /live/song/get/back_to_arranger            |              | back_to_arranger            | Query whether "back to arranger" is lit           |
 | /live/song/get/can_redo                    |              | can_redo                    | Query whether redo is available                   |
@@ -133,7 +133,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 #### Setters
 
 | Address                                    | Query params                | Response params | Description                                     |
-|:-------------------------------------------|:----------------------------|:----------------|:------------------------------------------------|
+| :----------------------------------------- | :-------------------------- | :-------------- | :---------------------------------------------- |
 | /live/song/set/arrangement_overdub         | arrangement_overdub         |                 | Set whether arrangement overdub is on           |
 | /live/song/set/back_to_arranger            | back_to_arranger            |                 | Set whether "back to arranger" is lit           |
 | /live/song/set/clip_trigger_quantization   | clip_trigger_quantization   |                 | Set the current clip trigger quantization level |
@@ -158,12 +158,12 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 ### Song: Properties of cue points, scenes and tracks
 
 | Address                    | Query params | Response params        | Description                                                                 |
-|:---------------------------|:-------------|:-----------------------|:----------------------------------------------------------------------------|
+| :------------------------- | :----------- | :--------------------- | :-------------------------------------------------------------------------- |
 | /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
-| /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  | 
-| /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  | 
-| /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          | 
-| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. | 
+| /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  |
+| /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  |
+| /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          |
+| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. |
 
 
 #### Querying track/clip data in bulk with /live/song/get/track_data
@@ -190,9 +190,25 @@ Queries tracks 0..11, and returns a long list of values comprising:
 These messages are sent to the client automatically when the song state changes.
 
 | Address         | Response params | Description                                                          |
-|:----------------|:----------------|:---------------------------------------------------------------------|
+| :-------------- | :-------------- | :------------------------------------------------------------------- |
 | /live/song/beat | beat_number     | Sent to the client application on each beat when the song is playing |
 
+</details>
+
+---
+
+## View API
+
+Represents the view (user interface) of live
+
+<details>
+### View properties
+
+| Address                       | Query params | Response params               | Description                                  |
+| :---------------------------- | :----------- | :---------------------------- | :------------------------------------------- |
+| /live/view/get/selected_scene |              | selected_scene                | returns the selected scene (start at 0)      |
+| /live/view/get/selected_track |              | selected_track                | returns selected track (start at 0)          |
+| /live/view/get/selected_clip  |              | selected_scene selected_track | returns the scene and track of selected clip |
 </details>
 
 ---
@@ -208,9 +224,9 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 ### Track methods
 
-| Address                                      | Query params             | Response params             | Description                                                                        |
-|:---------------------------------------------|:-------------------------|:----------------------------|:-----------------------------------------------------------------------------------|
-| /live/track/stop_all_clips                   | track_id                 |                             | Stop all clips on track                                                            |
+| Address                    | Query params | Response params | Description             |
+| :------------------------- | :----------- | :-------------- | :---------------------- |
+| /live/track/stop_all_clips | track_id     |                 | Stop all clips on track |
 
 ### Track properties
 
@@ -220,7 +236,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 #### Getters
 
 | Address                                           | Query params      | Response params            | Description                                      |
-|:--------------------------------------------------|:------------------|:---------------------------|:-------------------------------------------------|
+| :------------------------------------------------ | :---------------- | :------------------------- | :----------------------------------------------- |
 | /live/track/get/arm                               | track_id          | track_id, armed            | Query whether track is armed                     |
 | /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...     | List input channels (e.g. "1", "2", "1/2", ...)  |
 | /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...        | List input routes (e.g. "Ext. In", ...)          |
@@ -257,7 +273,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 #### Setters
 
 | Address                                  | Query params             | Response params | Description                |
-|:-----------------------------------------|:-------------------------|:----------------|:---------------------------|
+| :--------------------------------------- | :----------------------- | :-------------- | :------------------------- |
 | /live/track/set/arm                      | track_id, armed          |                 | Set track arm state on/off |
 | /live/track/set/color                    | track_id, color          |                 | Set track color            |
 | /live/track/set/color_index              | track_id, color_index    |                 | Set track color index      |
@@ -276,22 +292,22 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 ### Track: Properties of multiple clips
 
-| Address                                      | Query params             | Response params             | Description                                      |
-|:---------------------------------------------|:-------------------------|:----------------------------|:-------------------------------------------------|
-| /live/track/get/clips/name                   | track_id                 | track_id, [name, ....]      | Query all clip names on track                    |
-| /live/track/get/clips/length                 | track_id                 | track_id, [length, ...]     | Query all clip lengths on track                  |
-| /live/track/get/clips/color                  | track_id                 | track_id, [color, ...]      | Query all clip colors on track                   |
-| /live/track/get/arrangement_clips/name       | track_id                 | track_id, [name, ....]      | Query all arrangement view clip names on track   |
-| /live/track/get/arrangement_clips/length     | track_id                 | track_id, [length, ...]     | Query all arrangement view clip lengths on track |
-| /live/track/get/arrangement_clips/start_time | track_id                 | track_id, [start_time, ...] | Query all arrangement view clip times on track   |
+| Address                                      | Query params | Response params             | Description                                      |
+| :------------------------------------------- | :----------- | :-------------------------- | :----------------------------------------------- |
+| /live/track/get/clips/name                   | track_id     | track_id, [name, ....]      | Query all clip names on track                    |
+| /live/track/get/clips/length                 | track_id     | track_id, [length, ...]     | Query all clip lengths on track                  |
+| /live/track/get/clips/color                  | track_id     | track_id, [color, ...]      | Query all clip colors on track                   |
+| /live/track/get/arrangement_clips/name       | track_id     | track_id, [name, ....]      | Query all arrangement view clip names on track   |
+| /live/track/get/arrangement_clips/length     | track_id     | track_id, [length, ...]     | Query all arrangement view clip lengths on track |
+| /live/track/get/arrangement_clips/start_time | track_id     | track_id, [start_time, ...] | Query all arrangement view clip times on track   |
 
 ### Track: Properties of devices
-| Address                                      | Query params             | Response params             | Description                                                                        |
-|:---------------------------------------------|:-------------------------|:----------------------------|:-----------------------------------------------------------------------------------|
-| /live/track/get/num_devices                  | track_id                 | track_id, num_devices       | Query the number of devices on the track                                           |
-| /live/track/get/devices/name                 | track_id                 | track_id, [name, ...]       | Query all device names on track                                                    |
-| /live/track/get/devices/type                 | track_id                 | track_id, [type, ...]       | Query all devices types on track                                                   |
-| /live/track/get/devices/class_name           | track_id                 | track_id, [class, ...]      | Query all device class names on track                                              |
+| Address                            | Query params | Response params        | Description                              |
+| :--------------------------------- | :----------- | :--------------------- | :--------------------------------------- |
+| /live/track/get/num_devices        | track_id     | track_id, num_devices  | Query the number of devices on the track |
+| /live/track/get/devices/name       | track_id     | track_id, [name, ...]  | Query all device names on track          |
+| /live/track/get/devices/type       | track_id     | track_id, [type, ...]  | Query all devices types on track         |
+| /live/track/get/devices/class_name | track_id     | track_id, [class, ...] | Query all device class names on track    |
 
 See [Device API](#device-api) for details on Device type/class_names.
  
@@ -307,7 +323,7 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 <summary><b>Documentation</b>: Clip Slot API</summary>
 
 | Address                             | Query params                       | Response params                    | Description                              |
-|:------------------------------------|:-----------------------------------|:-----------------------------------|:-----------------------------------------|
+| :---------------------------------- | :--------------------------------- | :--------------------------------- | :--------------------------------------- |
 | /live/clip_slot/create_clip         | track_id, clip_id, length          |                                    | Create a clip in the slot                |
 | /live/clip_slot/delete_clip         | track_id, clip_id                  |                                    | Delete the clip in the slot              |
 | /live/clip_slot/get/has_clip        | track_id, clip_id                  | track_id, clip_id, has_clip        | Query whether the slot has a clip        |
@@ -358,7 +374,6 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 | /live/clip/set/loop_start                | track_id, clip_id, loop_start                                       | track_id, clip_id, loop_start                                                          | Set clip's loop start                                                                                                                                |
 | /live/clip/get/loop_end                  | track_id, clip_id                                                   | track_id, clip_id, loop_end                                                            | Get clip's loop end                                                                                                                                  |
 | /live/clip/set/loop_end                  | track_id, clip_id, loop_end                                         | track_id, clip_id, loop_end                                                            | Set clip's loop end                                                                                                                                  |
-
 </details>
 
 ---
@@ -371,7 +386,7 @@ Represents an instrument or effect.
 <summary><b>Documentation</b>: Device API</summary>
 
 | Address                                  | Query params                             | Response params                          | Description                                                                             |
-|:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|
+| :--------------------------------------- | :--------------------------------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------- |
 | /live/device/get/name                    | track_id, device_id                      | track_id, device_id, name                | Get device name                                                                         |
 | /live/device/get/class_name              | track_id, device_id                      | track_id, device_id, class_name          | Get device class_name                                                                   |
 | /live/device/get/type                    | track_id, device_id                      | track_id, device_id, type                | Get device type                                                                         |

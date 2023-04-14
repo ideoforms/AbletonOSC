@@ -3,10 +3,32 @@ from typing import Tuple, Callable, Any, Optional
 from .handler import AbletonOSCHandler
 import Live
 
+def note_name_to_midi(name):
+    """ Maps a MIDI note name (D3, C#6) to a value.
+    Assumes that middle C is C4. """
+    note_names = [["C"],
+                  ["C#", "Db"],
+                  ["D"],
+                  ["D#", "Eb"],
+                  ["E"],
+                  ["F"],
+                  ["F#", "Gb"],
+                  ["G"],
+                  ["G#", "Ab"],
+                  ["A"],
+                  ["A#", "Bb"],
+                  ["B"]]
+
+    for index, names in enumerate(note_names):
+        if name in names:
+            return index
+    return None
+
 class ClipHandler(AbletonOSCHandler):
     def __init__(self, manager):
         super().__init__(manager)
         self.class_identifier = "clip"
+        self._clip_notes_cache = []
 
     def init_api(self):
         def create_clip_callback(func, *args, pass_clip_index=False):
@@ -136,48 +158,25 @@ class ClipHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/clip/stop_listen/playing_position",
                                     create_clip_callback(clip_remove_playing_position_listener, pass_clip_index=True))
 
-        def note_name_to_midi(name):
-            """ Maps a MIDI note name (D3, C#6) to a value.
-            Assumes that middle C is C4. """
-            note_names = [["C"],
-                          ["C#", "Db"],
-                          ["D"],
-                          ["D#", "Eb"],
-                          ["E"],
-                          ["F"],
-                          ["F#", "Gb"],
-                          ["G"],
-                          ["G#", "Ab"],
-                          ["A"],
-                          ["A#", "Bb"],
-                          ["B"]]
-
-            for index, names in enumerate(note_names):
-                if name in names:
-                    return index
-            return None
-
         def clips_filter_handler(params: Tuple):
             # TODO: Pre-cache clip notes
+            if len(self._clip_notes_cache) == 0:
+                self.logger.warning("Building clip notes cache...")
+                self._build_clip_name_cache()
+            else:
+                self.logger.warning("Found existing clip notes cache (len = %d)" % len(self._clip_notes_cache))
             note_indices = [note_name_to_midi(name) for name in params]
-            regex = "([_-])([A-G][A-G#b1-9-]*)$"
 
-            self.logger.info("Got note indices: %s" % note_indices)
-            for track in self.song.tracks:
-                for clip_slot in track.clip_slots:
-                    if clip_slot.has_clip:
+            self.logger.warning("Got note indices: %s" % note_indices)
+            for track_index, track in enumerate(self.song.tracks):
+                for clip_slot_index, clip_slot in enumerate(track.clip_slots):
+                    clip_notes_list = self._clip_notes_cache[track_index][clip_slot_index]
+                    if clip_notes_list:
                         clip = clip_slot.clip
-                        clip_name = clip.name
-                        match = re.search(regex, clip_name)
-                        if match:
-                            clip_notes_str = match.group(2)
-                            clip_notes_str = re.sub("[1-9]", "", clip_notes_str)
-                            clip_notes_list = clip_notes_str.split("-")
-                            clip_notes_list = [note_name_to_midi(name) for name in clip_notes_list]
-                            if all(note in note_indices for note in clip_notes_list):
-                                clip.muted = False
-                            else:
-                                clip.muted = True
+                        if all(note in note_indices for note in clip_notes_list):
+                            clip.muted = False
+                        else:
+                            clip.muted = True
 
         self.osc_server.add_handler("/live/clips/filter", clips_filter_handler)
 
@@ -194,3 +193,19 @@ class ClipHandler(AbletonOSCHandler):
 
         self.osc_server.add_handler("/live/clips/unfilter", clips_unfilter_handler)
 
+    def _build_clip_name_cache(self):
+        regex = "([_-])([A-G][A-G#b1-9-]*)$"
+        for track_index, track in enumerate(self.song.tracks):
+            self._clip_notes_cache.append([])
+            for clip_slot_index, clip_slot in enumerate(track.clip_slots):
+                self._clip_notes_cache[-1].append([])
+                if clip_slot.has_clip:
+                    clip = clip_slot.clip
+                    clip_name = clip.name
+                    match = re.search(regex, clip_name)
+                    if match:
+                        clip_notes_str = match.group(2)
+                        clip_notes_str = re.sub("[1-9]", "", clip_notes_str)
+                        clip_notes_list = clip_notes_str.split("-")
+                        clip_notes_list = [note_name_to_midi(name) for name in clip_notes_list]
+                        self._clip_notes_cache[-1][-1] = clip_notes_list

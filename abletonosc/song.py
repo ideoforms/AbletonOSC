@@ -1,4 +1,5 @@
 import Live
+import json
 from functools import partial
 from typing import Tuple, Any
 
@@ -143,6 +144,41 @@ class SongHandler(AbletonOSCHandler):
                         self.logger.error("Unknown object identifier in get/track_data: %s" % obj)
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
+
+
+        def song_export_structure(params):
+            path = "/tmp/abletonosc-song-structure.json"
+
+            tracks = []
+            for track_index, track in enumerate(self.song.tracks):
+                group_track = None
+                if track.group_track:
+                    group_track = list(self.song.tracks).index(track.group_track)
+                track_data = {
+                    "index": track_index,
+                    "name": track.name,
+                    "is_foldable": track.is_foldable,
+                    "group_track": group_track,
+                    "clips": []
+                }
+                for clip_index, clip_slot in enumerate(track.clip_slots):
+                    if clip_slot.clip:
+                        clip_data = {
+                            "index": clip_index,
+                            "name": clip_slot.clip.name,
+                            "length": clip_slot.clip.length,
+                        }
+                        track_data["clips"].append(clip_data)
+                tracks.append(track_data)
+            song = {
+                "tracks": tracks
+            }
+
+            fd = open(path, "w")
+            json.dump(song, fd)
+            fd.close()
+            return (1,)
+        self.osc_server.add_handler("/live/song/export/structure", song_export_structure)
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: Scene properties

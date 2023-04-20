@@ -88,7 +88,14 @@ class OSCServer:
         Synchronously process all data queued on the OSC socket.
         """
         try:
+            repeats = 0
             while True:
+                repeats += 1
+                if repeats > 20:
+                    fd = open("/tmp/TOO_MANY_REPEATS", "w")
+                    fd.write(data)
+                    fd.close()
+                    break
                 #--------------------------------------------------------------------------------
                 # Loop until no more data is available.
                 #--------------------------------------------------------------------------------

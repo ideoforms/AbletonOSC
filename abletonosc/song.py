@@ -152,7 +152,7 @@ class SongHandler(AbletonOSCHandler):
             tracks = []
             for track_index, track in enumerate(self.song.tracks):
                 group_track = None
-                if track.group_track:
+                if track.group_track is not None:
                     group_track = list(self.song.tracks).index(track.group_track)
                 track_data = {
                     "index": track_index,

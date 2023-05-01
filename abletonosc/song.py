@@ -60,6 +60,7 @@ class SongHandler(AbletonOSCHandler):
             "punch_out",
             "record_mode",
             "session_record",
+            "session_automation_record",
             "signature_denominator",
             "signature_numerator",
             "tempo"
@@ -87,13 +88,14 @@ class SongHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/song/get/num_tracks", lambda _: (len(self.song.tracks),))
 
         def song_get_track_names(params):
+            tracks = list(self.song.tracks + [ self.song.master_track ])
             if len(params) == 0:
-                track_index_min, track_index_max = 0, len(self.song.tracks)
+                track_index_min, track_index_max = 0, len(tracks)
             else:
                 track_index_min, track_index_max = params
                 if track_index_max == -1:
-                    track_index_max = len(self.song.tracks)
-            return tuple(self.song.tracks[index].name for index in range(track_index_min, track_index_max))
+                    track_index_max = len(tracks)
+            return tuple(tracks[index].name for index in range(track_index_min, track_index_max))
         self.osc_server.add_handler("/live/song/get/track_names", song_get_track_names)
 
         def song_get_track_data(params):
@@ -113,11 +115,12 @@ class SongHandler(AbletonOSCHandler):
             track_index_min, track_index_max, *properties = params
             self.logger.info("Getting track data: %s (tracks %d..%d)" %
                              (properties, track_index_min, track_index_max))
+            tracks = list(self.song.tracks + [ self.song.master_track])
             if track_index_max == -1:
-                track_index_max = len(self.song.tracks)
+                track_index_max = len(tracks)
             rv = []
             for track_index in range(track_index_min, track_index_max):
-                track = self.song.tracks[track_index]
+                track = tracks[track_index]
                 for prop in properties:
                     obj, property_name = prop.split(".")
                     if obj == "track":
@@ -129,7 +132,7 @@ class SongHandler(AbletonOSCHandler):
                                 #--------------------------------------------------------------------------------
                                 # Map Track objects to their track_index to return via OSC
                                 #--------------------------------------------------------------------------------
-                                value = list(self.song.tracks).index(value)
+                                value = list(tracks).index(value)
                         rv.append(value)
                     elif obj == "clip":
                         for clip_slot in track.clip_slots:

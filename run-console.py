@@ -27,7 +27,7 @@ class LiveAPICompleter:
         results =  [x for x in self.commands if x.startswith(text)] + [None]
         return results[state]
 
-words = ["horse", "hogan", "horrific"]
+words = ["live", "song", "track", "clip", "device", "parameter", "parameters"]
 completer = LiveAPICompleter(words)
 readline.set_completer(completer.complete)
 

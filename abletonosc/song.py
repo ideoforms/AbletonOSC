@@ -159,7 +159,8 @@ class SongHandler(AbletonOSCHandler):
                     "name": track.name,
                     "is_foldable": track.is_foldable,
                     "group_track": group_track,
-                    "clips": []
+                    "clips": [],
+                    "devices": []
                 }
                 for clip_index, clip_slot in enumerate(track.clip_slots):
                     if clip_slot.clip:
@@ -169,6 +170,24 @@ class SongHandler(AbletonOSCHandler):
                             "length": clip_slot.clip.length,
                         }
                         track_data["clips"].append(clip_data)
+
+                for device_index, device in enumerate(track.devices):
+                    device_data = {
+                        "class_name": device.class_name,
+                        "type": device.type,
+                        "name": device.name,
+                        "parameters": []
+                    }
+                    for parameter in device.parameters:
+                        device_data["parameters"].append({
+                            "name": parameter.name,
+                            "value": parameter.value,
+                            "min": parameter.min,
+                            "max": parameter.max,
+                            "is_quantized": parameter.is_quantized,
+                        })
+                    track_data["devices"].append(device_data)
+
                 tracks.append(track_data)
             song = {
                 "tracks": tracks

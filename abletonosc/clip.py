@@ -88,7 +88,9 @@ class ClipHandler(AbletonOSCHandler):
             "looping",
             "loop_start",
             "loop_end",
-            "warping"
+            "warping",
+            "start_marker",
+            "end_marker"
         ]
 
         for method in methods:
@@ -107,7 +109,13 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._set_property, prop))
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
-            notes = clip.get_notes(0, 0, clip.end_marker, 127)
+            estimatedMinTime = -16000 # pick up notes can start before 0
+            estimatedMaxTime = 1000000 # Ableton clip max length is 24 hours. This is more than enough at over 200bpm
+            # These numbers were came up after a bunch of try and error. They look arbitrary but it works. 
+            # I have tried different comnination of min and max time including using sys.maxsize, sys.float_info.min, sys.float_info.max
+            # clip.end_marker, clip_start_marker... but those don't work well. Notes are still missing
+            # https://github.com/ideoforms/AbletonOSC/issues/86
+            notes = clip.get_notes(estimatedMinTime, 0, estimatedMaxTime, 127)
             return tuple(item for sublist in notes for item in sublist)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):

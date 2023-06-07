@@ -107,7 +107,7 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._set_property, prop))
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
-            notes = clip.get_notes(0, 0, clip.length, 127)
+            notes = clip.get_notes(0, 0, clip.end_marker, 127)
             return tuple(item for sublist in notes for item in sublist)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):

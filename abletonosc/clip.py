@@ -108,7 +108,7 @@ class ClipHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/clip/set/%s" % prop,
                                         create_clip_callback(self._set_property, prop))
 
-        def clip_get_notes(clip, params: Tuple[Any] = ()):
+        def clip_get_notes_helper(clip, params: Tuple[Any] = ()):
             # Define default values
             estimated_min_from_time = -16000
             estimated_max_time_span = 1000000 # Ableton clip max length is 24 hours. This is more than enough at over 200bpm
@@ -124,8 +124,34 @@ class ClipHandler(AbletonOSCHandler):
             else:
                 from_time, from_pitch, time_span, pitch_span = estimated_min_from_time, 0, estimated_max_time_span, 128
 
-            notes = clip.get_notes(from_time, from_pitch, time_span, pitch_span)
-            return tuple(item for sublist in notes for item in sublist)
+            return clip.get_notes(from_time, from_pitch, time_span, pitch_span)
+
+        def clip_get_notes(clip, params: Tuple[Any] = ()):
+            notes = clip_get_notes_helper(clip, params)
+            return tuple(item for note in notes for item in note)
+
+        def clip_get_notes_range(clip, params: Tuple[Any] = ()):
+            notes = clip_get_notes_helper(clip, params)
+
+            min_start_time = float('inf')  # Initialize with a large value
+            max_end_time = float('-inf')   # Initialize with a small value
+            min_pitch = float('inf')            # Initialize with a large value
+            max_pitch = float('-inf')           # Initialize with a small value
+
+            for note in notes:
+                pitch, start_time, duration, velocity, mute = note
+
+                # Update smallest start time
+                min_start_time = min(min_start_time, start_time)
+
+                # Update largest end time (start_time + duration)
+                max_end_time = max(max_end_time, start_time + duration)
+
+                # Update minimum and maximum pitch
+                min_pitch = min(min_pitch, pitch)
+                max_pitch = max(max_pitch, pitch)
+
+            return (min_start_time, max_end_time, min_pitch, max_pitch)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):
             notes = []
@@ -144,6 +170,7 @@ class ClipHandler(AbletonOSCHandler):
             clip.remove_notes_extended(start_pitch, pitch_span, start_time, time_span)
 
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
+        self.osc_server.add_handler("/live/clip/get/notes_range", create_clip_callback(clip_get_notes_range))
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
         self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
 

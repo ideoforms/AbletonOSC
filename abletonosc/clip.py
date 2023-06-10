@@ -109,6 +109,9 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._set_property, prop))
 
         def clip_get_notes_helper(clip, params: Tuple[Any] = ()):
+            if clip is None:
+                self.logger.info("Trying to get notes from an empty clip")
+                return ()
             # Define default values
             estimated_min_from_time = -16000
             estimated_max_time_span = 1000000 # Ableton clip max length is 24 hours. This is more than enough at over 200bpm

@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple, Any, Callable
 from .constants import OSC_LISTEN_PORT, OSC_RESPONSE_PORT
 from ..pythonosc.osc_message import OscMessage, ParseError
@@ -40,6 +41,8 @@ class OSCServer:
         self.logger = logging.getLogger("abletonosc")
         self.logger.info("Starting OSC server (local %s, response port %d)",
                          str(self._local_addr), self._response_port)
+        max_chunk_size = self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+        self.logger.info(f"Socket message size limit: {max_chunk_size} bytes")
 
     def add_handler(self, address: str, handler: Callable) -> None:
         """
@@ -71,17 +74,53 @@ class OSCServer:
             remote_addr: The remote address to send to, as a 2-tuple (hostname, port).
                          If None, uses the default remote address.
         """
-        msg_builder = OscMessageBuilder(address)
-        for param in params:
-            msg_builder.add_arg(param)
+        chunks = []
+        max_chunk_size = self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+        #  calculate total size of params in bytes
+        total_size = sys.getsizeof(params)
+        for item in params:
+            total_size += sys.getsizeof(item)
 
-        try:
-            msg = msg_builder.build()
-            if remote_addr is None:
-                remote_addr = self._remote_addr
-            self._socket.sendto(msg.dgram, remote_addr)
-        except BuildError:
-            self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
+        if total_size <= max_chunk_size:
+            # the whole params fit in 1 chunk
+            chunks = [params]
+        else:
+            # split the data into smaller chunks to avoid Message Too Long error
+            # If data is splited into chunks, the first and the last data will be 
+            # a delimiter "$#$". Receiver will look into these delimiters as a hint
+            delimiter = '#$#'
+            params = (delimiter,) + params + (delimiter,)
+
+            current_chunk = []
+            current_size = 0
+
+            for item in params:
+                item_size = sys.getsizeof(item)
+                
+                if current_size + item_size <= max_chunk_size:
+                    current_chunk.append(item)
+                    current_size += item_size
+                else:
+                    chunks.append(tuple(current_chunk))
+                    current_chunk = [item]
+                    current_size = item_size
+
+            # Add the last chunk if it is not empty
+            if current_chunk:
+                chunks.append(tuple(current_chunk))
+
+        for chunk in chunks:
+            msg_builder = OscMessageBuilder(address)
+            for param in chunk:
+                msg_builder.add_arg(param)
+
+            try:
+                msg = msg_builder.build()
+                if remote_addr is None:
+                    remote_addr = self._remote_addr
+                self._socket.sendto(msg.dgram, remote_addr)
+            except BuildError:
+                self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
 
     def process(self) -> None:
         """

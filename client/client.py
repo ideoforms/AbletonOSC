@@ -96,14 +96,28 @@ class AbletonOSCClient:
               address: str,
               params: tuple = (),
               timeout: float = TICK_DURATION):
-        rv = None
+        rv = ()
         _event = threading.Event()
+        data_sent_in_chunks = False
 
         def received_response(params):
             nonlocal rv
             nonlocal _event
-            rv = params
-            _event.set()
+            nonlocal data_sent_in_chunks
+            
+            rv += tuple(params)
+
+            delimiter = '#$#'
+            # If response data was sent in chunks due to socket size limit,
+            # The beginning and end of all data is marked with '#$#' 
+            # Be careful in case params contains only (delimiter)
+            # That's the end of the data chunks
+            # Make sure it's the beginning by checking for len(params) > 1
+            if params and params[0] == delimiter and len(params) > 1:
+                data_sent_in_chunks = True
+
+            if not data_sent_in_chunks or (params and params[-1] == delimiter):
+                _event.set()
 
         self.add_handler(address, received_response)
         self.send_message(address, params)

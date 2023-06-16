@@ -9,6 +9,7 @@ import errno
 import socket
 import logging
 import traceback
+import random
 
 class OSCServer:
     def __init__(self,
@@ -75,7 +76,8 @@ class OSCServer:
                          If None, uses the default remote address.
         """
         chunks = []
-        max_chunk_size = self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+        max_chunk_size = min(self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF), 47000)
+        self.logger.debug(f"Max chunk size {max_chunk_size}")
         #  calculate total size of params in bytes
         total_size = sys.getsizeof(params)
         for item in params:
@@ -85,12 +87,9 @@ class OSCServer:
             # the whole params fit in 1 chunk
             chunks = [params]
         else:
-            # split the data into smaller chunks to avoid Message Too Long error
-            # If data is splited into chunks, the first and the last data will be 
-            # a delimiter "$#$". Receiver will look into these delimiters as a hint
-            delimiter = '#$#'
-            params = (delimiter,) + params + (delimiter,)
-
+            # Split the data into smaller chunks to avoid the "Message Too Long" error
+            # If the data is split into chunks, the last 4 pieces of information of a chunk are
+            # chunk index, total chunks, message id, '#$#'
             current_chunk = []
             current_size = 0
 
@@ -109,7 +108,26 @@ class OSCServer:
             if current_chunk:
                 chunks.append(tuple(current_chunk))
 
-        for chunk in chunks:
+        total_chunks = len(chunks)
+        updated_chunks = []
+        self.logger.debug(f"total chunks {total_chunks}")
+
+        if total_chunks > 1:
+            msg_id = random.randint(1, 127)
+            self.logger.info(f"Long message, split into {total_chunks} chunks before sending. msg id {msg_id}")
+
+            for index, chunk in enumerate(chunks):
+                updated_chunk = chunk + (index, total_chunks, msg_id, '#$#')
+                self.logger.debug(f"updated chunk {updated_chunk}")
+
+                updated_chunks.append(updated_chunk)
+
+        self.logger.debug(f"updated chunks {updated_chunks}")
+        # Select chunks to iterate based on the total number of chunks
+        chunks_to_iterate = updated_chunks if total_chunks > 1 else chunks
+        self.logger.debug(f"chunks to iterate {chunks_to_iterate}")
+
+        for chunk in chunks_to_iterate:
             msg_builder = OscMessageBuilder(address)
             for param in chunk:
                 msg_builder.add_arg(param)

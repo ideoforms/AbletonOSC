@@ -99,24 +99,35 @@ class AbletonOSCClient:
         rv = ()
         _event = threading.Event()
         data_sent_in_chunks = False
+        msg_id = 0
+        n_chunk_received = 0
+        total_chunks = 0
 
         def received_response(params):
             nonlocal rv
             nonlocal _event
             nonlocal data_sent_in_chunks
+            nonlocal msg_id
+            nonlocal n_chunk_received
+            nonlocal total_chunks
             
             rv += tuple(params)
 
             delimiter = '#$#'
             # If response data was sent in chunks due to socket size limit,
-            # The beginning and end of all data is marked with '#$#' 
-            # Be careful in case params contains only (delimiter)
-            # That's the end of the data chunks
-            # Make sure it's the beginning by checking for len(params) > 1
-            if params and params[0] == delimiter and len(params) > 1:
+            # the last 4 pieces of information of a chunk are
+            # chunk index, total chunks, message id, '#$#'
+            
+            if params and params[-1] == delimiter:
                 data_sent_in_chunks = True
+                msg_id = params[-2]
+                total_chunks = params[-3]
+                chunk_id = params[-4]
+                n_chunk_received += 1
 
-            if not data_sent_in_chunks or (params and params[-1] == delimiter):
+            # Assuming that consecutive chunks received within the timeout have the same message ID
+            # TODO: Handle chunks with different message IDs
+            if not data_sent_in_chunks or (n_chunk_received == total_chunks):
                 _event.set()
 
         self.add_handler(address, received_response)
@@ -124,6 +135,9 @@ class AbletonOSCClient:
         _event.wait(timeout)
         self.remove_handler(address)
         if not _event.is_set():
+            if data_sent_in_chunks:
+                print(f"Timeout! Recevied {n_chunk_received} / {total_chunks} chunks.") 
+                print("Try lowering max_chunk_size in send() in osc_server.py if problem persists")
             raise RuntimeError("No response received to query: %s" % address)
         return rv
 

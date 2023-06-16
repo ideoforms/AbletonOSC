@@ -36,7 +36,14 @@ Activity logs will be output to a `logs` subdirectory. Logging granularity can b
 AbletonOSC listens for OSC messages on port **11000**, and sends replies on port **11001**. Replies will be sent to the
 same IP as the originating message. When querying properties, OSC wildcard patterns can be used; for example, `/live/clip/get/* 0 0` will query all the properties of track 0, clip 0.
 
-When the data to be sent exceeds the maximum size limit of one OSC message, it will be divided into smaller chunks. The first chunk will begin with the delimiter '#\$#' and the last chunk will end with the same delimiter '#\$#'. This situation may occur, for example, with commands such as `/live/song/get/track_data` or `/live/clip/get/notes`.
+When the data to be sent exceeds the maximum size limit of one OSC message, it will be divided into smaller chunks. Each chunk ends with these 4 information 
+
+- chunk index
+- total chunks
+- message id
+- delimiter '#\$#' 
+
+This situation may occur, for example, with commands such as `/live/song/get/track_data` or `/live/clip/get/notes`.
 
 ## Application API
 

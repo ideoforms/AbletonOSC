@@ -204,11 +204,14 @@ Represents the view (user interface) of live
 <details>
 ### View properties
 
-| Address                       | Query params | Response params               | Description                                  |
-| :---------------------------- | :----------- | :---------------------------- | :------------------------------------------- |
-| /live/view/get/selected_scene |              | selected_scene                | returns the selected scene (start at 0)      |
-| /live/view/get/selected_track |              | selected_track                | returns selected track (start at 0)          |
-| /live/view/get/selected_clip  |              | selected_scene selected_track | returns the scene and track of selected clip |
+| Address                       | Query params                      | Response params               | Description                                  |
+| :---------------------------- | :-----------                      | :---------------------------- | :------------------------------------------- |
+| /live/view/get/selected_scene |                                   | selected_scene                | returns the selected scene (start at 0)      |
+| /live/view/get/selected_track |                                   | selected_track                | returns selected track (start at 0)          |
+| /live/view/get/selected_clip  |                                   | selected_scene selected_track | returns the scene and track of selected clip |
+| /live/view/set/selected_scene | selected_scene                    |                               | set the selected scene (start at 0)          |
+| /live/view/set/selected_track | selected_track                    |                               | set selected track (start at 0)              |
+| /live/view/set/selected_clip  | selected_track, selected_scene    |                               | set selected clip                            |
 </details>
 
 ---

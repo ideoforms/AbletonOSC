@@ -442,3 +442,5 @@ For code contributions and feedback, many thanks to:
 - [stevmills](https://github.com/stevmills)
 - Marco Buongiorno Nardelli ([marcobn](https://github.com/marcobn)) and Colin Stokes
 - Mark Marijnissen ([markmarijnissen](https://github.com/markmarijnissen))
+- [capturcus](https://github.com/capturcus)
+

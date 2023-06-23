@@ -113,8 +113,8 @@ class ClipHandler(AbletonOSCHandler):
                 self.logger.info("Trying to get notes from an empty clip")
                 return ()
             # Define default values
-            estimated_min_from_time = -16000
-            estimated_max_time_span = 1000000 # Ableton clip max length is 24 hours. This is more than enough at over 200bpm
+            default_min_from_time = -16000
+            default_max_time_span = 1000000 # Ableton clip max length is 24 hours. This is more than enough at over 200bpm
             # These numbers were came up after a bunch of try and error. They look arbitrary but it works. 
             # I have tried different comnination of min and max time including using sys.maxsize, sys.float_info.min, sys.float_info.max
             # clip.end_marker, clip_start_marker... but those don't work well. Notes are still missing
@@ -125,7 +125,7 @@ class ClipHandler(AbletonOSCHandler):
             if len(params) == 4:
                 from_time, from_pitch, time_span, pitch_span = params
             else:
-                from_time, from_pitch, time_span, pitch_span = estimated_min_from_time, 0, estimated_max_time_span, 128
+                from_time, from_pitch, time_span, pitch_span = default_min_from_time, 0, default_max_time_span, 128
 
             return clip.get_notes(from_time, from_pitch, time_span, pitch_span)
 

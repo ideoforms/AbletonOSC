@@ -1,3 +1,5 @@
+import os
+import tempfile
 import Live
 import json
 from functools import partial
@@ -147,8 +149,6 @@ class SongHandler(AbletonOSCHandler):
 
 
         def song_export_structure(params):
-            path = "/tmp/abletonosc-song-structure.json"
-
             tracks = []
             for track_index, track in enumerate(self.song.tracks):
                 group_track = None
@@ -193,7 +193,7 @@ class SongHandler(AbletonOSCHandler):
                 "tracks": tracks
             }
 
-            fd = open(path, "w")
+            fd = open(os.path.join(tempfile.gettempdir(), "abletonosc-song-structure.json"), "w")
             json.dump(song, fd)
             fd.close()
             return (1,)

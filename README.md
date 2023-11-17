@@ -323,15 +323,14 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 <details>
 <summary><b>Documentation</b>: Clip Slot API</summary>
 
-| Address                             | Query params                       | Response params                    | Description                              |
-|:------------------------------------|:-----------------------------------|:-----------------------------------|:-----------------------------------------|
-| /live/clip_slot/create_clip         | track_id, clip_id, length          |                                    | Create a clip in the slot                |
-| /live/clip_slot/delete_clip         | track_id, clip_id                  |                                    | Delete the clip in the slot              |
-| /live/clip_slot/get/has_clip        | track_id, clip_id                  | track_id, clip_id, has_clip        | Query whether the slot has a clip        |
-| /live/clip_slot/get/has_stop_button | track_id, clip_id                  | track_id, clip_id, has_stop_button | Query whether the slot has a stop button |
-| /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button |                                    | Add or remove stop button (1=on, 0=off)  |
-
-# TODO: Add more properties and methods
+| Address                             | Query params                                                   | Response params                          | Description                                     |
+|:------------------------------------|:---------------------------------------------------------------|:-----------------------------------------|:------------------------------------------------|
+| /live/clip_slot/create_clip         | track_index, clip_index, length                                |                                          | Create a clip in the slot                       |
+| /live/clip_slot/delete_clip         | track_index, clip_index                                        |                                          | Delete the clip in the slot                     |
+| /live/clip_slot/get/has_clip        | track_index, clip_index                                        | track_index, clip_index, has_clip        | Query whether the slot has a clip               |
+| /live/clip_slot/get/has_stop_button | track_index, clip_index                                        | track_index, clip_index, has_stop_button | Query whether the slot has a stop button        |
+| /live/clip_slot/set/has_stop_button | track_index, clip_index, has_stop_button                       |                                          | Add or remove stop button (1=on, 0=off)         |
+| /live/clip_slot/duplicate_clip_to   | track_index, clip_index, target_track_index, target_clip_index |                                          | Duplicate the clip to an empty target clip slot |
 
 </details>
 

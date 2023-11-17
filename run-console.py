@@ -2,11 +2,13 @@
 
 #--------------------------------------------------------------------------------
 # Console client for AbletonOSC.
+#
 # Takes OSC commands and parameters, and prints the return value.
 #--------------------------------------------------------------------------------
 
 import re
 import sys
+import shlex
 import argparse
 
 try:
@@ -31,10 +33,14 @@ words = ["live", "song", "track", "clip", "device", "parameter", "parameters"]
 completer = LiveAPICompleter(words)
 readline.set_completer(completer.complete)
 
+def print_error(args):
+    print("Received error from Live: %s" % args)
+
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     if args.verbose:
         client.verbose = True
+    client.add_handler("/live/error", print_error)
     client.send_message("/live/api/reload")
 
     readline.parse_and_bind('tab: complete')
@@ -60,7 +66,10 @@ def main(args):
             print("OSC address must begin with a slash (/)")
             continue
 
-        command, *params_str = command_str.split(" ")
+        #--------------------------------------------------------------------------------
+        # Parse command-line, with support for quoted strings
+        #--------------------------------------------------------------------------------
+        command, *params_str = shlex.split(command_str)
         params = []
         for part in params_str:
             try:

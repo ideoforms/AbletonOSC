@@ -1,6 +1,6 @@
 # AbletonOSC: Control Ableton Live 11 with OSC
 
-[![stability-alpha](https://img.shields.io/badge/stability-alpha-f4d03f.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#alpha)
+[![stability-beta](https://img.shields.io/badge/stability-beta-33bbff.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#beta)
 
 AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to
 control [Ableton Live 11](https://www.ableton.com/en/live/). Building on ideas from the
@@ -9,17 +9,15 @@ entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object
 ([full API docs](https://structure-void.com/PythonLiveAPI_documentation/Live11.0.xml)), providing comprehensive control
 over Live's control interfaces using the same naming structure and object hierarchy as LOM.
 
-AbletonOSC is currently (2023-01-07) a work-in-progress, and APIs may be subject to change. Many major APIs are now exposed.
-
 **NOTE: Since 2022-12-17, all getters have been modified to return the ID of the object being queried as well as the return value**, for consistency with listeners. For example, `/live/clip/get/name` will return `track_id, clip_id, name`.
 
 # Installation
 
-AbletonOSC requires Ableton Live 11, and does not support earlier versions.
+AbletonOSC requires Ableton Live 11 or above, and does not support earlier versions.
 
 To install the script:
 
-- [Download a zip of this repository](https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip), unzip its contents, and rename AbletonOSC-master to AbletonOSC
+- [Download a zip of this repository](https://github.com/ideoforms/AbletonOSC/archive/refs/heads/master.zip), unzip its contents, and rename `AbletonOSC-master` to `AbletonOSC`
 - Install it following the instructions on
   Ableton's [Installing third-party remote scripts](https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts)
   doc, by copying the `AbletonOSC` folder to:
@@ -54,7 +52,7 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 These messages are sent to the client automatically when the application state changes.
 
 | Address       | Response params | Description                                                                                        |
-| :------------ | :-------------- | :------------------------------------------------------------------------------------------------- |
+|:--------------|:----------------|:---------------------------------------------------------------------------------------------------|
 | /live/startup |                 | Sent to the client application when AbletonOSC is started                                          |
 | /live/error   | error_msg       | Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log |
 
@@ -98,7 +96,7 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 
 ### Song properties
 
- - Changes for any Track property can be listened for by calling `/live/song/start_listen/<property>`
+ - Changes to any Track property can be listened for by calling `/live/song/start_listen/<property>`
  - Responses will be sent to `/live/song/get/<property>`, with parameters `<property_value>`
  - For further information on these properties and their parameters, see documentation
 for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_object_model#Song).
@@ -106,7 +104,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 #### Getters
 
 | Address                                    | Query params | Response params             | Description                                       |
-| :----------------------------------------- | :----------- | :-------------------------- | :------------------------------------------------ |
+|:-------------------------------------------|:-------------|:----------------------------|:--------------------------------------------------|
 | /live/song/get/arrangement_overdub         |              | arrangement_overdub         | Query whether arrangement overdub is on           |
 | /live/song/get/back_to_arranger            |              | back_to_arranger            | Query whether "back to arranger" is lit           |
 | /live/song/get/can_redo                    |              | can_redo                    | Query whether redo is available                   |
@@ -132,33 +130,33 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 
 #### Setters
 
-| Address                                    | Query params                | Response params | Description                                     |
-| :----------------------------------------- | :-------------------------- | :-------------- | :---------------------------------------------- |
-| /live/song/set/arrangement_overdub         | arrangement_overdub         |                 | Set whether arrangement overdub is on           |
-| /live/song/set/back_to_arranger            | back_to_arranger            |                 | Set whether "back to arranger" is lit           |
-| /live/song/set/clip_trigger_quantization   | clip_trigger_quantization   |                 | Set the current clip trigger quantization level |
-| /live/song/set/current_song_time           | current_song_time           |                 | Set the current song time, in beats             |
-| /live/song/set/groove_amount               | groove_amount               |                 | Set the current groove amount                   |
-| /live/song/set/loop                        | loop                        |                 | Set whether the song is currently looping       |
-| /live/song/set/loop_length                 | loop_length                 |                 | Set the current loop length                     |
-| /live/song/set/loop_start                  | loop_start                  |                 | Set the current loop start point                |
-| /live/song/set/metronome                   | metronome_on                |                 | Set metronome on/off                            |
-| /live/song/set/midi_recording_quantization | midi_recording_quantization |                 | Set the current MIDI recording quantization     |
-| /live/song/set/nudge_down                  | nudge_down                  |                 | Set nudge down                                  |
-| /live/song/set/nudge_up                    | nudge_up                    |                 | Set nudge up                                    |
-| /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                    |
-| /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                   |
-| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
-| /live/song/set/session_record              | session_record              |                 | Set whether session record is enabled           |
-| /live/song/set/signature_denominator       | signature_denominator       |                 | Set the time signature's denominator            |
-| /live/song/set/signature_numerator         | signature_numerator         |                 | Set the time signature's numerator              |
-| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                     |
-| /live/song/set/tempo                       | tempo_bpm                   |                 | Set the current song tempo                      |
+| Address                                    | Query params                | Response params | Description                                             |
+|:-------------------------------------------|:----------------------------|:----------------|:--------------------------------------------------------|
+| /live/song/set/arrangement_overdub         | arrangement_overdub         |                 | Set arrangement overdub (1=on, 0=off)                   |
+| /live/song/set/back_to_arranger            | back_to_arranger            |                 | Set whether "back to arranger" is lit (1=on, 0=off)     |
+| /live/song/set/clip_trigger_quantization   | clip_trigger_quantization   |                 | Set the current clip trigger quantization level         |
+| /live/song/set/current_song_time           | current_song_time           |                 | Set the current song time, in beats                     |
+| /live/song/set/groove_amount               | groove_amount               |                 | Set the current groove amount                           |
+| /live/song/set/loop                        | loop                        |                 | Set whether the song is currently looping (1=on, 0=off) |
+| /live/song/set/loop_length                 | loop_length                 |                 | Set the current loop length                             |
+| /live/song/set/loop_start                  | loop_start                  |                 | Set the current loop start point                        |
+| /live/song/set/metronome                   | metronome_on                |                 | Set metronome (1=on, 0=off)                             |
+| /live/song/set/midi_recording_quantization | midi_recording_quantization |                 | Set the current MIDI recording quantization             |
+| /live/song/set/nudge_down                  | nudge_down                  |                 | Set nudge down                                          |
+| /live/song/set/nudge_up                    | nudge_up                    |                 | Set nudge up                                            |
+| /live/song/set/punch_in                    | punch_in                    |                 | Set punch in                                            |
+| /live/song/set/punch_out                   | punch_out                   |                 | Set punch out                                           |
+| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                             |
+| /live/song/set/session_record              | session_record              |                 | Set whether session record is enabled (1=on, 0=off)     |
+| /live/song/set/signature_denominator       | signature_denominator       |                 | Set the time signature's denominator                    |
+| /live/song/set/signature_numerator         | signature_numerator         |                 | Set the time signature's numerator                      |
+| /live/song/set/record_mode                 | record_mode                 |                 | Set the current record mode                             |
+| /live/song/set/tempo                       | tempo_bpm                   |                 | Set the current song tempo                              |
 
 ### Song: Properties of cue points, scenes and tracks
 
 | Address                    | Query params | Response params        | Description                                                                 |
-| :------------------------- | :----------- | :--------------------- | :-------------------------------------------------------------------------- |
+|:---------------------------|:-------------|:-----------------------|:----------------------------------------------------------------------------|
 | /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
 | /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  |
 | /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  |
@@ -190,7 +188,7 @@ Queries tracks 0..11, and returns a long list of values comprising:
 These messages are sent to the client automatically when the song state changes.
 
 | Address         | Response params | Description                                                          |
-| :-------------- | :-------------- | :------------------------------------------------------------------- |
+|:----------------|:----------------|:---------------------------------------------------------------------|
 | /live/song/beat | beat_number     | Sent to the client application on each beat when the song is playing |
 
 </details>
@@ -204,14 +202,14 @@ Represents the view (user interface) of live
 <details>
 ### View properties
 
-| Address                       | Query params                      | Response params               | Description                                  |
-| :---------------------------- | :-----------                      | :---------------------------- | :------------------------------------------- |
-| /live/view/get/selected_scene |                                   | selected_scene                | returns the selected scene (start at 0)      |
-| /live/view/get/selected_track |                                   | selected_track                | returns selected track (start at 0)          |
-| /live/view/get/selected_clip  |                                   | selected_scene selected_track | returns the scene and track of selected clip |
-| /live/view/set/selected_scene | selected_scene                    |                               | set the selected scene (start at 0)          |
-| /live/view/set/selected_track | selected_track                    |                               | set selected track (start at 0)              |
-| /live/view/set/selected_clip  | selected_track, selected_scene    |                               | set selected clip                            |
+| Address                       | Query params             | Response params          | Description                                             |
+|:------------------------------|:-------------------------|:-------------------------|:--------------------------------------------------------|
+| /live/view/get/selected_scene |                          | scene_index              | Returns the selected scene index (with first scene = 0) |
+| /live/view/get/selected_track |                          | track_index              | Returns the selected index track (with first track = 0) |
+| /live/view/get/selected_clip  |                          | track_index, scene_index | Returns the track and scene index of the selected clip  |
+| /live/view/set/selected_scene | scene_index              |                          | Set the selected scene (with first scene = 0)           |
+| /live/view/set/selected_track | track_index              |                          | Set the selected track (with first track = 0)           |
+| /live/view/set/selected_clip  | track_index, scene_index |                          | Set the selected clip                                   |
 </details>
 
 ---
@@ -228,7 +226,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 ### Track methods
 
 | Address                    | Query params | Response params | Description             |
-| :------------------------- | :----------- | :-------------- | :---------------------- |
+|:---------------------------|:-------------|:----------------|:------------------------|
 | /live/track/stop_all_clips | track_id     |                 | Stop all clips on track |
 
 ### Track properties
@@ -238,65 +236,65 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 #### Getters
 
-| Address                                           | Query params      | Response params            | Description                                      |
-| :------------------------------------------------ | :---------------- | :------------------------- | :----------------------------------------------- |
-| /live/track/get/arm                               | track_id          | track_id, armed            | Query whether track is armed                     |
-| /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...     | List input channels (e.g. "1", "2", "1/2", ...)  |
-| /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...        | List input routes (e.g. "Ext. In", ...)          |
-| /live/track/get/available_output_routing_channels | track_id          | track_id, channel, ...     | List output channels (e.g. "1", "2", "1/2", ...) |
-| /live/track/get/available_output_routing_types    | track_id          | track_id, type, ...        | List output routes (e.g. "Ext. Out", ...)        |
-| /live/track/get/can_be_armed                      | track_id          | track_id, can_be_armed     | Query whether track can be armed                 |
-| /live/track/get/color                             | track_id          | track_id, color            | Query track color                                |
-| /live/track/get/color_index                       | track_id          | track_id, color_index      | Query track color index                          |
-| /live/track/get/current_monitoring_state          | track_id          | track_id, state            | Query current monitoring state (on/off)          |
-| /live/track/get/fired_slot_index                  | track_id          | track_id, index            | Query currently-fired slot                       |
-| /live/track/get/fold_state                        | track_id          | track_id, fold_state       | Query folded state (for groups)                  |
-| /live/track/get/has_audio_input                   | track_id          | track_id, has_audio_input  | Query has_audio_input                            |
-| /live/track/get/has_audio_output                  | track_id          | track_id, has_audio_output | Query has_audio_output                           |
-| /live/track/get/has_midi_input                    | track_id          | track_id, has_midi_input   | Query has_midi_input                             |
-| /live/track/get/has_midi_output                   | track_id          | track_id, has_midi_output  | Query has_midi_output                            |
-| /live/track/get/input_routing_channel             | track_id          | track_id, channel          | Query current input routing channel              |
-| /live/track/get/input_routing_type                | track_id          | track_id, type             | Query current input routing type                 |
-| /live/track/get/output_routing_channel            | track_id          | track_id, channel          | Query current output routing channel             |
-| /live/track/get/output_meter_left                 | track_id          | track_id, level            | Query current output level, left channel         |
-| /live/track/get/output_meter_level                | track_id          | track_id, level            | Query current output level, both channels        |
-| /live/track/get/output_meter_right                | track_id          | track_id, level            | Query current output level, right channel        |
-| /live/track/get/output_routing_type               | track_id          | track_id, type             | Query current output routing type                |
-| /live/track/get/is_foldable                       | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group |
-| /live/track/get/is_grouped                        | track_id          | track_id, is_grouped       | Query whether track is in a group                |
-| /live/track/get/is_visible                        | track_id          | track_id, is_visible       | Query whether track is visible                   |
-| /live/track/get/mute                              | track_id          | track_id, mute             | Query track mute on/off                          |
-| /live/track/get/name                              | track_id          | track_id, name             | Query track name                                 |
-| /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                              |
-| /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                     |
-| /live/track/get/send                              | track_id, send_id | track_id, value            | Query track send                                 |
-| /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                          |
-| /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                               |
+| Address                                           | Query params      | Response params            | Description                                       |
+|:--------------------------------------------------|:------------------|:---------------------------|:--------------------------------------------------|
+| /live/track/get/arm                               | track_id          | track_id, armed            | Query whether track is armed                      |
+| /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...     | List input channels (e.g. "1", "2", "1/2", ...)   |
+| /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...        | List input routes (e.g. "Ext. In", ...)           |
+| /live/track/get/available_output_routing_channels | track_id          | track_id, channel, ...     | List output channels (e.g. "1", "2", "1/2", ...)  |
+| /live/track/get/available_output_routing_types    | track_id          | track_id, type, ...        | List output routes (e.g. "Ext. Out", ...)         |
+| /live/track/get/can_be_armed                      | track_id          | track_id, can_be_armed     | Query whether track can be armed                  |
+| /live/track/get/color                             | track_id          | track_id, color            | Query track color                                 |
+| /live/track/get/color_index                       | track_id          | track_id, color_index      | Query track color index                           |
+| /live/track/get/current_monitoring_state          | track_id          | track_id, state            | Query current monitoring state (1=on, 0=off)      |
+| /live/track/get/fired_slot_index                  | track_id          | track_id, index            | Query currently-fired slot                        |
+| /live/track/get/fold_state                        | track_id          | track_id, fold_state       | Query folded state (for groups)                   |
+| /live/track/get/has_audio_input                   | track_id          | track_id, has_audio_input  | Query has_audio_input                             |
+| /live/track/get/has_audio_output                  | track_id          | track_id, has_audio_output | Query has_audio_output                            |
+| /live/track/get/has_midi_input                    | track_id          | track_id, has_midi_input   | Query has_midi_input                              |
+| /live/track/get/has_midi_output                   | track_id          | track_id, has_midi_output  | Query has_midi_output                             |
+| /live/track/get/input_routing_channel             | track_id          | track_id, channel          | Query current input routing channel               |
+| /live/track/get/input_routing_type                | track_id          | track_id, type             | Query current input routing type                  |
+| /live/track/get/output_routing_channel            | track_id          | track_id, channel          | Query current output routing channel              |
+| /live/track/get/output_meter_left                 | track_id          | track_id, level            | Query current output level, left channel          |
+| /live/track/get/output_meter_level                | track_id          | track_id, level            | Query current output level, both channels         |
+| /live/track/get/output_meter_right                | track_id          | track_id, level            | Query current output level, right channel         |
+| /live/track/get/output_routing_type               | track_id          | track_id, type             | Query current output routing type                 |
+| /live/track/get/is_foldable                       | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group  |
+| /live/track/get/is_grouped                        | track_id          | track_id, is_grouped       | Query whether track is in a group                 |
+| /live/track/get/is_visible                        | track_id          | track_id, is_visible       | Query whether track is visible (1=on, 0=off)      |
+| /live/track/get/mute                              | track_id          | track_id, mute             | Query track mute (1=on, 0=off)                    |
+| /live/track/get/name                              | track_id          | track_id, name             | Query track name                                  |
+| /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                               |
+| /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                      |
+| /live/track/get/send                              | track_id, send_id | track_id, value            | Query track send                                  |
+| /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                           |
+| /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                                |
 
 #### Setters
 
-| Address                                  | Query params             | Response params | Description                |
-| :--------------------------------------- | :----------------------- | :-------------- | :------------------------- |
-| /live/track/set/arm                      | track_id, armed          |                 | Set track arm state on/off |
-| /live/track/set/color                    | track_id, color          |                 | Set track color            |
-| /live/track/set/color_index              | track_id, color_index    |                 | Set track color index      |
-| /live/track/set/current_monitoring_state | track_id, state          |                 | Set monitoring on/off      |
-| /live/track/set/fold_state               | track_id, fold_state     |                 | Set folded on/off          |
-| /live/track/set/input_routing_channel    | track_id, channel        |                 | Set input routing channel  |
-| /live/track/set/input_routing_type       | track_id, type           |                 | Set input routing type     |
-| /live/track/set/mute                     | track_id, mute           |                 | Set track mute on/off      |
-| /live/track/set/name                     | track_id, name           |                 | Set track name             |
-| /live/track/set/output_routing_channel   | track_id, channel        |                 | Set output routing channel |
-| /live/track/set/output_routing_type      | track_id, type           |                 | Set output routing type    |
-| /live/track/set/panning                  | track_id, panning        |                 | Set track panning          |
-| /live/track/set/send                     | track_id, send_id, value |                 | Set track send             |
-| /live/track/set/solo                     | track_id, solo           |                 | Set track solo on/off      |
-| /live/track/set/volume                   | track_id, volume         |                 | Set track volume           |
+| Address                                  | Query params             | Response params | Description                       |
+|:-----------------------------------------|:-------------------------|:----------------|:----------------------------------|
+| /live/track/set/arm                      | track_id, armed          |                 | Set track arm state (1=on, 0=off) |
+| /live/track/set/color                    | track_id, color          |                 | Set track color                   |
+| /live/track/set/color_index              | track_id, color_index    |                 | Set track color index             |
+| /live/track/set/current_monitoring_state | track_id, state          |                 | Set monitoring on/off             |
+| /live/track/set/fold_state               | track_id, fold_state     |                 | Set group folded (1=on, 0=off)    |
+| /live/track/set/input_routing_channel    | track_id, channel        |                 | Set input routing channel         |
+| /live/track/set/input_routing_type       | track_id, type           |                 | Set input routing type            |
+| /live/track/set/mute                     | track_id, mute           |                 | Set track mute (1=on, 0=off)      |
+| /live/track/set/name                     | track_id, name           |                 | Set track name                    |
+| /live/track/set/output_routing_channel   | track_id, channel        |                 | Set output routing channel        |
+| /live/track/set/output_routing_type      | track_id, type           |                 | Set output routing type           |
+| /live/track/set/panning                  | track_id, panning        |                 | Set track panning                 |
+| /live/track/set/send                     | track_id, send_id, value |                 | Set track send                    |
+| /live/track/set/solo                     | track_id, solo           |                 | Set track solo (1=on, 0=off)      |
+| /live/track/set/volume                   | track_id, volume         |                 | Set track volume                  |
 
 ### Track: Properties of multiple clips
 
 | Address                                      | Query params | Response params             | Description                                      |
-| :------------------------------------------- | :----------- | :-------------------------- | :----------------------------------------------- |
+|:---------------------------------------------|:-------------|:----------------------------|:-------------------------------------------------|
 | /live/track/get/clips/name                   | track_id     | track_id, [name, ....]      | Query all clip names on track                    |
 | /live/track/get/clips/length                 | track_id     | track_id, [length, ...]     | Query all clip lengths on track                  |
 | /live/track/get/clips/color                  | track_id     | track_id, [color, ...]      | Query all clip colors on track                   |
@@ -306,7 +304,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 ### Track: Properties of devices
 | Address                            | Query params | Response params        | Description                              |
-| :--------------------------------- | :----------- | :--------------------- | :--------------------------------------- |
+|:-----------------------------------|:-------------|:-----------------------|:-----------------------------------------|
 | /live/track/get/num_devices        | track_id     | track_id, num_devices  | Query the number of devices on the track |
 | /live/track/get/devices/name       | track_id     | track_id, [name, ...]  | Query all device names on track          |
 | /live/track/get/devices/type       | track_id     | track_id, [type, ...]  | Query all devices types on track         |
@@ -326,12 +324,12 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 <summary><b>Documentation</b>: Clip Slot API</summary>
 
 | Address                             | Query params                       | Response params                    | Description                              |
-| :---------------------------------- | :--------------------------------- | :--------------------------------- | :--------------------------------------- |
+|:------------------------------------|:-----------------------------------|:-----------------------------------|:-----------------------------------------|
 | /live/clip_slot/create_clip         | track_id, clip_id, length          |                                    | Create a clip in the slot                |
 | /live/clip_slot/delete_clip         | track_id, clip_id                  |                                    | Delete the clip in the slot              |
 | /live/clip_slot/get/has_clip        | track_id, clip_id                  | track_id, clip_id, has_clip        | Query whether the slot has a clip        |
 | /live/clip_slot/get/has_stop_button | track_id, clip_id                  | track_id, clip_id, has_stop_button | Query whether the slot has a stop button |
-| /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button |                                    | Add or remove stop button                |
+| /live/clip_slot/set/has_stop_button | track_id, clip_id, has_stop_button |                                    | Add or remove stop button (1=on, 0=off)  |
 
 # TODO: Add more properties and methods
 
@@ -346,37 +344,37 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 <details>
 <summary><b>Documentation</b>: Clip API</summary>
 
-| Address                                  | Query params                                                        | Response params                                                                        | Description                                                                                                                                          |
-|:-----------------------------------------|:--------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| /live/clip/fire                          | track_id, clip_id                                                   |                                                                                        | Start clip playback                                                                                                                                  |
-| /live/clip/stop                          | track_id, clip_id                                                   |                                                                                        | Stop clip playback                                                                                                                                   |
-| /live/clip/duplicate_loop                | track_id, clip_id                                                   |                                                                                        | Duplicates clip loop                                                                                                                                 |
-| /live/clip/get/notes                     | track_id, clip_id                                                   | track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...] | Query the notes in a given clip.                                                                                                                     |
+| Address                                  | Query params                                                        | Response params                                                                        | Description                                                                                                                                              |
+|:-----------------------------------------|:--------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| /live/clip/fire                          | track_id, clip_id                                                   |                                                                                        | Start clip playback                                                                                                                                      |
+| /live/clip/stop                          | track_id, clip_id                                                   |                                                                                        | Stop clip playback                                                                                                                                       |
+| /live/clip/duplicate_loop                | track_id, clip_id                                                   |                                                                                        | Duplicates clip loop                                                                                                                                     |
+| /live/clip/get/notes                     | track_id, clip_id                                                   | track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...] | Query the notes in a given clip.                                                                                                                         |
 | /live/clip/add/notes                     | track_id, clip_id, pitch, start_time, duration, velocity, mute, ... |                                                                                        | Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false |
-| /live/clip/remove/notes                  | start_pitch, pitch_span, start_time, time_span                      |                                                                                        | Remove notes from a clip in a given range of pitches and times.                                                                                      |
-| /live/clip/get/color                     | track_id, clip_id                                                   | track_id, clip_id, color                                                               | Get clip color                                                                                                                                       |
-| /live/clip/set/color                     | track_id, clip_id, color                                            |                                                                                        | Set clip color                                                                                                                                       |
-| /live/clip/get/name                      | track_id, clip_id                                                   | track_id, clip_id, name                                                                | Get clip name                                                                                                                                        |
-| /live/clip/set/name                      | track_id, clip_id, name                                             |                                                                                        | Set clip name                                                                                                                                        |
-| /live/clip/get/gain                      | track_id, clip_id                                                   | track_id, clip_id, gain                                                                | Get clip gain                                                                                                                                        |
-| /live/clip/set/gain                      | track_id, clip_id, gain                                             |                                                                                        | Set clip gain                                                                                                                                        |
-| /live/clip/get/length                    | track_id, clip_id                                                   | track_id, clip_id, length                                                              | Get clip length                                                                                                                                      |
-| /live/clip/get/pitch_coarse              | track_id, clip_id                                                   | track_id, clip_id, semitones                                                           | Get clip coarse re-pitch                                                                                                                             |
-| /live/clip/set/pitch_coarse              | track_id, clip_id, semitones                                        |                                                                                        | Set clip coarse re-pitch                                                                                                                             |
-| /live/clip/get/pitch_fine                | track_id, clip_id                                                   | track_id, clip_id, cents                                                               | Get clip fine re-pitch                                                                                                                               |
-| /live/clip/set/pitch_fine                | track_id, clip_id, cents                                            |                                                                                        | Set clip fine re-pitch                                                                                                                               |
-| /live/clip/get/file_path                 | track_id, clip_id                                                   | track_id, clip_id, file_path                                                           | Get clip file path                                                                                                                                   |
-| /live/clip/get/is_audio_clip             | track_id, clip_id                                                   | track_id, clip_id, is_audio_clip                                                       | Query whether clip is audio                                                                                                                          |
-| /live/clip/get/is_midi_clip              | track_id, clip_id                                                   | track_id, clip_id, is_midi_clip                                                        | Query whether clip is MIDI                                                                                                                           |
-| /live/clip/get/is_playing                | track_id, clip_id                                                   | track_id, clip_id, is_playing                                                          | Query whether clip is playing                                                                                                                        |
-| /live/clip/get/is_recording              | track_id, clip_id                                                   | track_id, clip_id, is_recording                                                        | Query whether clip is recording                                                                                                                      |
-| /live/clip/get/playing_position          | track_id, clip_id                                                   | track_id, clip_id, playing_position                                                    | Get clip's playing position                                                                                                                          |
-| /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                                        | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position     |
-| /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                                        | Stop listening for clip's playing position.                                                                                                          |
-| /live/clip/get/loop_start                | track_id, clip_id                                                   | track_id, clip_id, loop_start                                                          | Get clip's loop start                                                                                                                                |
-| /live/clip/set/loop_start                | track_id, clip_id, loop_start                                       | track_id, clip_id, loop_start                                                          | Set clip's loop start                                                                                                                                |
-| /live/clip/get/loop_end                  | track_id, clip_id                                                   | track_id, clip_id, loop_end                                                            | Get clip's loop end                                                                                                                                  |
-| /live/clip/set/loop_end                  | track_id, clip_id, loop_end                                         | track_id, clip_id, loop_end                                                            | Set clip's loop end                                                                                                                                  |
+| /live/clip/remove/notes                  | start_pitch, pitch_span, start_time, time_span                      |                                                                                        | Remove notes from a clip in a given range of pitches and times.                                                                                          |
+| /live/clip/get/color                     | track_id, clip_id                                                   | track_id, clip_id, color                                                               | Get clip color                                                                                                                                           |
+| /live/clip/set/color                     | track_id, clip_id, color                                            |                                                                                        | Set clip color                                                                                                                                           |
+| /live/clip/get/name                      | track_id, clip_id                                                   | track_id, clip_id, name                                                                | Get clip name                                                                                                                                            |
+| /live/clip/set/name                      | track_id, clip_id, name                                             |                                                                                        | Set clip name                                                                                                                                            |
+| /live/clip/get/gain                      | track_id, clip_id                                                   | track_id, clip_id, gain                                                                | Get clip gain                                                                                                                                            |
+| /live/clip/set/gain                      | track_id, clip_id, gain                                             |                                                                                        | Set clip gain                                                                                                                                            |
+| /live/clip/get/length                    | track_id, clip_id                                                   | track_id, clip_id, length                                                              | Get clip length                                                                                                                                          |
+| /live/clip/get/pitch_coarse              | track_id, clip_id                                                   | track_id, clip_id, semitones                                                           | Get clip coarse re-pitch                                                                                                                                 |
+| /live/clip/set/pitch_coarse              | track_id, clip_id, semitones                                        |                                                                                        | Set clip coarse re-pitch                                                                                                                                 |
+| /live/clip/get/pitch_fine                | track_id, clip_id                                                   | track_id, clip_id, cents                                                               | Get clip fine re-pitch                                                                                                                                   |
+| /live/clip/set/pitch_fine                | track_id, clip_id, cents                                            |                                                                                        | Set clip fine re-pitch                                                                                                                                   |
+| /live/clip/get/file_path                 | track_id, clip_id                                                   | track_id, clip_id, file_path                                                           | Get clip file path                                                                                                                                       |
+| /live/clip/get/is_audio_clip             | track_id, clip_id                                                   | track_id, clip_id, is_audio_clip                                                       | Query whether clip is audio                                                                                                                              |
+| /live/clip/get/is_midi_clip              | track_id, clip_id                                                   | track_id, clip_id, is_midi_clip                                                        | Query whether clip is MIDI                                                                                                                               |
+| /live/clip/get/is_playing                | track_id, clip_id                                                   | track_id, clip_id, is_playing                                                          | Query whether clip is playing                                                                                                                            |
+| /live/clip/get/is_recording              | track_id, clip_id                                                   | track_id, clip_id, is_recording                                                        | Query whether clip is recording                                                                                                                          |
+| /live/clip/get/playing_position          | track_id, clip_id                                                   | track_id, clip_id, playing_position                                                    | Get clip's playing position                                                                                                                              |
+| /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                                        | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position         |
+| /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                                        | Stop listening for clip's playing position.                                                                                                              |
+| /live/clip/get/loop_start                | track_id, clip_id                                                   | track_id, clip_id, loop_start                                                          | Get clip's loop start                                                                                                                                    |
+| /live/clip/set/loop_start                | track_id, clip_id, loop_start                                       | track_id, clip_id, loop_start                                                          | Set clip's loop start                                                                                                                                    |
+| /live/clip/get/loop_end                  | track_id, clip_id                                                   | track_id, clip_id, loop_end                                                            | Get clip's loop end                                                                                                                                      |
+| /live/clip/set/loop_end                  | track_id, clip_id, loop_end                                         | track_id, clip_id, loop_end                                                            | Set clip's loop end                                                                                                                                      |
 </details>
 
 ---
@@ -389,7 +387,7 @@ Represents an instrument or effect.
 <summary><b>Documentation</b>: Device API</summary>
 
 | Address                                  | Query params                             | Response params                          | Description                                                                             |
-| :--------------------------------------- | :--------------------------------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------- |
+|:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|
 | /live/device/get/name                    | track_id, device_id                      | track_id, device_id, name                | Get device name                                                                         |
 | /live/device/get/class_name              | track_id, device_id                      | track_id, device_id, class_name          | Get device class_name                                                                   |
 | /live/device/get/type                    | track_id, device_id                      | track_id, device_id, type                | Get device type                                                                         |

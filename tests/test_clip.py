@@ -57,9 +57,20 @@ def test_clip_add_notes(client):
 
     client.send_message("/live/clip/add/notes", (0, 0,
                                                  60, 0.0, 0.25, 64, False,
-                                                 67, 0.25, 0.5, 32, False))
+                                                 67, -0.25, 0.5, 32, False))
 
+    # Should return all notes, including those before time = 0
     client.send_message("/live/clip/get/notes", (0, 0))
     assert client.await_message("/live/clip/get/notes") == (0, 0,
                                                             60, 0.0, 0.25, 64, False,
-                                                            67, 0.25, 0.5, 32, False)
+                                                            67, -0.25, 0.5, 32, False)
+
+    client.send_message("/live/clip/add/notes", (0, 0,
+                                                 72, 0.0, 0.25, 64, False,
+                                                 60, 3.0, 0.5, 32, False))
+
+    # Query between t in [0..2] and pitch in [60, 71]
+    # Should only return a single note
+    client.send_message("/live/clip/get/notes", (0, 0, 0, 60, 2, 11))
+    assert client.await_message("/live/clip/get/notes") == (0, 0,
+                                                            60, 0.0, 0.25, 64, False)

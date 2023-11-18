@@ -107,7 +107,13 @@ class ClipHandler(AbletonOSCHandler):
                                         create_clip_callback(self._set_property, prop))
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
-            notes = clip.get_notes(0, 0, clip.length, 127)
+            if len(params) == 4:
+                time_start, pitch_start, time_span, pitch_span = params
+            elif len(params) == 0:
+                time_start, pitch_start, time_span, pitch_span = -8192, 0, 16384, 127
+            else:
+                raise ValueError("Invalid number of arguments for /clip/get/notes. Either 0 or 4 arguments must be passed.")
+            notes = clip.get_notes(time_start, pitch_start, time_span, pitch_span)
             return tuple(item for sublist in notes for item in sublist)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):

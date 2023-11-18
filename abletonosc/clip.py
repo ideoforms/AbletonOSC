@@ -88,7 +88,9 @@ class ClipHandler(AbletonOSCHandler):
             "looping",
             "loop_start",
             "loop_end",
-            "warping"
+            "warping",
+            "start_marker",
+            "end_marker",
         ]
 
         for method in methods:

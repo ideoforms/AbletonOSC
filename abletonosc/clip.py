@@ -110,13 +110,16 @@ class ClipHandler(AbletonOSCHandler):
 
         def clip_get_notes(clip, params: Tuple[Any] = ()):
             if len(params) == 4:
-                time_start, pitch_start, time_span, pitch_span = params
+                pitch_start, pitch_span, time_start, time_span = params
             elif len(params) == 0:
-                time_start, pitch_start, time_span, pitch_span = -8192, 0, 16384, 127
+                pitch_start, pitch_span, time_start, time_span = 0, 127, -8192, 16384
             else:
                 raise ValueError("Invalid number of arguments for /clip/get/notes. Either 0 or 4 arguments must be passed.")
-            notes = clip.get_notes(time_start, pitch_start, time_span, pitch_span)
-            return tuple(item for sublist in notes for item in sublist)
+            notes = clip.get_notes_extended(pitch_start, pitch_span, time_start, time_span)
+            all_note_attributes = []
+            for note in notes:
+                all_note_attributes += [note.pitch, note.start_time, note.duration, note.velocity, note.mute]
+            return tuple(all_note_attributes)
 
         def clip_add_notes(clip, params: Tuple[Any] = ()):
             notes = []
@@ -131,8 +134,13 @@ class ClipHandler(AbletonOSCHandler):
             clip.add_new_notes(tuple(notes))
 
         def clip_remove_notes(clip, params: Tuple[Any] = ()):
-            start_pitch, pitch_span, start_time, time_span = params
-            clip.remove_notes_extended(start_pitch, pitch_span, start_time, time_span)
+            if len(params) == 4:
+                pitch_start, pitch_span, time_start, time_span = params
+            elif len(params) == 0:
+                pitch_start, pitch_span, time_start, time_span = 0, 127, -8192, 16384
+            else:
+                raise ValueError("Invalid number of arguments for /clip/remove/notes. Either 0 or 4 arguments must be passed.")
+            clip.remove_notes_extended(pitch_start, pitch_span, time_start, time_span)
 
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))

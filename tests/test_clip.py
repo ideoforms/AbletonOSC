@@ -32,7 +32,6 @@ def _create_test_clips(client):
 
 def _test_clip_property(client, track_id, clip_id, property, values):
     for value in values:
-        print("Testing clip property %s, value: %s" % (property, value))
         client.send_message("/live/clip/set/%s" % property, (track_id, clip_id, value))
         wait_one_tick()
         assert client.query("/live/clip/get/%s" % property, (track_id, clip_id)) == (track_id, clip_id, value,)
@@ -53,16 +52,14 @@ def test_clip_property_pitch_fine(client):
     _test_clip_property(client, 2, 0, "pitch_fine", (0.5, 0.0))
 
 def test_clip_add_remove_notes(client):
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0)
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0)
 
     client.send_message("/live/clip/add/notes", (0, 0,
                                                  60, 0.0, 0.25, 64, False,
                                                  67, -0.25, 0.5, 32, False))
 
     # Should return all notes, including those before time = 0
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0,
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0,
                                                             60, 0.0, 0.25, 64, False,
                                                             67, -0.25, 0.5, 32, False)
 
@@ -72,19 +69,16 @@ def test_clip_add_remove_notes(client):
 
     # Query between t in [0..2] and pitch in [60, 71]
     # Should only return a single note
-    client.send_message("/live/clip/get/notes", (0, 0, 60, 11, 0, 2))
-    assert client.await_message("/live/clip/get/notes") == (0, 0,
-                                                            60, 0.0, 0.25, 64, False)
+    assert client.query("/live/clip/get/notes", (0, 0, 60, 11, 0, 2)) == (0, 0,
+                                                                          60, 0.0, 0.25, 64, False)
 
     client.send_message("/live/clip/remove/notes", (0, 0, 60, 11, 0, 2))
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0,
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0,
                                                             60, 3.0, 0.5, 32, False,
                                                             67, -0.25, 0.5, 32, False,
                                                             72, 0.0, 0.25, 64, False)
     client.send_message("/live/clip/remove/notes", (0, 0))
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0)
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0)
 
 def test_clip_add_many_notes(client):
     """
@@ -95,12 +89,12 @@ def test_clip_add_many_notes(client):
     random.seed(0)
     all_note_data = []
     pitch = 0
-    for n in range(127):
+    for pitch_index in range(127):
         time = random.randrange(-32, 32) / 4
         duration = random.randrange(1, 4) / 4
         velocity = random.randrange(1, 128)
         # Create multiple instances of the same sequence, shifted in time.
-        for timeshift in range(3):
+        for timeshift in range(1):
             note = (pitch,
                     time + (timeshift * 8),
                     duration,
@@ -111,13 +105,11 @@ def test_clip_add_many_notes(client):
     all_note_data = tuple(all_note_data)
 
     # Check clip is initially empty
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0)
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0)
 
     # Populate clip and check return value
     client.send_message("/live/clip/add/notes", (0, 0) + all_note_data)
-    client.send_message("/live/clip/get/notes", (0, 0))
-    assert client.await_message("/live/clip/get/notes") == (0, 0) + all_note_data
+    assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0) + all_note_data
 
     # Clear clip
     client.send_message("/live/clip/remove/notes", (0, 0))

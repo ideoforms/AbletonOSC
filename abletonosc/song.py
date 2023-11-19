@@ -1,4 +1,7 @@
+import os
+import tempfile
 import Live
+import json
 from functools import partial
 from typing import Tuple, Any
 
@@ -65,12 +68,13 @@ class SongHandler(AbletonOSCHandler):
         ]
 
         #--------------------------------------------------------------------------------
-        # Callbacks for Song: properties (read-only)
+        # Callbacks for Songi: properties (read-only)
         #--------------------------------------------------------------------------------
         properties_r = [
             "can_redo",
             "can_undo",
-            "is_playing"
+            "is_playing",
+            "song_length",
         ]
 
         for prop in properties_r + properties_rw:
@@ -143,6 +147,58 @@ class SongHandler(AbletonOSCHandler):
                         self.logger.error("Unknown object identifier in get/track_data: %s" % obj)
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
+
+
+        def song_export_structure(params):
+            tracks = []
+            for track_index, track in enumerate(self.song.tracks):
+                group_track = None
+                if track.group_track is not None:
+                    group_track = list(self.song.tracks).index(track.group_track)
+                track_data = {
+                    "index": track_index,
+                    "name": track.name,
+                    "is_foldable": track.is_foldable,
+                    "group_track": group_track,
+                    "clips": [],
+                    "devices": []
+                }
+                for clip_index, clip_slot in enumerate(track.clip_slots):
+                    if clip_slot.clip:
+                        clip_data = {
+                            "index": clip_index,
+                            "name": clip_slot.clip.name,
+                            "length": clip_slot.clip.length,
+                        }
+                        track_data["clips"].append(clip_data)
+
+                for device_index, device in enumerate(track.devices):
+                    device_data = {
+                        "class_name": device.class_name,
+                        "type": device.type,
+                        "name": device.name,
+                        "parameters": []
+                    }
+                    for parameter in device.parameters:
+                        device_data["parameters"].append({
+                            "name": parameter.name,
+                            "value": parameter.value,
+                            "min": parameter.min,
+                            "max": parameter.max,
+                            "is_quantized": parameter.is_quantized,
+                        })
+                    track_data["devices"].append(device_data)
+
+                tracks.append(track_data)
+            song = {
+                "tracks": tracks
+            }
+
+            fd = open(os.path.join(tempfile.gettempdir(), "abletonosc-song-structure.json"), "w")
+            json.dump(song, fd)
+            fd.close()
+            return (1,)
+        self.osc_server.add_handler("/live/song/export/structure", song_export_structure)
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: Scene properties

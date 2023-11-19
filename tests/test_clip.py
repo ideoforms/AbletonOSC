@@ -94,7 +94,7 @@ def test_clip_add_many_notes(client):
         duration = random.randrange(1, 4) / 4
         velocity = random.randrange(1, 128)
         # Create multiple instances of the same sequence, shifted in time.
-        for timeshift in range(1):
+        for timeshift in range(3):
             note = (pitch,
                     time + (timeshift * 8),
                     duration,

@@ -94,8 +94,8 @@ class OSCServer:
                 remote_hostname, _ = remote_addr
                 response_addr = (remote_hostname, self._response_port)
                 self.send(address=message.address,
-                            params=rv,
-                            remote_addr=response_addr)
+                          params=rv,
+                          remote_addr=response_addr)
         elif "*" in message.address:
             regex = message.address.replace("*", "[^/]+")
             for callback_address, callback in self._callbacks.items():
@@ -119,8 +119,8 @@ class OSCServer:
                         remote_hostname, _ = remote_addr
                         response_addr = (remote_hostname, self._response_port)
                         self.send(address=callback_address,
-                                    params=rv,
-                                    remote_addr=response_addr)
+                                  params=rv,
+                                  remote_addr=response_addr)
         else:
             self.logger.error("AbletonOSC: Unknown OSC address: %s" % message.address)
 

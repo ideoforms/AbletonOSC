@@ -43,21 +43,30 @@ class AbletonOSCHandler(Component):
         self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, value))
         return value,
 
-    def _start_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
+    def _start_listen(self, target, prop, params: Optional[Tuple] = (), getter = None) -> None:
         """
         Start listening for the property named `prop` on the Live object `target`.
         `params` is typically a tuple containing the track/clip index.
+
+        getter can be used for a customer getter when we're accesing native objects
+        e.g. in view.py we don't return the selected_scene, but the selected_scene index.
 
         Args:
             target: 
             prop:
             params:
+            getter:
         """
         def property_changed_callback():
-            value = getattr(target, prop)
+            if getter is None:
+                value = getattr(target, prop)
+            else:
+                value = getter(params)
+            if type(value) is not tuple:
+                value = (value,)
             self.logger.info("Property %s changed of %s %s: %s" % (prop, self.class_identifier, str(params), value))
             osc_address = "/live/%s/get/%s" % (self.class_identifier, prop)
-            self.osc_server.send(osc_address, (*params, value,))
+            self.osc_server.send(osc_address, (*params, *value,))
 
         listener_key = (prop, tuple(params))
         if listener_key in self.listener_functions:

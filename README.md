@@ -40,7 +40,7 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 <summary><b>Documentation</b>: Application API</summary>
 
 | Address                       | Query params | Response params              | Description                                                                              |
-|:------------------------------|:-------------|:-----------------------------|:-----------------------------------------------------------------------------------------|
+| :---------------------------- | :----------- | :--------------------------- | :--------------------------------------------------------------------------------------- |
 | /live/test                    |              | 'ok'                         | Display a confirmation message in Live, and sends an OSC reply to /live/test             |
 | /live/application/get/version |              | major_version, minor_version | Query Live's version                                                                     |
 | /live/api/reload              |              |                              | Initiates a live reload of the AbletonOSC server code. Used in development only.         |
@@ -70,7 +70,7 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 ### Song methods
 
 | Address                           | Query params | Response params | Description                                                                              |
-|:----------------------------------|:-------------|:----------------|:-----------------------------------------------------------------------------------------|
+| :-------------------------------- | :----------- | :-------------- | :--------------------------------------------------------------------------------------- |
 | /live/song/capture_midi           |              |                 | Capture midi                                                                             |
 | /live/song/continue_playing       |              |                 | Resume session playback                                                                  |
 | /live/song/create_audio_track     | index        |                 | Create a new audio track at the specified index (-1 = end of list)                       |
@@ -201,16 +201,20 @@ These messages are sent to the client automatically when the song state changes.
 Represents the view (user interface) of live
 
 <details>
-### View properties
+<summary><b>Documentation</b>: View API</summary>
 
 | Address                       | Query params             | Response params          | Description                                             |
 |:------------------------------|:-------------------------|:-------------------------|:--------------------------------------------------------|
-| /live/view/get/selected_scene |                          | scene_index              | Returns the selected scene index (with first scene = 0) |
-| /live/view/get/selected_track |                          | track_index              | Returns the selected index track (with first track = 0) |
+| /live/view/get/selected_scene |                          | scene_index              | Returns the selected scene index (first scene = 0) |
+| /live/view/get/selected_track |                          | track_index              | Returns the selected index track (first track = 0) |
 | /live/view/get/selected_clip  |                          | track_index, scene_index | Returns the track and scene index of the selected clip  |
-| /live/view/set/selected_scene | scene_index              |                          | Set the selected scene (with first scene = 0)           |
-| /live/view/set/selected_track | track_index              |                          | Set the selected track (with first track = 0)           |
-| /live/view/set/selected_clip  | track_index, scene_index |                          | Set the selected clip                                   |
+| /live/view/set/selected_scene          | scene_index              |                          | Set the selected scene (first scene = 0)           |
+| /live/view/set/selected_track          | track_index              |                          | Set the selected track (first track = 0)           |
+| /live/view/set/selected_clip           | track_index, scene_index |                          | Set the selected clip                                   |
+| /live/view/start_listen/selected_scene |              | selected_scene                | Start listening to the selected scene (first scene = 0) |
+| /live/view/start_listen/selected_track |              | selected_track                | Start listening to selected track (first track = 0)     |
+| /live/view/stop_listen/selected_scene  |              |                               | Stop listening to the selected scene (first scene = 0)  |
+| /live/view/stop_listen/selected_track  |              |                               | Stop listening to selected track (first track = 0)      |
 </details>
 
 ---
@@ -381,7 +385,6 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 | /live/clip/set/start_marker              | track_id, clip_id, start_marker                                     |                                                                                        | Set clip's start marker, expressed in floating-point beats                                                                                               |
 | /live/clip/get/end_marker                | track_id, clip_id                                                   | track_id, clip_id, end_marker                                                          | Get clip's end marker                                                                                                                                    |
 | /live/clip/set/end_marker                | track_id, clip_id, end_marker                                       |                                                                                        | Set clip's end marker, expressed in floating-point beats                                                                                                 |
-
 
 </details>
 

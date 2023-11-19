@@ -126,6 +126,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/session_record              |              | session_record              | Query whether session record is enabled           |
 | /live/song/get/signature_denominator       |              | denominator                 | Query the current time signature's denominator    |
 | /live/song/get/signature_numerator         |              | numerator                   | Query the current time signature's numerator      |
+| /live/song/get/song_length                 |              | song_length                 | Query the song arrangement length, in beats       |
 | /live/song/get/tempo                       |              | tempo_bpm                   | Query the current song tempo                      |
 
 #### Setters

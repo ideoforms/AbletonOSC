@@ -81,7 +81,9 @@ def main(args):
                     pass
             params.append(part)
         try:
-            print(client.query(command, params))
+            rv = client.query(command, params)
+            rv = ", ".join(str(part) for part in rv)
+            print(rv)
         except RuntimeError:
             pass
 

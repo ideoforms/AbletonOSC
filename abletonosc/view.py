@@ -9,7 +9,6 @@ class ViewHandler(AbletonOSCHandler):
 
     def init_api(self):
         def get_selected_scene(params: Optional[Tuple] = ()):
-            self.logger.info("get selected scene!")
             return (list(self.song.scenes).index(self.song.view.selected_scene),)
 
         def get_selected_track(params: Optional[Tuple] = ()):

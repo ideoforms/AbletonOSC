@@ -14,9 +14,9 @@ class ClipSlotHandler(AbletonOSCHandler):
                 clip_slot = track.clip_slots[clip_index]
 
                 if pass_clip_index:
-                    rv = func((track_index, clip_index), *args, params[2:])
+                    rv = func(clip_slot, *args, tuple(params[0:]))
                 else:
-                    rv = func(clip_slot, *args, params[2:])
+                    rv = func(clip_slot, *args, tuple(params[2:]))
 
                 self.logger.info(track_index, clip_index, rv)
                 if rv is not None:

@@ -54,9 +54,9 @@ class ClipHandler(AbletonOSCHandler):
                 track = self.song.tracks[track_index]
                 clip = track.clip_slots[clip_index].clip
                 if pass_clip_index:
-                    rv = func(clip, *args, params[0:])
+                    rv = func(clip, *args, tuple(params[0:]))
                 else:
-                    rv = func(clip, *args, params[2:])
+                    rv = func(clip, *args, tuple(params[2:]))
 
                 if rv is not None:
                     return (track_index, clip_index, *rv)
@@ -145,34 +145,6 @@ class ClipHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
         self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
-
-        # TODO: tidy up and generalise this
-        self.clip_listeners = {}
-
-        def clip_add_playing_position_listener(track_clip_index, params: Tuple[Any] = ()):
-            track_index, clip_index = track_clip_index
-            clip = self.song.tracks[track_index].clip_slots[clip_index].clip
-
-            def playing_position_changed_callback():
-                osc_address = "/live/clip/get/playing_position"
-                self.osc_server.send(osc_address, (track_index, clip_index, clip.playing_position))
-
-            clip_remove_playing_position_listener(track_clip_index)
-            clip.add_playing_position_listener(playing_position_changed_callback)
-            self.clip_listeners[track_clip_index] = playing_position_changed_callback
-
-        def clip_remove_playing_position_listener(track_clip_index, params: Tuple[Any] = ()):
-            track_index, clip_index = track_clip_index
-            clip = self.song.tracks[track_index].clip_slots[clip_index].clip
-
-            if track_clip_index in self.clip_listeners.keys():
-                clip.remove_playing_position_listener(self.clip_listeners[track_clip_index])
-                del self.clip_listeners[track_clip_index]
-
-        self.osc_server.add_handler("/live/clip/start_listen/playing_position",
-                                    create_clip_callback(clip_add_playing_position_listener, pass_clip_index=True))
-        self.osc_server.add_handler("/live/clip/stop_listen/playing_position",
-                                    create_clip_callback(clip_remove_playing_position_listener, pass_clip_index=True))
 
         def clips_filter_handler(params: Tuple):
             # TODO: Pre-cache clip notes

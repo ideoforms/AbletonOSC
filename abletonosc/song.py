@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import Live
 import json
@@ -194,6 +195,13 @@ class SongHandler(AbletonOSCHandler):
                 "tracks": tracks
             }
 
+            if sys.platform == "darwin":
+                #--------------------------------------------------------------------------------
+                # On macOS, TMPDIR by default points to a process-specific directory.
+                # We want to use a global temp dir (typically, tmp) so that other processes
+                # know where to find this output .json, so unset TMPDIR.
+                #--------------------------------------------------------------------------------
+                os.environ["TMPDIR"] = ""
             fd = open(os.path.join(tempfile.gettempdir(), "abletonosc-song-structure.json"), "w")
             json.dump(song, fd)
             fd.close()

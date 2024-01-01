@@ -115,6 +115,8 @@ class SongHandler(AbletonOSCHandler):
              track_1_name, clip_1_0_name,   clip_1_1_name,   ... clip_1_7_name, ...]
             """
             track_index_min, track_index_max, *properties = params
+            track_index_min = int(track_index_min)
+            track_index_max = int(track_index_max)
             self.logger.info("Getting track data: %s (tracks %d..%d)" %
                              (properties, track_index_min, track_index_max))
             if track_index_max == -1:

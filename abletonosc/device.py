@@ -80,14 +80,20 @@ class DeviceHandler(AbletonOSCHandler):
         # Device: Get/set individual parameters
         #--------------------------------------------------------------------------------
         def device_get_parameter_value(device, params: Tuple[Any] = ()):
-            return params[0], device.parameters[params[0]].value
+            # Cast to ints so that we can tolerate floats from interfaces such as TouchOSC
+            # that send floats by default.
+            # https://github.com/ideoforms/AbletonOSC/issues/33
+            param_index = int(params[0])
+            return param_index, device.parameters[param_index].value
 
         def device_set_parameter_value(device, params: Tuple[Any] = ()):
-            param_id, param_value = params[:2]
-            device.parameters[param_id].value = param_value
+            param_index, param_value = params[:2]
+            param_index = int(param_index)
+            device.parameters[param_index].value = param_value
 
         def device_get_parameter_name(device, params: Tuple[Any] = ()):
-            return params[0], device.parameters[params[0]].name
+            param_index = int(params[0])
+            return param_index, device.parameters[param_index].name
 
         self.osc_server.add_handler("/live/device/get/parameter/value", create_device_callback(device_get_parameter_value))
         self.osc_server.add_handler("/live/device/set/parameter/value", create_device_callback(device_set_parameter_value))

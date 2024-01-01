@@ -12,13 +12,14 @@ class AbletonOSCHandler(Component):
         self.osc_server: OSCServer = self.manager.osc_server
         self.init_api()
         self.listener_functions = {}
+        self.listener_objects = {}
         self.class_identifier = None
 
     def init_api(self):
         pass
 
     def clear_api(self):
-        pass
+        self._clear_listeners()
 
     #--------------------------------------------------------------------------------
     # Generic callbacks
@@ -77,6 +78,7 @@ class AbletonOSCHandler(Component):
         add_listener_function = getattr(target, add_listener_function_name)
         add_listener_function(property_changed_callback)
         self.listener_functions[listener_key] = property_changed_callback
+        self.listener_objects[listener_key] = target
         #--------------------------------------------------------------------------------
         # Immediately send the current value
         #--------------------------------------------------------------------------------
@@ -99,5 +101,15 @@ class AbletonOSCHandler(Component):
                 #--------------------------------------------------------------------------------
                 pass
             del self.listener_functions[listener_key]
+            del self.listener_objects[listener_key]
         else:
             self.logger.warning("No listener function found for property: %s (%s)" % (prop, str(params)))
+
+    def _clear_listeners(self):
+        """
+        Clears all listener functions, to prevent listeners continuing to report after a reload.
+        """
+        for listener_key in list(self.listener_functions.keys())[:]:
+            target = self.listener_objects[listener_key]
+            prop, params = listener_key
+            self._stop_listen(target, prop, params)

@@ -169,7 +169,7 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 
 It is often useful to be able to query data en masse about lots of different tracks and clips -- for example, when a set is first opened, to synchronise the state of your client with the Ableton set. This can be achieved with the `/live/song/get/track_data` API, which can query user-specified properties of multiple tracks and clips.
 
-Properties must be of the format `track.property_name` or `clip.property_name`.
+Properties must be of the format `track.property_name`, `clip.property_name` or `clip_slot.property_name`.
 
 For example:
 ```

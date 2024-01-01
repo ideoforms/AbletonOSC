@@ -184,13 +184,9 @@ Queries tracks 0..11, and returns a long list of values comprising:
  track_1_name, clip_1_0_name,   clip_1_1_name,   ... clip_1_7_name, ...]
 ```
 
-### Song status messages
+### Beat events
 
-These messages are sent to the client automatically when the song state changes.
-
-| Address         | Response params | Description                                                          |
-|:----------------|:----------------|:---------------------------------------------------------------------|
-| /live/song/beat | beat_number     | Sent to the client application on each beat when the song is playing |
+To request a status message to be sent to the client on each beat, call `/live/song/start_listen/beat`. Every beat, a reply will be sent to `/live/song/get/beat`, with an int parameter containing the current beat number. To stop listening for beat events, call `/live/song/stop_listen/beat`.
 
 </details>
 

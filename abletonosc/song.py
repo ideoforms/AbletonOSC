@@ -247,19 +247,35 @@ class SongHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
 
         #--------------------------------------------------------------------------------
-        # Listener for /live/song/beat
+        # Listener for /live/song/get/beat
         #--------------------------------------------------------------------------------
         self.last_song_time = -1.0
-        self.song.add_current_song_time_listener(self.song_time_changed)
+        
+        def stop_beat_listener(params: Tuple[Any] = ()):
+            try:
+                self.song.remove_current_song_time_listener(self.current_song_time_changed)
+            except:
+                pass
 
-    def song_time_changed(self):
+        def start_beat_listener(params: Tuple[Any] = ()):
+            stop_beat_listener()
+            self.song.add_current_song_time_listener(self.current_song_time_changed)
+
+        self.osc_server.add_handler("/live/song/start_listen/beat", start_beat_listener)
+        self.osc_server.add_handler("/live/song/stop_listen/beat", stop_beat_listener)
+
+    def current_song_time_changed(self):
         #--------------------------------------------------------------------------------
         # If song has rewound or skipped to next beat, sent a /live/beat message
         #--------------------------------------------------------------------------------
         if (self.song.current_song_time < self.last_song_time) or \
                 (int(self.song.current_song_time) > int(self.last_song_time)):
-            self.osc_server.send("/live/song/beat", (int(self.song.current_song_time),))
+            self.osc_server.send("/live/song/get/beat", (int(self.song.current_song_time),))
         self.last_song_time = self.song.current_song_time
 
     def clear_api(self):
-        self.song.remove_current_song_time_listener(self.song_time_changed)
+        super().clear_api()
+        try:
+            self.song.remove_current_song_time_listener(self.current_song_time_changed)
+        except:
+            pass

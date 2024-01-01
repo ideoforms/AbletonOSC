@@ -26,5 +26,5 @@ def wait_one_tick():
     time.sleep(TICK_DURATION)
 
 c = AbletonOSCClient()
-c.send_message("/live/reload")
+c.send_message("/live/api/reload")
 c.stop()

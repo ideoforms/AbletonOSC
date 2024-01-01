@@ -1,4 +1,4 @@
-from . import client, wait_one_tick
+from . import client, wait_one_tick, TICK_DURATION
 import pytest
 import random
 
@@ -113,3 +113,33 @@ def test_clip_add_many_notes(client):
 
     # Clear clip
     client.send_message("/live/clip/remove/notes", (0, 0))
+
+def test_clip_playing_position_listen(client):
+    client.send_message("/live/clip/start_listen/playing_position", [0, 0])
+    client.send_message("/live/clip/fire", [0, 0])
+
+    rv = client.await_message("/live/clip/get/playing_position", TICK_DURATION * 2)
+    assert rv == (0, 0, 0)
+
+    rv = client.await_message("/live/clip/get/playing_position", TICK_DURATION * 2)
+    assert rv[0] == 0
+    assert rv[1] == 0
+    assert rv[2] > 0
+
+    client.send_message("/live/clip/stop_listen/playing_position", (0, 0))
+
+def test_clip_listen_lifecycle(client):
+    client.send_message("/live/clip/set/name", [0, 0, "Alpha"])
+    wait_one_tick()
+    client.send_message("/live/clip/start_listen/name", [0, 0])
+    assert client.await_message("/live/clip/get/name", TICK_DURATION * 2) == (0, 0, "Alpha")
+    client.send_message("/live/clip/set/name", [0, 0, "Beta"])
+    assert client.await_message("/live/clip/get/name", TICK_DURATION * 2) == (0, 0, "Beta")
+
+    client.send_message("/live/clip_slot/delete_clip", [0, 0])
+    client.send_message("/live/clip_slot/create_clip", [0, 0, 8.0])
+    client.send_message("/live/clip/start_listen/name", [0, 0])
+    assert client.await_message("/live/clip/get/name", TICK_DURATION * 2) == (0, 0, "")
+    client.send_message("/live/clip/set/name", [0, 0, "Alpha"])
+    assert client.await_message("/live/clip/get/name", TICK_DURATION * 2) == (0, 0, "Alpha")
+    client.send_message("/live/clip/stop_listen/name", [0, 0])

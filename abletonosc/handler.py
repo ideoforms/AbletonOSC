@@ -89,7 +89,15 @@ class AbletonOSCHandler(Component):
             listener_function = self.listener_functions[listener_key]
             remove_listener_function_name = "remove_%s_listener" % prop
             remove_listener_function = getattr(target, remove_listener_function_name)
-            remove_listener_function(listener_function)
+            try:
+                remove_listener_function(listener_function)
+            except RuntimeError:
+                #--------------------------------------------------------------------------------
+                # This exception may be thrown when an observer is no longer connected --
+                # e.g., when trying to stop listening for a clip property of a clip that has been deleted.
+                # Ignore as it is benign.
+                #--------------------------------------------------------------------------------
+                pass
             del self.listener_functions[listener_key]
         else:
             self.logger.warning("No listener function found for property: %s (%s)" % (prop, str(params)))

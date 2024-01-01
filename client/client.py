@@ -34,6 +34,7 @@ class AbletonOSCClient:
         self.verbose = False
 
     def handle_osc(self, address, *params):
+        # print("Received OSC: %s %s" % (address, params))
         if address in self.address_handlers:
             self.address_handlers[address](params)
         if self.verbose:

@@ -137,10 +137,13 @@ class SongHandler(AbletonOSCHandler):
                         rv.append(value)
                     elif obj == "clip":
                         for clip_slot in track.clip_slots:
-                            if clip_slot.clip is not None:
-                                rv.append(getattr(clip_slot.clip, property_name))
+                            if property_name == "has_stop_button":
+                                rv.append(clip_slot.has_stop_button)
                             else:
-                                rv.append(None)
+                                if clip_slot.clip is not None:
+                                    rv.append(getattr(clip_slot.clip, property_name))
+                                else:
+                                    rv.append(None)
                     elif obj == "device":
                         for device in track.devices:
                             rv.append(getattr(device, property_name))

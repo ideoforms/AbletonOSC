@@ -93,13 +93,14 @@ class AbletonOSCHandler(Component):
             remove_listener_function = getattr(target, remove_listener_function_name)
             try:
                 remove_listener_function(listener_function)
-            except RuntimeError:
+            except Exception as e:
                 #--------------------------------------------------------------------------------
                 # This exception may be thrown when an observer is no longer connected --
                 # e.g., when trying to stop listening for a clip property of a clip that has been deleted.
                 # Ignore as it is benign.
                 #--------------------------------------------------------------------------------
-                pass
+                self.logger.info("Exception whilst removing listener (likely benign): %s" % e)
+                
             del self.listener_functions[listener_key]
             del self.listener_objects[listener_key]
         else:

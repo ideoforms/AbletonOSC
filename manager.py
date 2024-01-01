@@ -111,9 +111,8 @@ class Manager(ControlSurface):
             exc = traceback.format_exc()
             logging.warning(exc)
 
-        if self.handlers:
-            self.clear_api()
-            self.init_api()
+        self.clear_api()
+        self.init_api()
         logger.info("Reloaded code")
 
     def disconnect(self):

@@ -13,14 +13,14 @@ class TrackHandler(AbletonOSCHandler):
                                   include_track_id: bool = False):
             def track_callback(params: Tuple[Any]):
                 if params[0] == "*":
-                    track_indices = list(range(len(self.tracks)))
+                    track_indices = list(range(len(self.song.tracks)))
                 else:
                     track_indices = [int(params[0])]
 
                 for track_index in track_indices:
                     track = self.song.tracks[track_index]
                     if include_track_id:
-                        rv = func(track, *args, tuple(params[0:]))
+                        rv = func(track, *args, tuple([track_index] + params[1:]))
                     else:
                         rv = func(track, *args, tuple(params[1:]))
 

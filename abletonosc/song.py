@@ -254,11 +254,13 @@ class SongHandler(AbletonOSCHandler):
         def stop_beat_listener(params: Tuple[Any] = ()):
             try:
                 self.song.remove_current_song_time_listener(self.current_song_time_changed)
+                self.logger.info("Removing beat listener")
             except:
                 pass
 
         def start_beat_listener(params: Tuple[Any] = ()):
             stop_beat_listener()
+            self.logger.info("Adding beat listener")
             self.song.add_current_song_time_listener(self.current_song_time_changed)
 
         self.osc_server.add_handler("/live/song/start_listen/beat", start_beat_listener)

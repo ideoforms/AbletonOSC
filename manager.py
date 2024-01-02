@@ -14,15 +14,34 @@ class Manager(ControlSurface):
         ControlSurface.__init__(self, c_instance)
 
         self.log_level = "info"
-        self.start_logging()
 
         self.handlers = []
-        self.show_message("AbletonOSC: Listening for OSC on port %d" % abletonosc.OSC_LISTEN_PORT)
 
         self.osc_server = abletonosc.OSCServer()
         self.schedule_message(0, self.tick)
 
+        self.start_logging()
         self.init_api()
+
+        self.show_message("AbletonOSC: Listening for OSC on port %d" % abletonosc.OSC_LISTEN_PORT)
+        logger.info("Started AbletonOSC on address %s" % str(self.osc_server._local_addr))
+
+
+    def start_logging(self):
+        """
+        Start logging to a local logfile (logs/abletonosc.log),
+        and relay error messages via OSC.
+        """
+        module_path = os.path.dirname(os.path.realpath(__file__))
+        log_dir = os.path.join(module_path, "logs")
+        if not os.path.exists(log_dir):
+            os.mkdir(log_dir, 0o755)
+        log_path = os.path.join(log_dir, "abletonosc.log")
+        self.log_file_handler = logging.FileHandler(log_path)
+        self.log_file_handler.setLevel(self.log_level.upper())
+        formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
+        self.log_file_handler.setFormatter(formatter)
+        logger.addHandler(self.log_file_handler)
 
         class LiveOSCErrorLogHandler(logging.StreamHandler):
             def emit(handler, record):
@@ -37,17 +56,9 @@ class Manager(ControlSurface):
         self.live_osc_error_handler.setLevel(logging.ERROR)
         logger.addHandler(self.live_osc_error_handler)
 
-    def start_logging(self):
-        module_path = os.path.dirname(os.path.realpath(__file__))
-        log_dir = os.path.join(module_path, "logs")
-        if not os.path.exists(log_dir):
-            os.mkdir(log_dir, 0o755)
-        log_path = os.path.join(log_dir, "abletonosc.log")
-        self.log_file_handler = logging.FileHandler(log_path)
-        self.log_file_handler.setLevel(self.log_level.upper())
-        formatter = logging.Formatter('(%(asctime)s) [%(levelname)s] %(message)s')
-        self.log_file_handler.setFormatter(formatter)
-        logger.addHandler(self.log_file_handler)
+    def stop_logging(self):
+        logger.removeHandler(self.log_file_handler)
+        logger.removeHandler(self.live_osc_error_handler)
 
     def init_api(self):
         def test_callback(params):
@@ -118,6 +129,7 @@ class Manager(ControlSurface):
     def disconnect(self):
         self.show_message("Disconnecting...")
         logger.info("Disconnecting...")
+        self.stop_logging()
         self.osc_server.shutdown()
         super().disconnect()
 

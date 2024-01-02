@@ -33,14 +33,14 @@ words = ["live", "song", "track", "clip", "device", "parameter", "parameters"]
 completer = LiveAPICompleter(words)
 readline.set_completer(completer.complete)
 
-def print_error(args):
+def print_error(address, args):
     print("Received error from Live: %s" % args)
 
 def main(args):
     client = AbletonOSCClient(args.hostname, args.port)
     if args.verbose:
         client.verbose = True
-    client.add_handler("/live/error", print_error)
+    client.set_handler("/live/error", print_error)
     client.send_message("/live/api/reload")
 
     readline.parse_and_bind('tab: complete')

@@ -93,7 +93,7 @@ class TrackHandler(AbletonOSCHandler):
         # Might want to find a better approach that unifies volume and sends
         def track_get_send(track, params: Tuple[Any] = ()):
             send_id, = params
-            return track.mixer_device.sends[send_id].value,
+            return send_id, track.mixer_device.sends[send_id].value
 
         def track_set_send(track, params: Tuple[Any] = ()):
             send_id, value = params

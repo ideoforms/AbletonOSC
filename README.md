@@ -268,7 +268,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/get/name                              | track_id          | track_id, name             | Query track name                                  |
 | /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                               |
 | /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                      |
-| /live/track/get/send                              | track_id, send_id | track_id, value            | Query track send                                  |
+| /live/track/get/send                              | track_id, send_id | track_id, send_id, value   | Query track send                                  |
 | /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                           |
 | /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                                |
 

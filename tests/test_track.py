@@ -2,15 +2,6 @@ from . import client, wait_one_tick, TICK_DURATION
 import pytest
 import itertools
 
-def test_track_get_send(client):
-    track_id = 2
-    send_id = 1
-
-    for value in [0.5, 0.0]:
-        client.send_message("/live/track/set/send", [track_id, send_id, value])
-        wait_one_tick()
-        assert client.query("/live/track/get/send", (track_id, send_id)) == (track_id, value,)
-
 #--------------------------------------------------------------------------------
 # Test track properties
 #--------------------------------------------------------------------------------
@@ -40,6 +31,19 @@ def test_track_property_solo(client):
 
 def test_track_property_name(client):
     _test_track_property(client, 2, "name", ["Test", "Track"])
+
+#--------------------------------------------------------------------------------
+# Test track properties - sends
+#--------------------------------------------------------------------------------
+
+def test_track_get_send(client):
+    track_id = 2
+    send_id = 1
+
+    for value in [0.5, 0.0]:
+        client.send_message("/live/track/set/send", [track_id, send_id, value])
+        wait_one_tick()
+        assert client.query("/live/track/get/send", (track_id, send_id)) == (track_id, send_id, value,)
 
 #--------------------------------------------------------------------------------
 # Test track properties - clips

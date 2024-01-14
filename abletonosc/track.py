@@ -78,7 +78,7 @@ class TrackHandler(AbletonOSCHandler):
         # Volume, panning and send are properties of the track's mixer_device so
         # can't be formulated as normal callbacks that reference properties of track.
         #--------------------------------------------------------------------------------
-        mixer_properties_rw = ["volume", "panning"]
+        mixer_properties_rw = ["volume", "panning", "sends"]
         for prop in mixer_properties_rw:
             self.osc_server.add_handler("/live/track/get/%s" % prop,
                                         create_track_callback(self._get_mixer_property, prop))
@@ -88,19 +88,6 @@ class TrackHandler(AbletonOSCHandler):
                                         create_track_callback(self._start_mixer_listen, prop, include_track_id=True))
             self.osc_server.add_handler("/live/track/stop_listen/%s" % prop,
                                         create_track_callback(self._stop_mixer_listen, prop, include_track_id=True))
-
-        # Still need to fix these
-        # Might want to find a better approach that unifies volume and sends
-        def track_get_send(track, params: Tuple[Any] = ()):
-            send_id, = params
-            return send_id, track.mixer_device.sends[send_id].value
-
-        def track_set_send(track, params: Tuple[Any] = ()):
-            send_id, value = params
-            track.mixer_device.sends[send_id].value = value
-
-        self.osc_server.add_handler("/live/track/get/send", create_track_callback(track_get_send))
-        self.osc_server.add_handler("/live/track/set/send", create_track_callback(track_set_send))
 
         def track_delete_clip(track, params: Tuple[Any]):
             clip_index, = params
@@ -232,17 +219,34 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/set/input_routing_channel", create_track_callback(track_set_input_routing_channel))
 
     def _set_mixer_property(self, target, prop, params: Tuple) -> None:
-        parameter_object = getattr(target.mixer_device, prop)
-        self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
-        parameter_object.value = params[0]
+        if (prop == 'sends'):
+            send_id, value = params
+            parameter_object = getattr(target.mixer_device, prop)[send_id]
+            self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
+            parameter_object.value = value
+        else:
+            parameter_object = getattr(target.mixer_device, prop)
+            self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
+            parameter_object.value = params[0]
 
     def _get_mixer_property(self, target, prop, params: Optional[Tuple] = ()) -> Tuple[Any]:
-        parameter_object = getattr(target.mixer_device, prop)
-        self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, parameter_object.value))
-        return parameter_object.value,
+        if (prop == 'sends'):
+            send_id, = params
+            parameter_object = getattr(target.mixer_device, prop)[send_id]
+            self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, parameter_object.value))
+            return send_id, parameter_object.value,
+        else:
+            parameter_object = getattr(target.mixer_device, prop)
+            self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, parameter_object.value))
+            return parameter_object.value,
 
     def _start_mixer_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
-        parameter_object = getattr(target.mixer_device, prop)
+        if (prop == 'sends'):
+            track_id, send_id, = params
+            parameter_object = getattr(target.mixer_device, prop)[send_id]
+        else:
+            parameter_object = getattr(target.mixer_device, prop)
+
         def property_changed_callback():
             value = parameter_object.value
             self.logger.info("Property %s changed of %s %s: %s" % (prop, self.class_identifier, str(params), value))
@@ -251,19 +255,24 @@ class TrackHandler(AbletonOSCHandler):
 
         listener_key = (prop, tuple(params))
         if listener_key in self.listener_functions:
-            self._stop_mixer_listen(target, prop, params)
-
-        self.logger.info("Adding listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
-
-        parameter_object.add_value_listener(property_changed_callback)
-        self.listener_functions[listener_key] = property_changed_callback
+            # self._stop_mixer_listen(target, prop, params)
+            self.logger.info("Already assigned listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
+        else:
+            self.logger.info("Adding listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
+            parameter_object.add_value_listener(property_changed_callback)
+            self.listener_functions[listener_key] = property_changed_callback
         #--------------------------------------------------------------------------------
         # Immediately send the current value
         #--------------------------------------------------------------------------------
         property_changed_callback()
 
     def _stop_mixer_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
-        parameter_object = getattr(target.mixer_device, prop)
+        if (prop == 'sends'):
+            track_id, send_id, = params
+            parameter_object = getattr(target.mixer_device, prop)[send_id]
+        else:
+            parameter_object = getattr(target.mixer_device, prop)
+
         listener_key = (prop, tuple(params))
         if listener_key in self.listener_functions:
             self.logger.info("Removing listener for %s %s, property %s" % (self.class_identifier, str(params), prop))

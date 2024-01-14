@@ -219,7 +219,7 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/set/input_routing_channel", create_track_callback(track_set_input_routing_channel))
 
     def _set_mixer_property(self, target, prop, params: Tuple) -> None:
-        if (prop == 'sends'):
+        if prop == 'sends':
             send_id, value = params
             parameter_object = getattr(target.mixer_device, prop)[send_id]
             self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
@@ -230,7 +230,7 @@ class TrackHandler(AbletonOSCHandler):
             parameter_object.value = params[0]
 
     def _get_mixer_property(self, target, prop, params: Optional[Tuple] = ()) -> Tuple[Any]:
-        if (prop == 'sends'):
+        if prop == 'sends':
             send_id, = params
             parameter_object = getattr(target.mixer_device, prop)[send_id]
             self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, parameter_object.value))
@@ -241,7 +241,7 @@ class TrackHandler(AbletonOSCHandler):
             return parameter_object.value,
 
     def _start_mixer_listen(self, target, prop, params: Optional[Tuple] = ()) -> None:
-        if (prop == 'sends'):
+        if prop == 'sends':
             track_id, send_id, = params
             parameter_object = getattr(target.mixer_device, prop)[send_id]
         else:
@@ -255,7 +255,6 @@ class TrackHandler(AbletonOSCHandler):
 
         listener_key = (prop, tuple(params))
         if listener_key in self.listener_functions:
-            # self._stop_mixer_listen(target, prop, params)
             self.logger.info("Already assigned listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
         else:
             self.logger.info("Adding listener for %s %s, property: %s" % (self.class_identifier, str(params), prop))
@@ -267,7 +266,7 @@ class TrackHandler(AbletonOSCHandler):
         property_changed_callback()
 
     def _stop_mixer_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
-        if (prop == 'sends'):
+        if prop == 'sends':
             track_id, send_id, = params
             parameter_object = getattr(target.mixer_device, prop)[send_id]
         else:

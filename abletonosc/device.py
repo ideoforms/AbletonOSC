@@ -77,7 +77,6 @@ class DeviceHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/device/get/parameters/min", create_device_callback(device_get_parameters_min))
         self.osc_server.add_handler("/live/device/get/parameters/max", create_device_callback(device_get_parameters_max))
         self.osc_server.add_handler("/live/device/get/parameters/is_quantized", create_device_callback(device_get_parameters_is_quantized))
-
         self.osc_server.add_handler("/live/device/set/parameters/value", create_device_callback(device_set_parameters_value))
 
         #--------------------------------------------------------------------------------
@@ -90,6 +89,7 @@ class DeviceHandler(AbletonOSCHandler):
             param_index = int(params[0])
             return param_index, device.parameters[param_index].value
         
+        # Uses str_for_value method to return the UI-friendly version of a parameter value (ex: "2500Hz")
         def device_get_parameter_value_string(device, params: Tuple[Any] = ()):
             param_index = int(params[0])
             return param_index, device.parameters[param_index].str_for_value(device.parameters[param_index].value)

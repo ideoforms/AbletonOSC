@@ -41,9 +41,9 @@ def test_track_get_send(client):
     send_id = 1
 
     for value in [0.5, 0.0]:
-        client.send_message("/live/track/set/send", [track_id, send_id, value])
+        client.send_message("/live/track/set/sends", [track_id, send_id, value])
         wait_one_tick()
-        assert client.query("/live/track/get/send", (track_id, send_id)) == (track_id, send_id, value,)
+        assert client.query("/live/track/get/sends", (track_id, send_id)) == (track_id, send_id, value,)
 
 #--------------------------------------------------------------------------------
 # Test track properties - clips

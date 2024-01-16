@@ -89,7 +89,7 @@ class DeviceHandler(AbletonOSCHandler):
             param_index = int(params[0])
             return param_index, device.parameters[param_index].value
         
-        # Uses str_for_value method to return the UI-friendly version of a parameter value (ex: "2500Hz")
+        # Uses str_for_value method to return the UI-friendly version of a parameter value (ex: "2500 Hz")
         def device_get_parameter_value_string(device, params: Tuple[Any] = ()):
             param_index = int(params[0])
             return param_index, device.parameters[param_index].str_for_value(device.parameters[param_index].value)

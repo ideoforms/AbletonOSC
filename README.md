@@ -204,9 +204,11 @@ Represents the view (user interface) of live
 | /live/view/get/selected_scene          |                          | scene_index              | Returns the selected scene index (first scene = 0)      |
 | /live/view/get/selected_track          |                          | track_index              | Returns the selected index track (first track = 0)      |
 | /live/view/get/selected_clip           |                          | track_index, scene_index | Returns the track and scene index of the selected clip  |
+| /live/view/get/selected_device         |                          | track_index, device_index| Get the selected device (first device = 0)              |
 | /live/view/set/selected_scene          | scene_index              |                          | Set the selected scene (first scene = 0)                |
 | /live/view/set/selected_track          | track_index              |                          | Set the selected track (first track = 0)                |
 | /live/view/set/selected_clip           | track_index, scene_index |                          | Set the selected clip                                   |
+| /live/view/set/selected_device         | track_index, device_index|                          | Set the selected device (first device = 0)              |
 | /live/view/start_listen/selected_scene |                          | selected_scene           | Start listening to the selected scene (first scene = 0) |
 | /live/view/start_listen/selected_track |                          | selected_track           | Start listening to selected track (first track = 0)     |
 | /live/view/stop_listen/selected_scene  |                          |                          | Stop listening to the selected scene (first scene = 0)  |
@@ -390,6 +392,8 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 
 Represents an instrument or effect.
 
+ - Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
+
 <details>
 <summary><b>Documentation</b>: Device API</summary>
 
@@ -406,6 +410,7 @@ Represents an instrument or effect.
 | /live/device/get/parameters/is_quantized | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the list of is_quantized settings (i.e., whether the parameter must be an int/bool) |
 | /live/device/set/parameters/value        | track_id, device_id, value, value ...    |                                          | Set the device parameter values                                                         |
 | /live/device/get/parameter/value         | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get a device parameter value                                                            |
+| /live/device/get/parameter/value_string  | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get the device parameter value as a readable string ex: 2500 Hz                         |
 | /live/device/set/parameter/value         | track_id, device_id, parameter_id, value |                                          | Set a device parameter value                                                            |
 
 For devices:

@@ -139,3 +139,4 @@ class DeviceHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/device/set/parameter/value", create_device_callback(device_set_parameter_value))
         self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))
         self.osc_server.add_handler("/live/device/start_listen/parameter/value", create_device_callback(device_get_parameter_value_listener, include_ids = True))
+        self.osc_server.add_handler("/live/device/stop_listen/parameter/value", create_device_callback(device_get_parameter_remove_value_listener, include_ids = True))

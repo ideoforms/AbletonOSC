@@ -207,6 +207,7 @@ Represents the view (user interface) of live
 | /live/view/set/selected_scene          | scene_index              |                          | Set the selected scene (first scene = 0)                |
 | /live/view/set/selected_track          | track_index              |                          | Set the selected track (first track = 0)                |
 | /live/view/set/selected_clip           | track_index, scene_index |                          | Set the selected clip                                   |
+| /live/view/set/selected_device         | track_index, device_index|                          | Set the selected device (first device = 0)              |
 | /live/view/start_listen/selected_scene |                          | selected_scene           | Start listening to the selected scene (first scene = 0) |
 | /live/view/start_listen/selected_track |                          | selected_track           | Start listening to selected track (first track = 0)     |
 | /live/view/stop_listen/selected_scene  |                          |                          | Stop listening to the selected scene (first scene = 0)  |
@@ -390,6 +391,8 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 
 Represents an instrument or effect.
 
+ - Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
+
 <details>
 <summary><b>Documentation</b>: Device API</summary>
 
@@ -401,6 +404,7 @@ Represents an instrument or effect.
 | /live/device/get/num_parameters          | track_id, device_id                      | track_id, device_id, num_parameters      | Get the number of parameters exposed by the device                                      |
 | /live/device/get/parameters/name         | track_id, device_id                      | track_id, device_id, [name, ...]         | Get the list of parameter names exposed by the device                                   |
 | /live/device/get/parameters/value        | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter values                                                         |
+| /live/device/get/parameters/value_string | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter value as a readable string ex: 2500Hz                          |
 | /live/device/get/parameters/min          | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter minimum values                                                 |
 | /live/device/get/parameters/max          | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the device parameter maximum values                                                 |
 | /live/device/get/parameters/is_quantized | track_id, device_id                      | track_id, device_id, [value, ...]        | Get the list of is_quantized settings (i.e., whether the parameter must be an int/bool) |

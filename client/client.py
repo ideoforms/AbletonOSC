@@ -1,6 +1,7 @@
 import argparse
 import threading
-from pythonosc.udp_client import SimpleUDPClient
+from pythonosc.udp_client import SimpleUDPClient, OscBundle, OscMessageBuilder
+from pythonosc.osc_bundle_builder import OscBundleBuilder
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
 from typing import Callable, Iterable
@@ -45,6 +46,21 @@ class AbletonOSCClient:
         self.server_thread.join()
         self.server = None
 
+    def send_bundle(self,
+                    messages: list[tuple[str, tuple]]):
+
+        import time
+        now = int(time.time())
+        bundle_builder = OscBundleBuilder(now)
+        for address, params in messages:
+            builder = OscMessageBuilder(address=address)
+            for param in params:
+                builder.add_arg(param)
+            msg = builder.build()
+            bundle_builder.add_content(msg)
+        bundle = bundle_builder.build()
+        self.client.send(bundle)
+
     def send_message(self,
                      address: str,
                      params: Iterable = ()):
@@ -83,8 +99,8 @@ class AbletonOSCClient:
         del self.address_handlers[address]
 
     def await_message(self,
-                    address: str,
-                    timeout: float = TICK_DURATION):
+                      address: str,
+                      timeout: float = TICK_DURATION):
         """
         Awaits a reply from the given `address`, and optionally asserts that the function `fn`
         returns True when called with the returned OSC parameters.

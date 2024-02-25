@@ -132,15 +132,18 @@ class OSCServer:
                 self.process_message(i, remote_addr)
 
     def parse_bundle(self, data, remote_addr):
-        bundle = OscBundle(data)
-        if bundle.num_contents == 0:
+        if OscBundle.dgram_is_bundle(data):
+            try:
+                bundle = OscBundle(data)
+                self.process_bundle(bundle, remote_addr)
+            except ParseError:
+                self.logger.error("AbletonOSC: Error parsing OSC bundle: %s" % (traceback.format_exc()))
+        else:
             try:
                 message = OscMessage(data)
                 self.process_message(message, remote_addr)
             except ParseError:
-                self.logger.error("AbletonOSC: OSC parse error: %s" % (traceback.format_exc()))
-        else:
-            self.process_bundle(bundle, remote_addr)
+                self.logger.error("AbletonOSC: Error parsing OSC message: %s" % (traceback.format_exc()))
 
     def process(self) -> None:
         """

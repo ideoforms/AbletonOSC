@@ -219,7 +219,7 @@ Represents the view (user interface) of live
 
 ## Track API
 
-Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
+Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, sends, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
 
 To query the properties of multiple tracks, see [Song: Properties of cue points, scenes and tracks](https://github.com/ideoforms/AbletonOSC#song-properties-of-cue-points-scenes-and-tracks).
 
@@ -236,6 +236,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
  - Changes for any Track property can be listened for by calling `/live/track/start_listen/<property> <track_index>`
  - Responses will be sent to `/live/track/get/<property>`, with parameters `<track_index> <property_value>`
+ - Sends will take the same format, but with an added send index after the track index: `/live/track/start_listen/sends <track_index> <send_index>`
 
 #### Getters
 
@@ -270,7 +271,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/get/name                              | track_id          | track_id, name             | Query track name                                  |
 | /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                               |
 | /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                      |
-| /live/track/get/send                              | track_id, send_id | track_id, send_id, value   | Query track send                                  |
+| /live/track/get/sends                             | track_id, send_id | track_id, send_id, value   | Query track send                                  |
 | /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                           |
 | /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                                |
 
@@ -290,7 +291,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 | /live/track/set/output_routing_channel   | track_id, channel        |                 | Set output routing channel        |
 | /live/track/set/output_routing_type      | track_id, type           |                 | Set output routing type           |
 | /live/track/set/panning                  | track_id, panning        |                 | Set track panning                 |
-| /live/track/set/send                     | track_id, send_id, value |                 | Set track send                    |
+| /live/track/set/sends                    | track_id, send_id, value |                 | Set track send                    |
 | /live/track/set/solo                     | track_id, solo           |                 | Set track solo (1=on, 0=off)      |
 | /live/track/set/volume                   | track_id, volume         |                 | Set track volume                  |
 

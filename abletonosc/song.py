@@ -69,13 +69,14 @@ class SongHandler(AbletonOSCHandler):
         ]
 
         #--------------------------------------------------------------------------------
-        # Callbacks for Songi: properties (read-only)
+        # Callbacks for Song: properties (read-only)
         #--------------------------------------------------------------------------------
         properties_r = [
             "can_redo",
             "can_undo",
             "is_playing",
             "song_length",
+            "session_record_status"
         ]
 
         for prop in properties_r + properties_rw:

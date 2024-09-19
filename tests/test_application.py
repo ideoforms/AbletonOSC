@@ -9,7 +9,7 @@ def test_application_test(client):
 
 def test_application_get_version(client):
     rv = client.query("/live/application/get/version")
-    assert len(rv) == 2 and rv[0] == 11
+    assert len(rv) == 2 and rv[0] in (11, 12)
 
 def test_application_error(client):
     client.send_message("/live/clip/get/color", (0, 10))

@@ -81,7 +81,7 @@ class Dispatcher(object):
         Args:
             address: Address to be mapped
             handler: Callback function that will be called as the handler for the given address
-            *args: Fixed arguements that will be passed to the callback function
+            *args: Fixed arguments that will be passed to the callback function
             needs_reply_address: Whether the IP address from which the message originated from shall be passed as
                 an argument to the handler callback
 

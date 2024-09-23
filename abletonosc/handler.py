@@ -49,7 +49,7 @@ class AbletonOSCHandler(Component):
         Start listening for the property named `prop` on the Live object `target`.
         `params` is typically a tuple containing the track/clip index.
 
-        getter can be used for a customer getter when we're accesing native objects
+        getter can be used for a customer getter when we're accessing native objects
         e.g. in view.py we don't return the selected_scene, but the selected_scene index.
 
         Args:

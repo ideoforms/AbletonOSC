@@ -6,7 +6,7 @@ import time
 
 from typing import NamedTuple
 
-# 63 zero bits followed by a one in the least signifigant bit is a special
+# 63 zero bits followed by a one in the least significant bit is a special
 # case meaning "immediately."
 IMMEDIATELY = struct.pack('>Q', 1)
 

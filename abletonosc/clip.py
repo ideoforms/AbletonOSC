@@ -70,27 +70,49 @@ class ClipHandler(AbletonOSCHandler):
             "remove_notes_by_id"
         ]
         properties_r = [
+            ##"end_time" ## doesn't seem to do anything, can't test
             "file_path",
             "gain_display_string",
+            ##"groove", ## if other than None, says "Error handling OSC message: Infered arg_value type is not supported"
+            "has_groove", ## False/True
+            ## is_arrangement_clip - wasn't able to get this to do anything
             "is_midi_clip",
             "is_audio_clip",
+            "is_overdubbing", ## False/True
             "is_playing",
             "is_recording",
+            ##"is_triggered", ## if clip was triggered to record, or is recording
+            ## the above does not seem to actually do anything
             "length",
-            "playing_position"
+            "playing_position",
+            "sample_length", ## New, works - AudioClips only, -1 if no sample
+            "start_time", ## New, works
+            ##"view", ##"Infered arg_value type is not supported"
+            ##"warp_markers", ## "Infered arg_value type is not supported"
+            "will_record_on_start" ##False/True
         ]
         properties_rw = [
             "color",
+            "color_index", ## is the range 0 to 69?
+            "end_marker",
             "gain",
+            "launch_mode",## 0=Trigger, 1=Gate, 2=Toggle, 3=Repeat
+            "launch_quantization",## 0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T
+            ##8=1/4, 9=1/4T 10=1/8 11=1/8T, 12=1/16, 13=1/16T, 14=1/32
+            "legato", ## False/True
+            "loop_end",
+            "loop_start",
+            "looping",
+            "muted", ## False/True
             "name",
             "pitch_coarse",
             "pitch_fine",
-            "looping",
-            "loop_start",
-            "loop_end",
-            "warping",
+            "position", ## New, works
+            "ram_mode", ## False/True
             "start_marker",
-            "end_marker",
+            "velocity_amount", ## 0.0 - 1.0
+            "warp_mode", ## 0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro
+            "warping",
         ]
 
         for method in methods:

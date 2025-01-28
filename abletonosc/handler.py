@@ -42,7 +42,7 @@ class AbletonOSCHandler(Component):
             #--------------------------------------------------------------------------------
             value = None
         self.logger.info("Getting property for %s: %s = %s" % (self.class_identifier, prop, value))
-        return value,
+        return (value, *params)
 
     def _start_listen(self, target, prop, params: Optional[Tuple] = (), getter = None) -> None:
         """
@@ -100,7 +100,7 @@ class AbletonOSCHandler(Component):
                 # Ignore as it is benign.
                 #--------------------------------------------------------------------------------
                 self.logger.info("Exception whilst removing listener (likely benign): %s" % e)
-                
+
             del self.listener_functions[listener_key]
             del self.listener_objects[listener_key]
         else:

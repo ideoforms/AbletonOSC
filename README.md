@@ -389,6 +389,23 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 
 ---
 
+## Scene API
+
+Represents Live scenes.
+
+<details>
+<summary><b>Documentation</b>: Scene API</summary>
+
+### Scene methods
+
+| Address                         | Query params | Response params | Description             |
+|:--------------------------------|:-------------|:----------------|:------------------------|
+| /live/scene/fire | scene_id     |                 | Trigger the given scene |
+
+</details>
+
+---
+
 ## Device API
 
 Represents an instrument or effect.

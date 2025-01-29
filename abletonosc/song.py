@@ -225,7 +225,7 @@ class SongHandler(AbletonOSCHandler):
             else:
                 scene_index_min, scene_index_max = params
             return tuple(self.song.scenes[index].name for index in range(scene_index_min, scene_index_max))
-        self.osc_server.add_handler("/live/song/get/scene_names", song_get_scene_names)
+        self.osc_server.add_handler("/live/song/get/scenes/name", song_get_scene_names)
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: Cue point properties

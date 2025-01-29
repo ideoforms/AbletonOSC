@@ -26,11 +26,33 @@ class SceneHandler(AbletonOSCHandler):
 
         methods = [
             "fire",
+            "fire_as_selected",
         ]
         properties_r = [
+            "is_empty",
+            "is_triggered",
         ]
         properties_rw = [
+            "color",
+            "color_index",
+            "name",
+            "tempo",
+            "tempo_enabled",
+            "time_signature_numerator",
+            "time_signature_denominator",
+            "time_signature_enabled",
         ]
 
         for method in methods:
             self.osc_server.add_handler("/live/scene/%s" % method, create_scene_callback(self._call_method, method))
+
+        for prop in properties_r + properties_rw:
+            self.osc_server.add_handler("/live/scene/get/%s" % prop,
+                                        create_scene_callback(self._get_property, prop))
+            self.osc_server.add_handler("/live/scene/start_listen/%s" % prop,
+                                        create_scene_callback(self._start_listen, prop, include_ids=True))
+            self.osc_server.add_handler("/live/scene/stop_listen/%s" % prop,
+                                        create_scene_callback(self._stop_listen, prop, include_ids=True))
+        for prop in properties_rw:
+            self.osc_server.add_handler("/live/scene/set/%s" % prop,
+                                        create_scene_callback(self._set_property, prop))

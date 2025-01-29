@@ -400,7 +400,43 @@ Represents Live scenes.
 
 | Address                         | Query params | Response params | Description             |
 |:--------------------------------|:-------------|:----------------|:------------------------|
-| /live/scene/fire | scene_id     |                 | Trigger the given scene |
+| /live/scene/fire                | scene_id     |                 | Trigger the given scene |
+| /live/scene/fire_as_selected    | scene_id     |                 | Trigger the scene and select the next scene |
+
+
+### Scene properties
+
+ - Changes for any Scene property can be listened for by calling `/live/scene/start_listen/<property> <scene_index>`
+ - Responses will be sent to `/live/scene/get/<property>`, with parameters `<scene_index> <property_value>`
+
+#### Getters
+
+| Address                      | Query params      | Response params            | Description                                       |
+|:-----------------------------|:------------------|:---------------------------|:--------------------------------------------------|
+| /live/scene/get/color        | scene_id          | scene_id, color            | Query scene color                      |
+| /live/scene/get/color_index  | scene_id          | scene_id, color_index      | Query scene color index                |
+| /live/scene/get/is_empty        | scene_id          | scene_id, is_empty            | Query whether scene is empty                      |
+| /live/scene/get/is_triggered        | scene_id          | scene_id, is_triggered            | Query whether scene is in triggered state  |
+| /live/scene/get/name         | scene_id          | scene_id, name             | Query scene name                      |
+| /live/scene/get/tempo        | scene_id          | scene_id, tempo            | Query scene tempo |
+| /live/scene/get/tempo_enabled       | scene_id          | scene_id, tempo_enabled            | Query whether scene tempo is enabled |
+| /live/scene/get/time_signature_numerator        | scene_id          | scene_id, numerator            | Query scene time signature numerator  |
+| /live/scene/get/time_signature_denominator        | scene_id          | scene_id, denominator            | Query scene time signature denominator |
+| /live/scene/get/time_signature_enabled        | scene_id          | scene_id, enabled            | Query whether scene time signature is enabled |
+
+#### Setters
+
+| Address                                        | Query params             | Response params | Description                                  |
+|:-----------------------------------------------|:-------------------------|:----------------|:---------------------------------------------|
+| /live/scene/set/name                           | scene_id, name           |                 | Set scene name                               |
+| /live/scene/set/color                          | scene_id, color          |                 | Set scene color                              |
+| /live/scene/set/color_index                    | scene_id, color_index    |                 | Set scene color_index                        |
+| /live/scene/set/tempo                          | scene_id, tempo          |                 | Set scene tempo                              |
+| /live/scene/set/tempo_enabled                  | scene_id, tempo_enabled  |                 | Set whether scene tempo is enabled           |
+| /live/scene/set/time_signature_numerator       | scene_id, numerator      |                 | Set scene time signature numerator           |
+| /live/scene/set/time_signature_denominator     | scene_id, denominator    |                 | Set scene time signature denominator         |
+| /live/scene/set/time_signature_enabled         | scene_id, enabled        |                 | Set whether scene time signature is enabled  |
+
 
 </details>
 

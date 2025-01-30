@@ -391,7 +391,7 @@ Represents an audio or MIDI clip. Can be used to start/stop clips, and query/mod
 
 ## Scene API
 
-Represents Live scenes.
+Represents a scene, used to trigger a row of clips simultaneously. A scene's name, color, tempo and time signature can all be set and queried.
 
 <details>
 <summary><b>Documentation</b>: Scene API</summary>
@@ -402,7 +402,6 @@ Represents Live scenes.
 |:--------------------------------|:-------------|:----------------|:------------------------|
 | /live/scene/fire                | scene_id     |                 | Trigger the given scene |
 | /live/scene/fire_as_selected    | scene_id     |                 | Trigger the scene and select the next scene |
-
 
 ### Scene properties
 
@@ -446,10 +445,12 @@ Represents Live scenes.
 
 Represents an instrument or effect.
 
- - Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
-
 <details>
 <summary><b>Documentation</b>: Device API</summary>
+
+### Device properties
+
+- Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
 
 | Address                                  | Query params                             | Response params                          | Description                                                                             |
 |:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|

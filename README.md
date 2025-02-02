@@ -327,6 +327,7 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 
 | Address                             | Query params                                                   | Response params                          | Description                                     |
 |:------------------------------------|:---------------------------------------------------------------|:-----------------------------------------|:------------------------------------------------|
+| /live/clip_slot/fire                | track_index, clip_index                                        |                                          | Fire play/pause of the specified clip slot      |
 | /live/clip_slot/create_clip         | track_index, clip_index, length                                |                                          | Create a clip in the slot                       |
 | /live/clip_slot/delete_clip         | track_index, clip_index                                        |                                          | Delete the clip in the slot                     |
 | /live/clip_slot/get/has_clip        | track_index, clip_index                                        | track_index, clip_index, has_clip        | Query whether the slot has a clip               |

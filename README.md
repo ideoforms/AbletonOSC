@@ -401,6 +401,7 @@ Represents a scene, used to trigger a row of clips simultaneously. A scene's nam
 |:--------------------------------|:-------------|:----------------|:------------------------|
 | /live/scene/fire                | scene_id     |                 | Trigger the given scene |
 | /live/scene/fire_as_selected    | scene_id     |                 | Trigger the scene and select the next scene |
+| /live/scene/fire_selected       |              |                 | Trigger the selected scene and select the next scene |
 
 ### Scene properties
 

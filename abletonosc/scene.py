@@ -56,3 +56,10 @@ class SceneHandler(AbletonOSCHandler):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/scene/set/%s" % prop,
                                         create_scene_callback(self._set_property, prop))
+            
+        def scene_fire_selected(params: Tuple[Any] = ()):
+            selected_scene = self.song.view.selected_scene
+            if selected_scene:
+                selected_scene.fire_as_selected()
+
+        self.osc_server.add_handler("/live/scene/fire_selected", scene_fire_selected)

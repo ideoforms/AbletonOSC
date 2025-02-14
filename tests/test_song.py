@@ -28,6 +28,17 @@ def test_song_beat(client):
     client.send_message("/live/song/stop_playing")
     client.send_message("/live/song/stop_listen/beat")
     wait_one_tick()
+    client.send_message("/live/song/stop_playing")
+    wait_one_tick()
+    client.send_message("/live/song/start_listen/beat")
+    # play_selection does the same thing as start_playing if there is no selection,
+    # and there is no way to modify the selection via the API.
+    # This test only asserts that the method works, not the additional expected functionality.
+    client.send_message("/live/song/play_selection")
+    wait_one_tick()
+    wait_one_tick()
+    assert client.await_message("/live/song/get/beat", timeout=1.0) == (1,)
+    assert client.await_message("/live/song/get/beat", timeout=1.0) == (2,)
 
 def test_song_stop_all_clips(client):
     client.send_message("/live/clip_slot/create_clip", (0, 0, 4))

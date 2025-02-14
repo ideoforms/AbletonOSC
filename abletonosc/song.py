@@ -33,6 +33,7 @@ class SongHandler(AbletonOSCHandler):
             "jump_to_prev_cue",
             "jump_to_next_cue",
             "redo",
+            "play_selection",
             "start_playing",
             "stop_all_clips",
             "stop_playing",

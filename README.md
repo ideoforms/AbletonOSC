@@ -84,6 +84,7 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 | /live/song/jump_by                | time         |                 | Jump song position by the specified time, in beats                                       |
 | /live/song/jump_to_next_cue       |              |                 | Jump to the next cue marker                                                              |
 | /live/song/jump_to_prev_cue       |              |                 | Jump to the previous cue marker                                                          |
+| /live/song/play_selection         |              |                 | Start session playback and play the current selction                                     |
 | /live/song/redo                   |              |                 | Redo the last undone operation                                                           |
 | /live/song/start_playing          |              |                 | Start session playback                                                                   |
 | /live/song/stop_playing           |              |                 | Stop session playback                                                                    |

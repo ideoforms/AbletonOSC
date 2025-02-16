@@ -44,6 +44,7 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 | /live/api/reload              |              |                              | Initiates a live reload of the AbletonOSC server code. Used in development only.         |
 | /live/api/get/log_level       |              | log_level                    | Returns the current log level. Default is `info`.                                        |
 | /live/api/set/log_level       | log_level    |                              | Set the log level, which can be one of: `debug`, `info`, `warning`, `error`, `critical`. |
+| /live/api/show_message        | message      |                              | Show a message in Live's status bar                                                      |
 
 ### Application status messages
 

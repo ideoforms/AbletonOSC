@@ -18,3 +18,8 @@ class ApplicationHandler(AbletonOSCHandler):
             return application.average_process_usage,
         self.osc_server.add_handler("/live/application/get/average_process_usage", get_average_process_usage)
         self.osc_server.send("/live/application/get/average_process_usage")
+
+        def scroll_view(params):
+            application = Live.Application.get_application()
+            application.view.scroll_view(params[0], '', False)
+        self.osc_server.add_handler("/live/application/view/scroll_view", scroll_view)

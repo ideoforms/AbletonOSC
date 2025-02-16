@@ -54,6 +54,12 @@ These messages are sent to the client automatically when the application state c
 | /live/startup |                 | Sent to the client application when AbletonOSC is started                                          |
 | /live/error   | error_msg       | Sent to the client application when an error occurs. For more diagnostics, see logs/abletonosc.log |
 
+### Application view
+
+| Address                            | Query params  | Response params | Description         |
+|:-----------------------------------|:--------------|:----------------|:--------------------|
+| /live/application/view/scroll_view | direction_int |                 | Navigate the cursor |
+
 </details>
 
 ---

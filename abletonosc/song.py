@@ -57,11 +57,14 @@ class SongHandler(AbletonOSCHandler):
             "loop_start",
             "metronome",
             "midi_recording_quantization",
+            "name",
             "nudge_down",
             "nudge_up",
             "punch_in",
             "punch_out",
             "record_mode",
+            "root_note",
+            "scale_name",
             "session_record",
             "signature_denominator",
             "signature_numerator",
@@ -85,6 +88,7 @@ class SongHandler(AbletonOSCHandler):
             self.osc_server.add_handler("/live/song/stop_listen/%s" % prop, partial(self._stop_listen, self.song, prop))
         for prop in properties_rw:
             self.osc_server.add_handler("/live/song/set/%s" % prop, partial(self._set_property, self.song, prop))
+
 
         #--------------------------------------------------------------------------------
         # Callbacks for Song: Track properties

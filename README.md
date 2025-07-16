@@ -2,7 +2,7 @@
 
 [![stability-beta](https://img.shields.io/badge/stability-beta-33bbff.svg)](https://github.com/mkenney/software-guides/blob/master/STABILITY-BADGES.md#beta)
 
-AbletonOSC is a MIDI remote script that provides an Open Sound Control (OSC) interface to
+AbletonOSC is a MIDI remote script that provides an [Open Sound Control (OSC)](https://github.com/CNMAT/OpenSoundControl.org) interface to
 control [Ableton Live](https://www.ableton.com/en/live/). Building on ideas from the
 older [LiveOSC](https://github.com/hanshuebner/LiveOSC) scripts, its aim is to expose the
 entire [Live Object Model](https://docs.cycling74.com/max8/vignettes/live_object_model) API

@@ -56,7 +56,11 @@ class SceneHandler(AbletonOSCHandler):
         for prop in properties_rw:
             self.osc_server.add_handler("/live/scene/set/%s" % prop,
                                         create_scene_callback(self._set_property, prop))
-            
+        
+        #------------------------------------------------------------------------------------------------
+        # The Live API does not have a `fire_selected` Scene method (or class method accessible from Python).
+        # This block adds a `fire_selected` method that calls `fire_as_selected` on the selected scene.
+        #------------------------------------------------------------------------------------------------
         def scene_fire_selected(params: Tuple[Any] = ()):
             selected_scene = self.song.view.selected_scene
             if selected_scene:

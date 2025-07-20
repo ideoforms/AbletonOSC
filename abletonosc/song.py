@@ -52,6 +52,7 @@ class SongHandler(AbletonOSCHandler):
             "clip_trigger_quantization",
             "current_song_time",
             "groove_amount",
+            "is_ableton_link_enabled",
             "loop",
             "loop_length",
             "loop_start",
@@ -211,6 +212,7 @@ class SongHandler(AbletonOSCHandler):
             fd = open(os.path.join(tempfile.gettempdir(), "abletonosc-song-structure.json"), "w")
             json.dump(song, fd)
             fd.close()
+            self.logger.warning("Exported song structure to directory %s" % tempfile.gettempdir())
             return (1,)
         self.osc_server.add_handler("/live/song/export/structure", song_export_structure)
 

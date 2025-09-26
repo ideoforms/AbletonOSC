@@ -10,6 +10,7 @@ import os
 logger = logging.getLogger("abletonosc")
 
 class Manager(ControlSurface):
+<<<<<<< HEAD
     def parse_multi_arg_handler(self, params):
         """
         Handler for /parse_multi_arg. Expects a single string param:
@@ -90,10 +91,13 @@ class Manager(ControlSurface):
         return ()
 
 
+=======
+>>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
 
         self.log_level = "info"
+<<<<<<< HEAD
         self.handlers = []
 
         # Set up logging to file as early as possible
@@ -148,6 +152,13 @@ class Manager(ControlSurface):
                     self.osc_server.osc_aliases[alias_addr] = alias_cfg
                     logger.info(f"Registered simple alias for {alias_addr} → {alias_cfg.get('target')}")
 
+=======
+
+        self.handlers = []
+
+        try:
+            self.osc_server = abletonosc.OSCServer()
+>>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
             self.schedule_message(0, self.tick)
 
             self.start_logging()
@@ -159,6 +170,7 @@ class Manager(ControlSurface):
             self.show_message("AbletonOSC: Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
             logger.info("Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
 
+<<<<<<< HEAD
     def handle_osc_alias(self, address, params):
         """
         If the address matches an alias, transform the params and return (target_address, new_params), else None.
@@ -189,6 +201,8 @@ class Manager(ControlSurface):
         logger.debug(f"[ALIAS] Final args for {target}: {new_args}")
         return (target, tuple(new_args))
 
+=======
+>>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
 
     def start_logging(self):
         """

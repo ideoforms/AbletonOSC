@@ -82,7 +82,6 @@ class OSCServer:
                 remote_addr = self._remote_addr
             self._socket.sendto(msg.dgram, remote_addr)
         except BuildError:
-<<<<<<< HEAD
             pass  # Suppressed OSC build error traceback
 
     def process_message(self, message, remote_addr):
@@ -101,11 +100,6 @@ class OSCServer:
                         self.send(address=target_address, params=rv, remote_addr=response_addr)
                     return
         # Normal handler logic
-=======
-            self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
-
-    def process_message(self, message, remote_addr):
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
         if message.address in self._callbacks:
             callback = self._callbacks[message.address]
             rv = callback(message.params)
@@ -124,21 +118,8 @@ class OSCServer:
                     try:
                         rv = callback(message.params)
                     except ValueError:
-<<<<<<< HEAD
                         continue
                     except AttributeError:
-=======
-                        #--------------------------------------------------------------------------------
-                        # Don't throw errors for queries that require more arguments
-                        # (e.g. /live/track/get/send with no args)
-                        #--------------------------------------------------------------------------------
-                        continue
-                    except AttributeError:
-                        #--------------------------------------------------------------------------------
-                        # Don't throw errors when trying to create listeners for properties that can't
-                        # be listened for (e.g. can_be_armed, is_foldable)
-                        #--------------------------------------------------------------------------------
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
                         continue
                     if rv is not None:
                         assert isinstance(rv, tuple)
@@ -163,21 +144,13 @@ class OSCServer:
                 bundle = OscBundle(data)
                 self.process_bundle(bundle, remote_addr)
             except ParseError:
-<<<<<<< HEAD
                 pass  # Suppressed error parsing OSC bundle traceback
-=======
-                self.logger.error("AbletonOSC: Error parsing OSC bundle: %s" % (traceback.format_exc()))
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
         else:
             try:
                 message = OscMessage(data)
                 self.process_message(message, remote_addr)
             except ParseError:
-<<<<<<< HEAD
                 pass  # Suppressed error parsing OSC message traceback
-=======
-                self.logger.error("AbletonOSC: Error parsing OSC message: %s" % (traceback.format_exc()))
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
 
     def process(self) -> None:
         """
@@ -204,11 +177,7 @@ class OSCServer:
                 #--------------------------------------------------------------------------------
                 # This benign error seems to occur on startup on Windows
                 #--------------------------------------------------------------------------------
-<<<<<<< HEAD
                 pass  # Suppressed non-fatal socket error traceback
-=======
-                self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
             elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
                 #--------------------------------------------------------------------------------
                 # Another benign networking error, throw when no data is received
@@ -219,19 +188,11 @@ class OSCServer:
                 #--------------------------------------------------------------------------------
                 # Something more serious has happened
                 #--------------------------------------------------------------------------------
-<<<<<<< HEAD
                 pass  # Suppressed socket error traceback
 
         except Exception as e:
             self.logger.error("AbletonOSC: Error handling OSC message: %s" % e)
             pass  # Suppressed generic error traceback
-=======
-                self.logger.error("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
-
-        except Exception as e:
-            self.logger.error("AbletonOSC: Error handling OSC message: %s" % e)
-            self.logger.warning("AbletonOSC: %s" % traceback.format_exc())
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
 
     def shutdown(self) -> None:
         """

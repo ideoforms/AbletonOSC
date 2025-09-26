@@ -8,10 +8,12 @@
     "/arm_track_solo": {
       "type": "custom",
       "handler": "arm_track_solo_handler"
-    },
+    }
+    ,
     "/parse_multi_arg": {
       "type": "custom",
-      "handler": "parse_multi_arg_handler"
+      "handler": "parse_multi_arg_handler",
+      "target": "/live/track/volume"
     }
   }
 }

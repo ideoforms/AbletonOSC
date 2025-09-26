@@ -10,69 +10,77 @@ import os
 logger = logging.getLogger("abletonosc")
 
 class Manager(ControlSurface):
-<<<<<<< HEAD
     def parse_multi_arg_handler(self, params):
         """
-        Handler for /parse_multi_arg. Expects a single string param:
-        e.g. '/live/track/set/arm 2 true' or '/live/track/set/volume 3 (f) 0.8'
-        Parses types and dispatches to the correct OSC handler.
+        Custom handler for /parse_multi_arg: expects a single string param in the form:
+        "[osc command] <arg1> <arg2> <arg3>..."
+        Each arg can have a type indicator suffix: (i) for int, (f) for float, (s) for string.
+        If no type indicator, will infer type: int if possible, else float, else string.
+        Example: "/live/track/volume 0(i) 0.8(f)" or "/live/track/name 1 Hello(s)"
         """
         import re
-        logger = logging.getLogger("abletonosc.alias")
-        if not params or not params[0]:
-            logger.info("[PARSE_MULTI_ARG] No input string provided.")
+        if not params or not isinstance(params[0], str):
+            logger.warning("parse_multi_arg_handler: Expected a single string param.")
             return ()
-        parts = str(params[0]).split()
+        input_str = params[0].strip()
+        if not input_str:
+            logger.warning("parse_multi_arg_handler: Empty input string.")
+            return ()
+        # Split into command and args
+        parts = input_str.split()
         if not parts:
-            logger.info("[PARSE_MULTI_ARG] Empty input string.")
+            logger.warning("parse_multi_arg_handler: No command found in input string.")
             return ()
-        # Find OSC address (must start with /)
-        if not parts[0].startswith("/"):
-            logger.info(f"[PARSE_MULTI_ARG] First part is not an OSC address: {parts[0]}")
-            return ()
-        osc_address = parts[0]
-        args = []
-        type_pattern = re.compile(r"^(.*)\((i|f|s|b)\)$")
-        for part in parts[1:]:
-            m = type_pattern.match(part)
-            if m:
-                val, typ = m.group(1), m.group(2)
-                if typ == "i":
-                    try: args.append(int(val))
-                    except: args.append(val)
-                elif typ == "f":
-                    try: args.append(float(val))
-                    except: args.append(val)
-                elif typ == "b":
-                    if val.lower() == "true": args.append(True)
-                    elif val.lower() == "false": args.append(False)
-                    else: args.append(val)
+        target = parts[0]
+        arg_strs = parts[1:]
+        parsed_args = []
+        type_re = re.compile(r"^(.*?)(\((i|f|s|b)\))?$")
+        for arg in arg_strs:
+            m = type_re.match(arg)
+            if not m:
+                parsed_args.append(arg)
+                continue
+            val, _, typ = m.groups()
+            val = val.strip()
+            if typ == 'i':
+                try:
+                    parsed_args.append(int(val))
+                except Exception:
+                    parsed_args.append(val)
+            elif typ == 'f':
+                try:
+                    parsed_args.append(float(val))
+                except Exception:
+                    parsed_args.append(val)
+            elif typ == 's':
+                parsed_args.append(val)
+            elif typ == 'b':
+                # Only treat as boolean if (b) is present
+                if val.lower() in ('true', 'yes', 'on'):
+                    parsed_args.append(True)
+                elif val.lower() in ('false', 'no', 'off'):
+                    parsed_args.append(False)
+                elif val == '1':
+                    parsed_args.append(True)
+                elif val == '0':
+                    parsed_args.append(False)
                 else:
-                    args.append(val)
+                    parsed_args.append(bool(val))
             else:
-                # Infer type
-                if part.lower() == "true":
-                    args.append(True)
-                elif part.lower() == "false":
-                    args.append(False)
-                else:
+                # Infer type: int, then float, then string (do not treat 1/0 as bool)
+                try:
+                    parsed_args.append(int(val))
+                except Exception:
                     try:
-                        if re.match(r"^-?\d+$", part):
-                            args.append(int(part))
-                        elif re.match(r"^-?\d*\.\d+$", part):
-                            args.append(float(part))
-                        else:
-                            args.append(part)
-                    except:
-                        args.append(part)
-        logger.debug(f"[PARSE_MULTI_ARG] Dispatching {osc_address} with args {args}")
-        # Dispatch to the correct handler if registered
-        cb = self.osc_server._callbacks.get(osc_address)
-        if cb:
-            return cb(tuple(args)) or ()
-        else:
-            logger.info(f"[PARSE_MULTI_ARG] No handler registered for {osc_address}")
-            return ()
+                        parsed_args.append(float(val))
+                    except Exception:
+                        parsed_args.append(val)
+        logger.info(f"parse_multi_arg_handler: Forwarding to {target} with args {parsed_args}")
+        try:
+            self.osc_server.send(target, tuple(parsed_args))
+        except Exception as e:
+            logger.error(f"parse_multi_arg_handler error: {e}")
+        return ()
     def arm_track_solo_handler(self, params):
         """
         Custom handler for /arm_track_solo: disarm tracks 0-7, arm the specified track.
@@ -91,13 +99,10 @@ class Manager(ControlSurface):
         return ()
 
 
-=======
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
     def __init__(self, c_instance):
         ControlSurface.__init__(self, c_instance)
 
         self.log_level = "info"
-<<<<<<< HEAD
         self.handlers = []
 
         # Set up logging to file as early as possible
@@ -152,13 +157,6 @@ class Manager(ControlSurface):
                     self.osc_server.osc_aliases[alias_addr] = alias_cfg
                     logger.info(f"Registered simple alias for {alias_addr} → {alias_cfg.get('target')}")
 
-=======
-
-        self.handlers = []
-
-        try:
-            self.osc_server = abletonosc.OSCServer()
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
             self.schedule_message(0, self.tick)
 
             self.start_logging()
@@ -170,7 +168,6 @@ class Manager(ControlSurface):
             self.show_message("AbletonOSC: Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
             logger.info("Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
 
-<<<<<<< HEAD
     def handle_osc_alias(self, address, params):
         """
         If the address matches an alias, transform the params and return (target_address, new_params), else None.
@@ -201,8 +198,6 @@ class Manager(ControlSurface):
         logger.debug(f"[ALIAS] Final args for {target}: {new_args}")
         return (target, tuple(new_args))
 
-=======
->>>>>>> 507e5175bf6783d0fc7a9b46fd22fb9260238aba
 
     def start_logging(self):
         """

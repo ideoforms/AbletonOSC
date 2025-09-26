@@ -1,0 +1,17 @@
+{
+  "aliases": {
+    "/arm_track": {
+      "type": "simple",
+      "target": "/live/track/set/arm",
+      "args": ["$1", true]
+    },
+    "/arm_track_solo": {
+      "type": "custom",
+      "handler": "arm_track_solo_handler"
+    },
+    "/parse_multi_arg": {
+      "type": "custom",
+      "handler": "parse_multi_arg_handler"
+    }
+  }
+}

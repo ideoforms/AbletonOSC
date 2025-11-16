@@ -80,11 +80,14 @@ class Manager(ControlSurface):
             assert log_level in ("debug", "info", "warning", "error", "critical")
             self.log_level = log_level
             self.log_file_handler.setLevel(self.log_level.upper())
+        def show_message_callback(params):
+            self.show_message(params[0])
 
         self.osc_server.add_handler("/live/test", test_callback)
         self.osc_server.add_handler("/live/api/reload", reload_callback)
         self.osc_server.add_handler("/live/api/get/log_level", get_log_level_callback)
         self.osc_server.add_handler("/live/api/set/log_level", set_log_level_callback)
+        self.osc_server.add_handler("/live/api/show_message", show_message_callback)
 
         with self.component_guard():
             self.handlers = [

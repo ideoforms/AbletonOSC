@@ -70,27 +70,48 @@ class ClipHandler(AbletonOSCHandler):
             "remove_notes_by_id"
         ]
         properties_r = [
+            "end_time",
             "file_path",
             "gain_display_string",
+            "has_groove",
             "is_midi_clip",
             "is_audio_clip",
+            "is_overdubbing",
             "is_playing",
             "is_recording",
+            "is_triggered",
             "length",
-            "playing_position"
+            "playing_position",
+            "sample_length",
+            "start_time",
+            "will_record_on_start"
+            ## TODO list:
+            ##"groove", ## if other than None, says "Error handling OSC message: Infered arg_value type is not supported"
+            ## is_arrangement_clip            
+            ##"warp_markers", ## "Infered arg_value type is not supported"
+            ##"view", ##"Infered arg_value type is not supported"
         ]
         properties_rw = [
             "color",
+            "color_index",
+            "end_marker",
             "gain",
+            "launch_mode",
+            "launch_quantization",
+            "legato",
+            "loop_end",
+            "loop_start",
+            "looping",
+            "muted",
             "name",
             "pitch_coarse",
             "pitch_fine",
-            "looping",
-            "loop_start",
-            "loop_end",
-            "warping",
+            "position",
+            "ram_mode",
             "start_marker",
-            "end_marker",
+            "velocity_amount",
+            "warp_mode",
+            "warping",
         ]
 
         for method in methods:

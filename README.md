@@ -123,6 +123,8 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/punch_in                    |              | punch_in                    | Query punch in                                    |
 | /live/song/get/punch_out                   |              | punch_out                   | Query punch out                                   |
 | /live/song/get/record_mode                 |              | record_mode                 | Query the current record mode                     |
+| /live/song/get/root_note                 |              | root_note                 | Query the current root note                     |
+| /live/song/get/scale_name                 |              | scale_name                 | Query the current scale name                     |
 | /live/song/get/session_record              |              | session_record              | Query whether session record is enabled           |
 | /live/song/get/session_record_status       |              | session_record_status       | Query the current session record status           |
 | /live/song/get/signature_denominator       |              | denominator                 | Query the current time signature's denominator    |

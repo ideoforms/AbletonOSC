@@ -18,6 +18,7 @@ class SongHandler(AbletonOSCHandler):
         # Callbacks for Song: methods
         #--------------------------------------------------------------------------------
         for method in [
+            "capture_and_insert_scene",
             "capture_midi",
             "continue_playing",
             "create_audio_track",
@@ -29,10 +30,13 @@ class SongHandler(AbletonOSCHandler):
             "delete_track",
             "duplicate_scene",
             "duplicate_track",
+            "force_link_beat_time",
             "jump_by",
             "jump_to_prev_cue",
             "jump_to_next_cue",
             "redo",
+            "re_enable_automation",
+            "set_or_delete_cue",
             "start_playing",
             "stop_all_clips",
             "stop_playing",
@@ -248,6 +252,14 @@ class SongHandler(AbletonOSCHandler):
                 cue_point = song.cue_points[cue_point_index]
                 cue_point.jump()
         self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
+
+        self.osc_server.add_handler("/live/song/cue_point/add_or_delete", partial(self._call_method, self.song, "set_or_delete_cue"))
+        def song_cue_point_set_name(song, params: Tuple[Any] = ()):
+            cue_point_index = params[0]
+            new_name = params[1]
+            cue_point = song.cue_points[cue_point_index]
+            cue_point.name = new_name
+        self.osc_server.add_handler("/live/song/cue_point/set/name", partial(song_cue_point_set_name, self.song))
 
         #--------------------------------------------------------------------------------
         # Listener for /live/song/get/beat

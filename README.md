@@ -76,6 +76,8 @@ Represents the top-level Song object. Used to start/stop playback, create/modify
 | /live/song/create_return_track    |              |                 | Create a new return track                                                                |
 | /live/song/create_scene           | index        |                 | Create a new scene at the specified index (-1 = end of list)                             |
 | /live/song/cue_point/jump         | cue_point    |                 | Jump to a specific cue point, by name or numeric index (based on the list of cue points) |
+| /live/song/cue_point/add_or_delete |             |                 | Add a cue point under the cursor, or, if one exists, delete it |
+| /live/song/cue_point/set/name         | cue_point    |                 | Rename a cue point, given its index |
 | /live/song/delete_scene           | scene_index  |                 | Delete a scene                                                                           |
 | /live/song/delete_return_track    | track_index  |                 | Delete a return track                                                                    |
 | /live/song/delete_track           | track_index  |                 | Delete a track                                                                           |

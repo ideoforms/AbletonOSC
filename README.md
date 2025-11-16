@@ -477,7 +477,28 @@ For devices:
 
 </details>
 
- ---
+
+---
+
+## MidiMap API
+
+Can be used to create assignments between MIDI CC and Live parameters.
+
+<details>
+<summary><b>Documentation</b>: MidiMap API</summary>
+
+### MidiMap methods
+
+| Address                | Query params | Response params | Description             |
+|:-----------------------|:-------------|:----------------|:------------------------|
+| /live/midimap/map_cc   | track_id, device_id, param_id, channel, cc     |  | Create an assignment such that control change `cc` on channel `channel` will control the specified parameter. |
+                                                |
+
+Note that, for consistency with other object types (and Live's internal API), **channels are indexed from zero** - so MIDI channel 1 should be queried with index `0`, etc.
+
+</details>
+
+---
 
 # Utilities
 

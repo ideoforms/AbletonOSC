@@ -1,4 +1,6 @@
 from ableton.v2.control_surface import ControlSurface
+from _Framework.EncoderElement import EncoderElement
+import Live
 
 from . import abletonosc
 
@@ -16,6 +18,7 @@ class Manager(ControlSurface):
         self.log_level = "info"
 
         self.handlers = []
+        self.midi_mappings = {}
 
         try:
             self.osc_server = abletonosc.OSCServer()
@@ -92,7 +95,8 @@ class Manager(ControlSurface):
                 abletonosc.TrackHandler(self),
                 abletonosc.DeviceHandler(self),
                 abletonosc.ViewHandler(self),
-                abletonosc.SceneHandler(self)
+                abletonosc.SceneHandler(self),
+                abletonosc.MidiMapHandler(self),
             ]
 
     def clear_api(self):
@@ -139,4 +143,13 @@ class Manager(ControlSurface):
         self.osc_server.shutdown()
         super().disconnect()
 
+    def build_midi_map(self, midi_map_handle):
+        """
+        Called by Live to build the MIDI map.
+        """
+        logger.debug("Building MIDI map...")
 
+        for channel, cc in self.midi_mappings.keys():
+            parameter = self.midi_mappings[(channel, cc)]
+            Live.MidiMap.map_midi_cc(midi_map_handle, parameter, channel, cc, Live.MidiMap.MapMode.absolute, 1)
+            logger.debug("Mapped CC %d on channel %d to parameter %s" % (cc, channel, parameter.name))

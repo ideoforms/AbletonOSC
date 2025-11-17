@@ -216,7 +216,7 @@ def main(args):
         "/live/clip/get/has_groove",
         "/live/clip/get/is_audio_clip",
         "/live/clip/get/is_midi_clip",
-        "/live/clip/get/is_overdubbing
+        "/live/clip/get/is_overdubbing",
         "/live/clip/get/is_playing",
         "/live/clip/get/is_recording",
         "/live/clip/get/launch_mode",

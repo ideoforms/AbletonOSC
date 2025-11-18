@@ -3,4 +3,5 @@
 __pycache__
 .DS_Store
 logs/
-devel/
+devel/*
+!devel/introspect.py

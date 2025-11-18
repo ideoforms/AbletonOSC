@@ -503,6 +503,40 @@ For devices:
 - `class_name` is the Live instrument/effect name, e.g. Operator, Reverb. For external plugins and racks, can be
   AuPluginDevice, PluginDevice, InstrumentGroupDevice...
 
+### Device Variations API (Live 12+)
+
+Device Variations (also known as Macro Variations) allow storing and recalling different states of rack device macros. This feature is available in Ableton Live 12+ for Instrument Racks, Audio Effect Racks, MIDI Effect Racks, and Drum Racks.
+
+#### Properties
+
+| Address                                           | Query params        | Response params                     | Description                                                    |
+|:--------------------------------------------------|:--------------------|:------------------------------------|:---------------------------------------------------------------|
+| /live/device/get/variation_count                  | track_id, device_id | track_id, device_id, count          | Get the number of variations stored in the rack device         |
+| /live/device/get/selected_variation_index         | track_id, device_id | track_id, device_id, index          | Get the currently selected variation index (-1 if none)        |
+| /live/device/set/selected_variation_index         | track_id, device_id, index |                               | Select a variation by index (does not recall it)               |
+| /live/device/start_listen/variation_count         | track_id, device_id |                                     | Start listening for variation count changes                    |
+| /live/device/stop_listen/variation_count          | track_id, device_id |                                     | Stop listening for variation count changes                     |
+| /live/device/start_listen/selected_variation_index| track_id, device_id |                                     | Start listening for selected variation index changes           |
+| /live/device/stop_listen/selected_variation_index | track_id, device_id |                                     | Stop listening for selected variation index changes            |
+
+#### Methods
+
+| Address                                   | Query params        | Response params | Description                                                    |
+|:------------------------------------------|:--------------------|:----------------|:---------------------------------------------------------------|
+| /live/device/recall_selected_variation    | track_id, device_id |                 | Apply the currently selected variation's macro values          |
+| /live/device/recall_last_used_variation   | track_id, device_id |                 | Recall the last used variation                                 |
+| /live/device/store_variation              | track_id, device_id |                 | Store current macro values as a new variation                  |
+| /live/device/delete_selected_variation    | track_id, device_id |                 | Delete the currently selected variation                        |
+| /live/device/randomize_macros             | track_id, device_id |                 | Randomize all macro values in the rack                         |
+
+#### Introspection
+
+| Address                   | Query params        | Response params                     | Description                                                    |
+|:--------------------------|:--------------------|:------------------------------------|:---------------------------------------------------------------|
+| /live/device/introspect   | track_id, device_id | properties, methods                 | List all available properties and methods for the device       |
+
+**Note:** Device Variations commands will only work with RackDevice types (Instrument Rack, Effect Rack, Drum Rack) in Ableton Live 12 or later. For other device types or earlier Live versions, these commands will have no effect.
+
 </details>
 
 

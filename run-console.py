@@ -276,6 +276,20 @@ def main(args):
         "/live/device/get/parameter/value",
         "/live/device/get/parameter/value_string",
         "/live/device/set/parameter/value",
+        "/live/device/introspect",
+        # Device Variations API (Live 12+)
+        "/live/device/get/variation_count",
+        "/live/device/get/selected_variation_index",
+        "/live/device/set/selected_variation_index",
+        "/live/device/start_listen/variation_count",
+        "/live/device/stop_listen/variation_count",
+        "/live/device/start_listen/selected_variation_index",
+        "/live/device/stop_listen/selected_variation_index",
+        "/live/device/recall_selected_variation",
+        "/live/device/recall_last_used_variation",
+        "/live/device/delete_selected_variation",
+        "/live/device/randomize_macros",
+        "/live/device/store_variation",
         # Add more addresses as needed
     ]
 

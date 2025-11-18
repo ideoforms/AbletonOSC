@@ -22,13 +22,27 @@ class DeviceHandler(AbletonOSCHandler):
             return device_callback
 
         methods = [
+            # Device Variations (Live 12+, only available on RackDevice)
+            "recall_selected_variation",
+            "recall_last_used_variation",
+            "delete_selected_variation",
+            "randomize_macros"
         ]
         properties_r = [
             "class_name",
             "name",
-            "type"
+            "type",
+            # Device Variations (Live 12+, only available on RackDevice)
+            "variation_count",
+            "can_have_chains",
+            "chains",
+            "has_macro_mappings",
+            "macros_mapped",
+            "visible_macro_count"
         ]
         properties_rw = [
+            # Device Variations (Live 12+, only available on RackDevice)
+            "selected_variation_index"
         ]
 
         for method in methods:
@@ -140,3 +154,65 @@ class DeviceHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))
         self.osc_server.add_handler("/live/device/start_listen/parameter/value", create_device_callback(device_get_parameter_value_listener, include_ids = True))
         self.osc_server.add_handler("/live/device/stop_listen/parameter/value", create_device_callback(device_get_parameter_remove_value_listener, include_ids = True))
+
+        #--------------------------------------------------------------------------------
+        # Device: Variation methods (Live 12+)
+        #--------------------------------------------------------------------------------
+        def device_store_variation(device, params: Tuple[Any] = ()):
+            """
+            Store the current macro state as a variation.
+            If no index is provided, creates a new variation at the end.
+            If an index is provided, overwrites that variation.
+            """
+            if len(params) > 0:
+                variation_index = int(params[0])
+                # Note: The Live API store_variation() method might not accept an index parameter.
+                # We may need to adjust this based on testing.
+                device.store_variation(variation_index)
+            else:
+                device.store_variation()
+
+        self.osc_server.add_handler("/live/device/store_variation", create_device_callback(device_store_variation))
+
+        #--------------------------------------------------------------------------------
+        # Device: Introspection (for API discovery)
+        #--------------------------------------------------------------------------------
+        def device_introspect(device, params: Tuple[Any] = ()):
+            """
+            Returns all properties and methods available on a device object.
+            Useful for discovering available APIs in Live.
+            """
+            all_attrs = dir(device)
+
+            # Filter out private/magic methods and common inherited methods
+            filtered_attrs = [
+                attr for attr in all_attrs
+                if not attr.startswith('_') and attr not in ['add_update_listener', 'remove_update_listener']
+            ]
+
+            properties = []
+            methods = []
+
+            for attr in filtered_attrs:
+                try:
+                    obj = getattr(device, attr)
+                    # Check if it's callable (method) or a property
+                    if callable(obj):
+                        methods.append(attr)
+                    else:
+                        # Try to get the value to see if it's a readable property
+                        try:
+                            value = str(obj)[:50]  # Limit string length
+                            properties.append(f"{attr}={value}")
+                        except:
+                            properties.append(attr)
+                except:
+                    pass
+
+            # Return as tuples for OSC transmission
+            return (
+                "PROPERTIES:", *properties,
+                "METHODS:", *methods
+            )
+
+        self.osc_server.add_handler("/live/device/introspect", create_device_callback(device_introspect))

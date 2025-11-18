@@ -22,11 +22,10 @@ An introspection handler was added to `device.py` and the following properties/m
 #### Available Properties:
 - ✅ `selected_variation_index`: Index of the active variation (-1 = none)
 - ✅ `variation_count`: Number of available variations
-- ✅ `can_have_chains`: Whether the device can have chains (racks)
-- ✅ `chains`: List of chains in the rack
-- ✅ `has_macro_mappings`: Whether the rack has macro mappings
-- ✅ `macros_mapped`: Tuple indicating which macros are mapped
-- ✅ `visible_macro_count`: Number of visible macros
+
+#### Other Available Properties (not included in this PR):
+These properties are available on RackDevice but are not directly related to variations:
+- `can_have_chains`, `chains`, `has_macro_mappings`, `macros_mapped`, `visible_macro_count`
 
 #### Available Methods:
 - ✅ `recall_selected_variation()`: Recall the selected variation
@@ -48,10 +47,6 @@ The following endpoints have been implemented in `device.py`:
 | Endpoint | Params | Response | Description |
 |----------|--------|----------|-------------|
 | `/live/device/get/variation_count` | track_id, device_id | track_id, device_id, count | Number of available variations |
-| `/live/device/get/can_have_chains` | track_id, device_id | track_id, device_id, bool | Whether device can have chains |
-| `/live/device/get/has_macro_mappings` | track_id, device_id | track_id, device_id, bool | Whether rack has macro mappings |
-| `/live/device/get/macros_mapped` | track_id, device_id | track_id, device_id, tuple | Tuple of mapped macros |
-| `/live/device/get/visible_macro_count` | track_id, device_id | track_id, device_id, count | Number of visible macros |
 
 #### Read/Write Properties (Getters & Setters)
 
@@ -102,8 +97,7 @@ Standard listeners are automatically available for all properties:
 
 1. **✅ Modify `abletonosc/device.py`**:
    - [x] Add properties to `properties_r`:
-     - `variation_count`, `can_have_chains`, `chains`, `has_macro_mappings`,
-     - `macros_mapped`, `visible_macro_count`
+     - `variation_count`
    - [x] Add properties to `properties_rw`:
      - `selected_variation_index`
    - [x] Add methods:
@@ -112,26 +106,30 @@ Standard listeners are automatically available for all properties:
    - [x] Implement custom callback for `store_variation()`
    - [x] Implement introspection handler `/live/device/introspect`
 
-2. **🧪 Create test script `test_device_variations.py`**:
-   - [x] Tests for all read-only properties
-   - [x] Tests for `selected_variation_index` (read/write)
-   - [x] Tests for `recall_*` methods
-   - [ ] Tests for modification methods (user validation required)
+2. **🧪 Create test scripts**:
+   - [x] `test_device_variations.py` - Manual integration test script
+   - [x] `tests/test_device.py` - Automated pytest unit tests
+     - Tests for `variation_count` property
+     - Tests for `selected_variation_index` (read/write)
+     - Tests for all variation methods
+     - Listeners tests
+     - Auto-skip if no RackDevice with variations found
 
 3. **📝 Documentation**:
    - [x] Update `DEVICE_VARIATIONS_PROPOSAL.md` with discovered APIs
-   - [ ] Document in `README.md` (to be done before PR)
+   - [x] Clean up API to focus only on variation-specific properties
+   - [ ] Document in `README.md` (optional - to be done before or after PR)
 
 ### Phase 3: Testing and Validation ✅ COMPLETED
 
 - [x] Live 12 test set with Rack "elzinko-arp-v1" (4 variations)
 - [x] Restart Live and run `./test_device_variations.py`
 - [x] Validate all use cases
-  - ✅ Read-only properties: `variation_count`, `can_have_chains`, etc.
+  - ✅ Read-only property: `variation_count`
   - ✅ Read/write property: `selected_variation_index` (tested -1 → 0 → -1)
   - ✅ Methods: `recall_selected_variation`, `recall_last_used_variation`
   - ⚠️ Modification methods available but not tested (for safety)
-- [ ] Create unit tests in `tests/test_device.py` (optional for future PR)
+- [x] Create unit tests in `tests/test_device.py` with pytest
 
 ### Phase 4: Pull Request 📤 PENDING
 

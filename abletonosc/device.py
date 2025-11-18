@@ -33,12 +33,7 @@ class DeviceHandler(AbletonOSCHandler):
             "name",
             "type",
             # Device Variations (Live 12+, only available on RackDevice)
-            "variation_count",
-            "can_have_chains",
-            "chains",
-            "has_macro_mappings",
-            "macros_mapped",
-            "visible_macro_count"
+            "variation_count"
         ]
         properties_rw = [
             # Device Variations (Live 12+, only available on RackDevice)

@@ -2,6 +2,3 @@
 *.swp
 __pycache__
 .DS_Store
-logs/
-devel/*
-!devel/introspect.py

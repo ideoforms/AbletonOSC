@@ -2,7 +2,7 @@ from . import client, wait_one_tick, TICK_DURATION
 import pytest
 
 #--------------------------------------------------------------------------------
-# Device Variations tests (Live 12+)
+# Device Variations tests
 #
 # To test variations:
 # 1. Create an Instrument Rack or Effect Rack on track 0
@@ -10,7 +10,7 @@ import pytest
 # 3. Run: pytest tests/test_device.py
 #
 # Note: These tests will be skipped if the device doesn't support variations
-# (e.g., not a RackDevice or Live version < 12)
+# (e.g., not a RackDevice)
 #--------------------------------------------------------------------------------
 
 # Test configuration: Adjust these if your test rack is on a different track/device
@@ -154,46 +154,43 @@ def test_device_variations_randomize(client):
         wait_one_tick()
 
 #--------------------------------------------------------------------------------
-# Test Device Variations - Destructive methods (commented out by default)
+# Test Device Variations - Destructive methods
 #--------------------------------------------------------------------------------
 
-# Uncomment these tests if you want to test destructive operations
-# WARNING: These will modify your rack's variations!
+def test_device_variations_store(client):
+    """Test that we can store a new variation."""
+    # Get current count
+    count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
 
-# def test_device_variations_store(client):
-#     """Test that we can store a new variation."""
-#     # Get current count
-#     count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
-#
-#     # Store a new variation
-#     client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
-#     wait_one_tick()
-#
-#     # Verify count increased
-#     count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
-#     assert count_after == count_before + 1
-#
-#     # Clean up: delete the variation we just created
-#     client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_after - 1))
-#     wait_one_tick()
-#     client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
-#     wait_one_tick()
+    # Store a new variation
+    client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    wait_one_tick()
 
-# def test_device_variations_delete(client):
-#     """Test that we can delete a variation."""
-#     # First create a variation to delete
-#     client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
-#     wait_one_tick()
-#
-#     # Get count and select the last variation
-#     count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
-#     client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_before - 1))
-#     wait_one_tick()
-#
-#     # Delete it
-#     client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
-#     wait_one_tick()
-#
-#     # Verify count decreased
-#     count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
-#     assert count_after == count_before - 1
+    # Verify count increased
+    count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    assert count_after == count_before + 1
+
+    # Clean up: delete the variation we just created
+    client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_after - 1))
+    wait_one_tick()
+    client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    wait_one_tick()
+
+def test_device_variations_delete(client):
+    """Test that we can delete a variation."""
+    # First create a variation to delete
+    client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    wait_one_tick()
+
+    # Get count and select the last variation
+    count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_before - 1))
+    wait_one_tick()
+
+    # Delete it
+    client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    wait_one_tick()
+
+    # Verify count decreased
+    count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    assert count_after == count_before - 1

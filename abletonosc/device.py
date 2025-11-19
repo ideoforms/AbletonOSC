@@ -40,7 +40,7 @@ class DeviceHandler(AbletonOSCHandler):
                                         create_device_callback(self._set_property, prop))
 
         #--------------------------------------------------------------------------------
-        # Device Variations API (Live 12+, only available on RackDevice)
+        # Device Variations API (RackDevice only)
         #--------------------------------------------------------------------------------
 
         # Variations properties: /live/device/get/variations/{property}
@@ -227,17 +227,19 @@ class DeviceHandler(AbletonOSCHandler):
                     else:
                         # Try to get the value to see if it's a readable property
                         try:
-                            value = str(obj)[:50]  # Limit string length
+                            # Limit string length to avoid OSC message size issues
+                            # and improve readability in introspection output
+                            value = str(obj)[:50]
                             properties.append(f"{attr}={value}")
                         except:
                             properties.append(attr)
                 except:
                     pass
 
-            # Return as tuples for OSC transmission
+            # Return as tuples for OSC transmission (lowercase for consistency)
             return (
-                "PROPERTIES:", *properties,
-                "METHODS:", *methods
+                "properties:", *properties,
+                "methods:", *methods
             )
 
         self.osc_server.add_handler("/live/device/introspect", create_device_callback(device_introspect))

@@ -254,6 +254,26 @@ class SongHandler(AbletonOSCHandler):
                 cue_point = song.cue_points[cue_point_index]
                 cue_point.jump()
         self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
+        
+        #--------------------------------------------------------------------------------
+        # Callbacks for Song: File, Project, and Set Name
+        #--------------------------------------------------------------------------------
+        def get_live_set_details(song, _):
+            """
+            Handler function to return File, Project, and Set names as a tuple of length 3 when requested via OSC.
+            
+            Returns:
+                tuple: A tuple containing the full file path, parent folder name and 
+                    song file name of the current Live Set.
+            """
+            song_file_path = song.file_path
+            folder_name = os.path.basename(os.path.dirname(song_file_path))
+            song_file_name = os.path.basename(song_file_path)
+            
+            return (song_file_path, folder_name, song_file_name)
+
+        # Register the handler function to be triggered when "/live/song/get/live_set" is received via OSC
+        self.osc_server.add_handler("/live/song/get/live_set", partial(get_live_set_details, self.song))
 
         self.osc_server.add_handler("/live/song/cue_point/add_or_delete", partial(self._call_method, self.song, "set_or_delete_cue"))
         def song_cue_point_set_name(song, params: Tuple[Any] = ()):

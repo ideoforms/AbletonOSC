@@ -1,3 +1,4 @@
+import sys
 from typing import Tuple, Any, Callable
 from .constants import OSC_LISTEN_PORT, OSC_RESPONSE_PORT
 from ..pythonosc.osc_message import OscMessage, ParseError
@@ -9,6 +10,7 @@ import errno
 import socket
 import logging
 import traceback
+import random
 
 class OSCServer:
     def __init__(self,
@@ -41,6 +43,8 @@ class OSCServer:
         self.logger = logging.getLogger("abletonosc")
         self.logger.info("Starting OSC server (local %s, response port %d)",
                          str(self._local_addr), self._response_port)
+        max_chunk_size = self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+        self.logger.info(f"Socket message size limit: {max_chunk_size} bytes")
 
     def add_handler(self, address: str, handler: Callable) -> None:
         """
@@ -72,17 +76,70 @@ class OSCServer:
             remote_addr: The remote address to send to, as a 2-tuple (hostname, port).
                          If None, uses the default remote address.
         """
-        msg_builder = OscMessageBuilder(address)
-        for param in params:
-            msg_builder.add_arg(param)
+        chunks = []
+        max_chunk_size = min(self._socket.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF), 47000)
+        self.logger.debug(f"Max chunk size {max_chunk_size}")
+        #  calculate total size of params in bytes
+        total_size = sys.getsizeof(params)
+        for item in params:
+            total_size += sys.getsizeof(item)
 
-        try:
-            msg = msg_builder.build()
-            if remote_addr is None:
-                remote_addr = self._remote_addr
-            self._socket.sendto(msg.dgram, remote_addr)
-        except BuildError:
-            self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
+        if total_size <= max_chunk_size:
+            # the whole params fit in 1 chunk
+            chunks = [params]
+        else:
+            # Split the data into smaller chunks to avoid the "Message Too Long" error
+            # If the data is split into chunks, the last 4 pieces of information of a chunk are
+            # chunk index, total chunks, message id, '#$#'
+            current_chunk = []
+            current_size = 0
+
+            for item in params:
+                item_size = sys.getsizeof(item)
+                
+                if current_size + item_size <= max_chunk_size:
+                    current_chunk.append(item)
+                    current_size += item_size
+                else:
+                    chunks.append(tuple(current_chunk))
+                    current_chunk = [item]
+                    current_size = item_size
+
+            # Add the last chunk if it is not empty
+            if current_chunk:
+                chunks.append(tuple(current_chunk))
+
+        total_chunks = len(chunks)
+        updated_chunks = []
+        self.logger.debug(f"total chunks {total_chunks}")
+
+        if total_chunks > 1:
+            msg_id = random.randint(1, 127)
+            self.logger.info(f"Long message, split into {total_chunks} chunks before sending. msg id {msg_id}")
+
+            for index, chunk in enumerate(chunks):
+                updated_chunk = chunk + (index, total_chunks, msg_id, '#$#')
+                self.logger.debug(f"updated chunk {updated_chunk}")
+
+                updated_chunks.append(updated_chunk)
+
+        self.logger.debug(f"updated chunks {updated_chunks}")
+        # Select chunks to iterate based on the total number of chunks
+        chunks_to_iterate = updated_chunks if total_chunks > 1 else chunks
+        self.logger.debug(f"chunks to iterate {chunks_to_iterate}")
+
+        for chunk in chunks_to_iterate:
+            msg_builder = OscMessageBuilder(address)
+            for param in chunk:
+                msg_builder.add_arg(param)
+
+            try:
+                msg = msg_builder.build()
+                if remote_addr is None:
+                    remote_addr = self._remote_addr
+                self._socket.sendto(msg.dgram, remote_addr)
+            except BuildError:
+                self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
 
     def process_message(self, message, remote_addr):
         if message.address in self._callbacks:

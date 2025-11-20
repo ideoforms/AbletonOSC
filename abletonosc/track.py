@@ -31,7 +31,9 @@ class TrackHandler(AbletonOSCHandler):
 
         methods = [
             "delete_device",
-            "stop_all_clips"
+            "stop_all_clips",
+            "create_audio_clip",
+            "create_midi_clip",
         ]
         properties_r = [
             "can_be_armed",

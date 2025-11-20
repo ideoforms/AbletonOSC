@@ -231,9 +231,11 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 ### Track methods
 
-| Address                    | Query params | Response params | Description             |
-|:---------------------------|:-------------|:----------------|:------------------------|
-| /live/track/stop_all_clips | track_id     |                 | Stop all clips on track |
+| Address                       | Query params                      | Response params | Description              |
+|:------------------------------|:----------------------------------|:----------------|:-------------------------|
+| /live/track/stop_all_clips    | track_id                          |                 | Stop all clips on track  |
+| /live/track/create_audio_clip | track_id, file_path, position     |                 | Adds audio clip to track |
+| /live/track/create_midi_clip  | track_id, position, length        |                 | Adds midi clip to track  |
 
 ### Track properties
 

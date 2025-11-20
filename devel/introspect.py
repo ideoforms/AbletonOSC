@@ -64,8 +64,15 @@ def find_free_port(start_port=11001, max_attempts=10):
             continue
     return None
 
-def format_introspection_output(result, object_type, object_ids):
-    """Format and print the introspection results in a readable way."""
+def format_introspection_output(result, object_type, object_ids, highlight_keywords=None):
+    """Format and print the introspection results in a readable way.
+
+    Args:
+        result: The introspection data received from the server
+        object_type: Type of object being introspected
+        object_ids: IDs used to identify the object
+        highlight_keywords: Optional list of keywords to highlight in the output
+    """
     if not result or len(result) < 3:
         print(f"❌ No introspection data received for {object_type} {object_ids}")
         return
@@ -76,9 +83,9 @@ def format_introspection_output(result, object_type, object_ids):
     methods = []
 
     for item in result[len(object_ids):]:  # Skip object IDs
-        if item == "PROPERTIES:":
+        if item == "properties:":
             current_section = "properties"
-        elif item == "METHODS:":
+        elif item == "methods:":
             current_section = "methods"
         elif current_section == "properties":
             properties.append(item)
@@ -95,15 +102,14 @@ def format_introspection_output(result, object_type, object_ids):
     print("📋 PROPERTIES:")
     print("-" * 80)
     if properties:
-        # Highlight interesting keywords
-        interesting_keywords = ['variation', 'macro', 'chain', 'selected', 'current', 'active']
-        interesting_props = [p for p in properties if any(k in p.lower() for k in interesting_keywords)]
-        other_props = [p for p in properties if p not in interesting_props]
+        # Highlight if keywords provided
+        if highlight_keywords:
+            interesting_props = [p for p in properties if any(k in p.lower() for k in highlight_keywords)]
 
-        if interesting_props:
-            print("\n🎯 HIGHLIGHTED (variation, macro, chain, selected, etc.):")
-            for prop in sorted(interesting_props):
-                print(f"  ✨ {prop}")
+            if interesting_props:
+                print(f"\n🎯 HIGHLIGHTED ({', '.join(highlight_keywords)}):")
+                for prop in sorted(interesting_props):
+                    print(f"  ✨ {prop}")
 
         print(f"\n📝 ALL PROPERTIES ({len(properties)} total):")
         for prop in sorted(properties):
@@ -117,13 +123,14 @@ def format_introspection_output(result, object_type, object_ids):
     print("🔧 METHODS:")
     print("-" * 80)
     if methods:
-        interesting_keywords = ['variation', 'macro', 'chain', 'recall', 'store', 'delete']
-        interesting_methods = [m for m in methods if any(k in m.lower() for k in interesting_keywords)]
+        # Highlight if keywords provided
+        if highlight_keywords:
+            interesting_methods = [m for m in methods if any(k in m.lower() for k in highlight_keywords)]
 
-        if interesting_methods:
-            print("\n🎯 HIGHLIGHTED (variation, macro, chain, recall, etc.):")
-            for method in sorted(interesting_methods):
-                print(f"  ✨ {method}()")
+            if interesting_methods:
+                print(f"\n🎯 HIGHLIGHTED ({', '.join(highlight_keywords)}):")
+                for method in sorted(interesting_methods):
+                    print(f"  ✨ {method}()")
 
         print(f"\n📝 ALL METHODS ({len(methods)} total):")
         for method in sorted(methods):
@@ -134,7 +141,7 @@ def format_introspection_output(result, object_type, object_ids):
     print()
     print("=" * 80)
 
-def introspect_object(object_type, object_ids, client_port=None):
+def introspect_object(object_type, object_ids, client_port=None, highlight_keywords=None):
     """
     Introspect a Live object and print its properties and methods.
 
@@ -142,6 +149,7 @@ def introspect_object(object_type, object_ids, client_port=None):
         object_type: Type of object (device, clip, track, song)
         object_ids: List of IDs to identify the object (e.g., [track_id, device_id])
         client_port: Optional client port to use
+        highlight_keywords: Optional list of keywords to highlight in the output
     """
     # Check if introspection is implemented for this object type
     if object_type not in INTROSPECTION_ENDPOINTS:
@@ -179,7 +187,7 @@ def introspect_object(object_type, object_ids, client_port=None):
     try:
         # Query the introspection endpoint
         result = client.query(endpoint, object_ids)
-        format_introspection_output(result, object_type, object_ids)
+        format_introspection_output(result, object_type, object_ids, highlight_keywords)
         return True
     except Exception as e:
         print(f"❌ Introspection failed: {e}")
@@ -225,6 +233,12 @@ Note: Currently only 'device' introspection is implemented.
         help="Client port to use (default: auto-detect free port)"
     )
 
+    parser.add_argument(
+        "--highlight",
+        type=str,
+        help="Comma-separated keywords to highlight in the output (e.g., 'variation,macro,chain')"
+    )
+
     args = parser.parse_args()
 
     # Validate object IDs based on object type
@@ -247,7 +261,12 @@ Note: Currently only 'device' introspection is implemented.
             print(f"   Usage: {sys.argv[0]} {args.object_type} {id_names.get(args.object_type)}")
         sys.exit(1)
 
-    success = introspect_object(args.object_type, args.object_ids, args.port)
+    # Parse highlight keywords if provided
+    highlight_keywords = None
+    if args.highlight:
+        highlight_keywords = [kw.strip().lower() for kw in args.highlight.split(',')]
+
+    success = introspect_object(args.object_type, args.object_ids, args.port, highlight_keywords)
     sys.exit(0 if success else 1)
 
 if __name__ == "__main__":

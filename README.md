@@ -46,6 +46,26 @@ same IP as the originating message. When querying properties, OSC wildcard patte
 | /live/api/set/log_level       | log_level    |                              | Set the log level, which can be one of: `debug`, `info`, `warning`, `error`, `critical`. |
 | /live/api/show_message        | message      |                              | Show a message in Live's status bar                                                      |
 
+### Introspection (Developer Tool)
+
+The introspection API allows developers and maintainers to discover available properties and methods on any Live object at runtime. This is primarily useful for development, debugging, and exploring the Live API.
+
+| Address            | Query params                    | Response params      | Description                                                    |
+|:-------------------|:--------------------------------|:---------------------|:---------------------------------------------------------------|
+| /live/introspect   | object_type, object_ids...      | object_ids..., "properties:", prop1, prop2, ..., "methods:", method1, method2, ... | Introspect a Live object and return its available properties and methods |
+
+**Supported object types:**
+- `device` - Requires `track_id, device_id` (e.g., `/live/introspect device 0 0`)
+- `clip` - Requires `track_id, clip_id` (e.g., `/live/introspect clip 0 1`)
+- `track` - Requires `track_id` (e.g., `/live/introspect track 2`)
+- `song` - No additional IDs required (e.g., `/live/introspect song`)
+
+**Developer tool:** A formatted introspection client is available in `tools/introspect.py`:
+```bash
+./tools/introspect.py device 0 0                      # Basic introspection
+./tools/introspect.py device 0 0 --highlight variation,macro  # With highlighting
+```
+
 ### Application status messages
 
 These messages are sent to the client automatically when the application state changes.
@@ -508,7 +528,6 @@ Represents an instrument or effect.
 | /live/device/variations/store              | track_id, device_id |                 | Store current macro values as a new variation (RackDevice only)                  |
 | /live/device/variations/delete    | track_id, device_id |                 | Delete the currently selected variation (RackDevice only)                        |
 | /live/device/variations/randomize             | track_id, device_id |                 | Randomize all macro values in the rack (RackDevice only)                         |
-| /live/device/introspect   | track_id, device_id | properties, methods                 | List all available properties and methods for the device       |
 
 For devices:
 

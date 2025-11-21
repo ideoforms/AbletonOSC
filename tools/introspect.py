@@ -6,32 +6,29 @@ This utility allows you to discover all available properties and methods on any
 Live object that has an introspection endpoint implemented.
 
 Usage:
-    ./utils/introspect.py device <track_id> <device_id>
-    ./utils/introspect.py clip <track_id> <clip_id>
-    ./utils/introspect.py track <track_id>
-    ./utils/introspect.py song
+    ./devel/introspect.py device <track_id> <device_id>
+    ./devel/introspect.py clip <track_id> <clip_id>
+    ./devel/introspect.py track <track_id>
+    ./devel/introspect.py song
 
 Examples:
     # Introspect first device on track 0
-    ./utils/introspect.py device 0 0
+    ./devel/introspect.py device 0 0
 
     # Introspect first clip on track 2
-    ./utils/introspect.py clip 2 0
+    ./devel/introspect.py clip 2 0
 
     # Introspect track 1
-    ./utils/introspect.py track 1
+    ./devel/introspect.py track 1
 
     # Introspect song object
-    ./utils/introspect.py song
+    ./devel/introspect.py song
 
 Requirements:
     - Ableton Live must be running
     - AbletonOSC must be loaded as a Control Surface
     - The introspection endpoint must be implemented for the object type
 
-Note:
-    Currently, only /live/device/introspect is implemented.
-    This tool is designed to be extensible as more introspection endpoints are added.
 """
 
 import sys
@@ -43,14 +40,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from client.client import AbletonOSCClient
 
-# Mapping of object types to their introspection endpoints
-INTROSPECTION_ENDPOINTS = {
-    "device": "/live/device/introspect",
-    # Future endpoints can be added here:
-    # "clip": "/live/clip/introspect",
-    # "track": "/live/track/introspect",
-    # "song": "/live/song/introspect",
-}
+# Introspection endpoint (unified for all object types)
+INTROSPECTION_ENDPOINT = "/live/introspect"
 
 def find_free_port(start_port=11001, max_attempts=10):
     """Find a free UDP port for the OSC client."""
@@ -151,19 +142,15 @@ def introspect_object(object_type, object_ids, client_port=None, highlight_keywo
         client_port: Optional client port to use
         highlight_keywords: Optional list of keywords to highlight in the output
     """
-    # Check if introspection is implemented for this object type
-    if object_type not in INTROSPECTION_ENDPOINTS:
-        print(f"❌ Error: Introspection not yet implemented for '{object_type}'")
+    # Validate object type
+    valid_types = ["device", "clip", "track", "song"]
+    if object_type not in valid_types:
+        print(f"❌ Error: Unknown object type '{object_type}'")
         print()
-        print("Currently supported object types:")
-        for obj_type in INTROSPECTION_ENDPOINTS.keys():
+        print("Supported object types:")
+        for obj_type in valid_types:
             print(f"  • {obj_type}")
-        print()
-        print("To add support for more object types, implement the corresponding")
-        print("introspection handler in the AbletonOSC server code.")
         return False
-
-    endpoint = INTROSPECTION_ENDPOINTS[object_type]
 
     # Find a free port if not specified
     if client_port is None:
@@ -185,8 +172,9 @@ def introspect_object(object_type, object_ids, client_port=None, highlight_keywo
         return False
 
     try:
-        # Query the introspection endpoint
-        result = client.query(endpoint, object_ids)
+        # Query the introspection endpoint with object_type as first parameter
+        params = (object_type,) + tuple(object_ids)
+        result = client.query(INTROSPECTION_ENDPOINT, params)
         format_introspection_output(result, object_type, object_ids, highlight_keywords)
         return True
     except Exception as e:

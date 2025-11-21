@@ -276,8 +276,7 @@ def main(args):
         "/live/device/get/parameter/value",
         "/live/device/get/parameter/value_string",
         "/live/device/set/parameter/value",
-        "/live/device/introspect",
-        # Device Variations API (Live 12+)
+        "/live/introspect",
         "/live/device/get/variations/num",
         "/live/device/get/variations/selected",
         "/live/device/set/variations/selected",

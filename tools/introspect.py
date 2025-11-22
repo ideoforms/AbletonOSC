@@ -172,10 +172,66 @@ def introspect_object(object_type, object_ids, client_port=None, highlight_keywo
         return False
 
     try:
+        # Validate that the requested object exists before introspecting
+        # Use 2 second timeout for all queries (OSC can be slow)
+        QUERY_TIMEOUT = 2.0
+
+        if object_type == "device":
+            track_id, device_id = object_ids[0], object_ids[1]
+
+            # Check if track exists
+            num_tracks_result = client.query("/live/song/get/num_tracks", (), timeout=QUERY_TIMEOUT)
+            num_tracks = num_tracks_result[0] if num_tracks_result else 0
+            if track_id >= num_tracks:
+                print(f"❌ Error: Track {track_id} does not exist")
+                print(f"   Available tracks: 0-{num_tracks - 1} ({num_tracks} total)")
+                return False
+
+            # Check if device exists on this track
+            num_devices_result = client.query("/live/track/get/num_devices", (track_id,), timeout=QUERY_TIMEOUT)
+            num_devices = num_devices_result[1] if len(num_devices_result) > 1 else 0
+            if device_id >= num_devices:
+                print(f"❌ Error: Device {device_id} does not exist on track {track_id}")
+                print(f"   Track {track_id} has {num_devices} device(s)")
+                if num_devices > 0:
+                    print(f"   Available devices: 0-{num_devices - 1}")
+                else:
+                    print(f"   💡 Tip: Add a device to track {track_id} first")
+                return False
+
+        elif object_type == "clip":
+            track_id, clip_id = object_ids[0], object_ids[1]
+
+            # Check if track exists
+            num_tracks_result = client.query("/live/song/get/num_tracks", (), timeout=QUERY_TIMEOUT)
+            num_tracks = num_tracks_result[0] if num_tracks_result else 0
+            if track_id >= num_tracks:
+                print(f"❌ Error: Track {track_id} does not exist")
+                print(f"   Available tracks: 0-{num_tracks - 1} ({num_tracks} total)")
+                return False
+
+            # Check if clip exists
+            has_clip_result = client.query("/live/clip_slot/get/has_clip", (track_id, clip_id), timeout=QUERY_TIMEOUT)
+            has_clip = has_clip_result[2] if len(has_clip_result) > 2 else False
+            if not has_clip:
+                print(f"❌ Error: Clip slot {clip_id} on track {track_id} is empty")
+                print(f"   💡 Tip: Add a clip to track {track_id}, slot {clip_id} first")
+                return False
+
+        elif object_type == "track":
+            track_id = object_ids[0]
+
+            # Check if track exists
+            num_tracks_result = client.query("/live/song/get/num_tracks", (), timeout=QUERY_TIMEOUT)
+            num_tracks = num_tracks_result[0] if num_tracks_result else 0
+            if track_id >= num_tracks:
+                print(f"❌ Error: Track {track_id} does not exist")
+                print(f"   Available tracks: 0-{num_tracks - 1} ({num_tracks} total)")
+                return False
+
         # Query the introspection endpoint with object_type as first parameter
-        # Use longer timeout (2 seconds) as introspection returns large amounts of data
         params = (object_type,) + tuple(object_ids)
-        result = client.query(INTROSPECTION_ENDPOINT, params, timeout=2.0)
+        result = client.query(INTROSPECTION_ENDPOINT, params, timeout=QUERY_TIMEOUT)
         format_introspection_output(result, object_type, object_ids, highlight_keywords)
         return True
     except Exception as e:

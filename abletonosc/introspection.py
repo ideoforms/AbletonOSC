@@ -38,6 +38,19 @@ class IntrospectionHandler(AbletonOSCHandler):
                         self.logger.error("Introspect device: Missing track_id or device_id")
                         return
                     track_index, device_index = int(object_ids[0]), int(object_ids[1])
+
+                    # Validate track exists
+                    num_tracks = len(self.song.tracks)
+                    if track_index >= num_tracks:
+                        self.logger.error(f"Introspect device: Track {track_index} does not exist (available: 0-{num_tracks - 1})")
+                        return
+
+                    # Validate device exists on track
+                    num_devices = len(self.song.tracks[track_index].devices)
+                    if device_index >= num_devices:
+                        self.logger.error(f"Introspect device: Device {device_index} does not exist on track {track_index} (track has {num_devices} device(s))")
+                        return
+
                     obj = self.song.tracks[track_index].devices[device_index]
 
                 elif object_type == "clip":
@@ -45,13 +58,37 @@ class IntrospectionHandler(AbletonOSCHandler):
                         self.logger.error("Introspect clip: Missing track_id or clip_id")
                         return
                     track_index, clip_index = int(object_ids[0]), int(object_ids[1])
-                    obj = self.song.tracks[track_index].clip_slots[clip_index].clip
+
+                    # Validate track exists
+                    num_tracks = len(self.song.tracks)
+                    if track_index >= num_tracks:
+                        self.logger.error(f"Introspect clip: Track {track_index} does not exist (available: 0-{num_tracks - 1})")
+                        return
+
+                    # Validate clip slot exists and has a clip
+                    track = self.song.tracks[track_index]
+                    if clip_index >= len(track.clip_slots):
+                        self.logger.error(f"Introspect clip: Clip slot {clip_index} does not exist on track {track_index}")
+                        return
+
+                    if not track.clip_slots[clip_index].has_clip:
+                        self.logger.error(f"Introspect clip: Clip slot {clip_index} on track {track_index} is empty")
+                        return
+
+                    obj = track.clip_slots[clip_index].clip
 
                 elif object_type == "track":
                     if len(object_ids) < 1:
                         self.logger.error("Introspect track: Missing track_id")
                         return
                     track_index = int(object_ids[0])
+
+                    # Validate track exists
+                    num_tracks = len(self.song.tracks)
+                    if track_index >= num_tracks:
+                        self.logger.error(f"Introspect track: Track {track_index} does not exist (available: 0-{num_tracks - 1})")
+                        return
+
                     obj = self.song.tracks[track_index]
 
                 elif object_type == "song":
@@ -62,7 +99,7 @@ class IntrospectionHandler(AbletonOSCHandler):
                     return
 
             except (IndexError, AttributeError) as e:
-                self.logger.error(f"Introspect: Failed to access {object_type} with IDs {object_ids}: {e}")
+                self.logger.error(f"Introspect: Unexpected error accessing {object_type} with IDs {object_ids}: {e}")
                 return
 
             # Perform introspection on the object

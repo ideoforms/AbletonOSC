@@ -19,11 +19,11 @@ RACK_DEVICE_ID = 0
 
 def _device_has_variations(client, track_id, device_id):
     """
-    Check if a device supports variations by querying variations/num.
+    Check if a device supports variations by querying variations/variation_count.
     Returns True if the device is a RackDevice with variation support.
     """
     try:
-        result = client.query("/live/device/get/variations/num", (track_id, device_id))
+        result = client.query("/live/device/get/variations/variation_count", (track_id, device_id))
         # If we get a valid response with a variation count, the device supports variations
         return result and len(result) >= 3
     except:
@@ -47,7 +47,7 @@ def _check_rack_device(client):
 
 def test_device_variations_num(client):
     """Test that we can read the number of variations."""
-    result = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    result = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
     assert len(result) == 3
     assert result[0] == RACK_TRACK_ID
     assert result[1] == RACK_DEVICE_ID
@@ -57,11 +57,11 @@ def test_device_variations_num(client):
 def test_device_variations_num_listener(client):
     """Test that we can listen to variation count changes."""
     # Start listening
-    client.send_message("/live/device/start_listen/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/start_listen/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Stop listening
-    client.send_message("/live/device/stop_listen/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/stop_listen/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
 #--------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ def test_device_variations_num_listener(client):
 
 def test_device_variations_selected_get(client):
     """Test that we can read the selected variation index."""
-    result = client.query("/live/device/get/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    result = client.query("/live/device/get/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
     assert len(result) == 3
     assert result[0] == RACK_TRACK_ID
     assert result[1] == RACK_DEVICE_ID
@@ -80,23 +80,23 @@ def test_device_variations_selected_get(client):
 def test_device_variations_selected_set(client):
     """Test that we can set the selected variation index."""
     # Get the current variation and variation count
-    current_result = client.query("/live/device/get/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    current_result = client.query("/live/device/get/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
     current_variation = current_result[2]
 
-    count_result = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    count_result = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
     variation_count = count_result[2]
 
     if variation_count > 0:
         # Try to select the first variation
-        client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, 0))
+        client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, 0))
         wait_one_tick()
 
         # Verify the change
-        result = client.query("/live/device/get/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+        result = client.query("/live/device/get/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
         assert result[2] == 0
 
         # Restore original variation
-        client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, current_variation))
+        client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, current_variation))
         wait_one_tick()
     else:
         pytest.skip("No variations available to test variations/selected setter")
@@ -104,11 +104,11 @@ def test_device_variations_selected_set(client):
 def test_device_variations_selected_listener(client):
     """Test that we can listen to selected variation changes."""
     # Start listening
-    client.send_message("/live/device/start_listen/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/start_listen/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Stop listening
-    client.send_message("/live/device/stop_listen/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/stop_listen/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
 #--------------------------------------------------------------------------------
@@ -117,16 +117,16 @@ def test_device_variations_selected_listener(client):
 
 def test_device_variations_recall(client):
     """Test that we can recall the selected variation."""
-    count_result = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    count_result = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
     variation_count = count_result[2]
 
     if variation_count > 0:
         # Select a variation first
-        client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, 0))
+        client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, 0))
         wait_one_tick()
 
         # Recall it
-        client.send_message("/live/device/variations/recall", (RACK_TRACK_ID, RACK_DEVICE_ID))
+        client.send_message("/live/device/variations/recall_selected_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
         wait_one_tick()
         # No assertion - just verify the command doesn't error
     else:
@@ -134,23 +134,23 @@ def test_device_variations_recall(client):
 
 def test_device_variations_recall_last(client):
     """Test that we can recall the last used variation."""
-    client.send_message("/live/device/variations/recall_last", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/recall_last_used_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
     # No assertion - just verify the command doesn't error
 
 def test_device_variations_randomize(client):
     """Test that we can randomize macros."""
     # Store current state by reading selected variation
-    current_result = client.query("/live/device/get/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    current_result = client.query("/live/device/get/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID))
     current_variation = current_result[2]
 
     # Randomize macros
-    client.send_message("/live/device/variations/randomize", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/randomize_macros", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Restore to original variation if one was selected
     if current_variation >= 0:
-        client.send_message("/live/device/variations/recall", (RACK_TRACK_ID, RACK_DEVICE_ID))
+        client.send_message("/live/device/variations/recall_selected_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
         wait_one_tick()
 
 #--------------------------------------------------------------------------------
@@ -160,37 +160,37 @@ def test_device_variations_randomize(client):
 def test_device_variations_store(client):
     """Test that we can store a new variation."""
     # Get current count
-    count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    count_before = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
 
     # Store a new variation
-    client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/store_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Verify count increased
-    count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    count_after = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
     assert count_after == count_before + 1
 
     # Clean up: delete the variation we just created
-    client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_after - 1))
+    client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, count_after - 1))
     wait_one_tick()
-    client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/delete_selected_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
 def test_device_variations_delete(client):
     """Test that we can delete a variation."""
     # First create a variation to delete
-    client.send_message("/live/device/variations/store", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/store_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Get count and select the last variation
-    count_before = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
-    client.send_message("/live/device/set/variations/selected", (RACK_TRACK_ID, RACK_DEVICE_ID, count_before - 1))
+    count_before = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, count_before - 1))
     wait_one_tick()
 
     # Delete it
-    client.send_message("/live/device/variations/delete", (RACK_TRACK_ID, RACK_DEVICE_ID))
+    client.send_message("/live/device/variations/delete_selected_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
     wait_one_tick()
 
     # Verify count decreased
-    count_after = client.query("/live/device/get/variations/num", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
+    count_after = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))[2]
     assert count_after == count_before - 1

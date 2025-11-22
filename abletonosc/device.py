@@ -54,21 +54,21 @@ class DeviceHandler(AbletonOSCHandler):
             device.selected_variation_index = int(params[0])
 
         # Register variations property handlers
-        self.osc_server.add_handler("/live/device/get/variations/num",
+        self.osc_server.add_handler("/live/device/get/variations/variation_count",
                                     create_device_callback(device_get_variations_num))
-        self.osc_server.add_handler("/live/device/get/variations/selected",
+        self.osc_server.add_handler("/live/device/get/variations/selected_variation_index",
                                     create_device_callback(device_get_variations_selected))
-        self.osc_server.add_handler("/live/device/set/variations/selected",
+        self.osc_server.add_handler("/live/device/set/variations/selected_variation_index",
                                     create_device_callback(device_set_variations_selected))
 
         # Variations listeners: /live/device/start_listen/variations/{property}
-        self.osc_server.add_handler("/live/device/start_listen/variations/num",
+        self.osc_server.add_handler("/live/device/start_listen/variations/variation_count",
                                     create_device_callback(self._start_listen, "variation_count"))
-        self.osc_server.add_handler("/live/device/stop_listen/variations/num",
+        self.osc_server.add_handler("/live/device/stop_listen/variations/variation_count",
                                     create_device_callback(self._stop_listen, "variation_count"))
-        self.osc_server.add_handler("/live/device/start_listen/variations/selected",
+        self.osc_server.add_handler("/live/device/start_listen/variations/selected_variation_index",
                                     create_device_callback(self._start_listen, "selected_variation_index"))
-        self.osc_server.add_handler("/live/device/stop_listen/variations/selected",
+        self.osc_server.add_handler("/live/device/stop_listen/variations/selected_variation_index",
                                     create_device_callback(self._stop_listen, "selected_variation_index"))
 
         # Variations methods: /live/device/variations/{method}
@@ -84,13 +84,13 @@ class DeviceHandler(AbletonOSCHandler):
         def device_variations_randomize(device, params: Tuple[Any] = ()):
             device.randomize_macros()
 
-        self.osc_server.add_handler("/live/device/variations/recall",
+        self.osc_server.add_handler("/live/device/variations/recall_selected_variation",
                                     create_device_callback(device_variations_recall))
-        self.osc_server.add_handler("/live/device/variations/recall_last",
+        self.osc_server.add_handler("/live/device/variations/recall_last_used_variation",
                                     create_device_callback(device_variations_recall_last))
-        self.osc_server.add_handler("/live/device/variations/delete",
+        self.osc_server.add_handler("/live/device/variations/delete_selected_variation",
                                     create_device_callback(device_variations_delete))
-        self.osc_server.add_handler("/live/device/variations/randomize",
+        self.osc_server.add_handler("/live/device/variations/randomize_macros",
                                     create_device_callback(device_variations_randomize))
 
         #--------------------------------------------------------------------------------
@@ -197,4 +197,4 @@ class DeviceHandler(AbletonOSCHandler):
             """
             device.store_variation()
 
-        self.osc_server.add_handler("/live/device/variations/store", create_device_callback(device_variations_store))
+        self.osc_server.add_handler("/live/device/variations/store_variation", create_device_callback(device_variations_store))

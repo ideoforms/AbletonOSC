@@ -499,6 +499,7 @@ Represents an instrument or effect.
 ### Device properties
 
 - Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
+- Changes for Device Variations properties can be listened for by calling `/live/device/start_listen/variations/<property> <track_index> <device_index>` (where property is `variation_count` or `selected_variation_index`)
 
 | Address                                  | Query params                             | Response params                          | Description                                                                             |
 |:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|
@@ -515,19 +516,19 @@ Represents an instrument or effect.
 | /live/device/get/parameter/value         | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get a device parameter value                                                            |
 | /live/device/get/parameter/value_string  | track_id, device_id, parameter_id        | track_id, device_id, parameter_id, value | Get the device parameter value as a readable string ex: 2500 Hz                         |
 | /live/device/set/parameter/value         | track_id, device_id, parameter_id, value |                                          | Set a device parameter value                                                            |
-| /live/device/get/variations/num                  | track_id, device_id | track_id, device_id, count          | Get the number of variations (RackDevice only)         |
-| /live/device/get/variations/selected         | track_id, device_id | track_id, device_id, index          | Get the selected variation index, -1 if none (RackDevice only)        |
-| /live/device/set/variations/selected         | track_id, device_id, index |                               | Select a variation by index (RackDevice only)               |
+| /live/device/get/variations/variation_count                  | track_id, device_id | track_id, device_id, count          | Get the number of variations (RackDevice only)         |
+| /live/device/get/variations/selected_variation_index         | track_id, device_id | track_id, device_id, index          | Get the selected variation index, -1 if none (RackDevice only)        |
+| /live/device/set/variations/selected_variation_index         | track_id, device_id, index |                               | Select a variation by index (RackDevice only)               |
 
 ### Device methods
 
 | Address                                   | Query params        | Response params | Description                                                    |
 |:------------------------------------------|:--------------------|:----------------|:---------------------------------------------------------------|
-| /live/device/variations/recall    | track_id, device_id |                 | Apply the selected variation's macro values (RackDevice only)          |
-| /live/device/variations/recall_last   | track_id, device_id |                 | Recall the last used variation (RackDevice only)                                 |
-| /live/device/variations/store              | track_id, device_id |                 | Store current macro values as a new variation (RackDevice only)                  |
-| /live/device/variations/delete    | track_id, device_id |                 | Delete the currently selected variation (RackDevice only)                        |
-| /live/device/variations/randomize             | track_id, device_id |                 | Randomize all macro values in the rack (RackDevice only)                         |
+| /live/device/variations/recall_selected_variation    | track_id, device_id |                 | Apply the selected variation's macro values (RackDevice only)          |
+| /live/device/variations/recall_last_used_variation   | track_id, device_id |                 | Recall the last used variation (RackDevice only)                                 |
+| /live/device/variations/store_variation              | track_id, device_id |                 | Store current macro values as a new variation (RackDevice only)                  |
+| /live/device/variations/delete_selected_variation    | track_id, device_id |                 | Delete the currently selected variation (RackDevice only)                        |
+| /live/device/variations/randomize_macros             | track_id, device_id |                 | Randomize all macro values in the rack (RackDevice only)                         |
 
 For devices:
 

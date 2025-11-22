@@ -21,12 +21,19 @@ class DeviceHandler(AbletonOSCHandler):
 
             return device_callback
 
+        methods = [
+        ]
         properties_r = [
             "class_name",
             "name",
             "type"
         ]
-        properties_rw = []
+        properties_rw = [
+        ]
+
+        for method in methods:
+            self.osc_server.add_handler("/live/device/%s" % method,
+                                        create_device_callback(self._call_method, method))
 
         for prop in properties_r + properties_rw:
             self.osc_server.add_handler("/live/device/get/%s" % prop,

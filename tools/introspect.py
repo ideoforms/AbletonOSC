@@ -173,8 +173,9 @@ def introspect_object(object_type, object_ids, client_port=None, highlight_keywo
 
     try:
         # Query the introspection endpoint with object_type as first parameter
+        # Use longer timeout (2 seconds) as introspection returns large amounts of data
         params = (object_type,) + tuple(object_ids)
-        result = client.query(INTROSPECTION_ENDPOINT, params)
+        result = client.query(INTROSPECTION_ENDPOINT, params, timeout=2.0)
         format_introspection_output(result, object_type, object_ids, highlight_keywords)
         return True
     except Exception as e:

@@ -47,6 +47,60 @@ class DeviceHandler(AbletonOSCHandler):
                                         create_device_callback(self._set_property, prop))
 
         #--------------------------------------------------------------------------------
+        # Device Variations API (RackDevice only)
+        #--------------------------------------------------------------------------------
+
+        # Variations properties: /live/device/get/variations/{property}
+        def device_get_variations_num(device, params: Tuple[Any] = ()):
+            return (device.variation_count,)
+
+        def device_get_variations_selected(device, params: Tuple[Any] = ()):
+            return (device.selected_variation_index,)
+
+        def device_set_variations_selected(device, params: Tuple[Any] = ()):
+            device.selected_variation_index = int(params[0])
+
+        # Register variations property handlers
+        self.osc_server.add_handler("/live/device/get/variations/variation_count",
+                                    create_device_callback(device_get_variations_num))
+        self.osc_server.add_handler("/live/device/get/variations/selected_variation_index",
+                                    create_device_callback(device_get_variations_selected))
+        self.osc_server.add_handler("/live/device/set/variations/selected_variation_index",
+                                    create_device_callback(device_set_variations_selected))
+
+        # Variations listeners: /live/device/start_listen/variations/{property}
+        self.osc_server.add_handler("/live/device/start_listen/variations/variation_count",
+                                    create_device_callback(self._start_listen, "variation_count"))
+        self.osc_server.add_handler("/live/device/stop_listen/variations/variation_count",
+                                    create_device_callback(self._stop_listen, "variation_count"))
+        self.osc_server.add_handler("/live/device/start_listen/variations/selected_variation_index",
+                                    create_device_callback(self._start_listen, "selected_variation_index"))
+        self.osc_server.add_handler("/live/device/stop_listen/variations/selected_variation_index",
+                                    create_device_callback(self._stop_listen, "selected_variation_index"))
+
+        # Variations methods: /live/device/variations/{method}
+        def device_variations_recall(device, params: Tuple[Any] = ()):
+            device.recall_selected_variation()
+
+        def device_variations_recall_last(device, params: Tuple[Any] = ()):
+            device.recall_last_used_variation()
+
+        def device_variations_delete(device, params: Tuple[Any] = ()):
+            device.delete_selected_variation()
+
+        def device_variations_randomize(device, params: Tuple[Any] = ()):
+            device.randomize_macros()
+
+        self.osc_server.add_handler("/live/device/variations/recall_selected_variation",
+                                    create_device_callback(device_variations_recall))
+        self.osc_server.add_handler("/live/device/variations/recall_last_used_variation",
+                                    create_device_callback(device_variations_recall_last))
+        self.osc_server.add_handler("/live/device/variations/delete_selected_variation",
+                                    create_device_callback(device_variations_delete))
+        self.osc_server.add_handler("/live/device/variations/randomize_macros",
+                                    create_device_callback(device_variations_randomize))
+
+        #--------------------------------------------------------------------------------
         # Device: Get/set parameter lists
         #--------------------------------------------------------------------------------
         def device_get_num_parameters(device, params: Tuple[Any] = ()):
@@ -140,3 +194,14 @@ class DeviceHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))
         self.osc_server.add_handler("/live/device/start_listen/parameter/value", create_device_callback(device_get_parameter_value_listener, include_ids = True))
         self.osc_server.add_handler("/live/device/stop_listen/parameter/value", create_device_callback(device_get_parameter_remove_value_listener, include_ids = True))
+
+        #--------------------------------------------------------------------------------
+        # Device: Store variation (separate handler for optional parameter)
+        #--------------------------------------------------------------------------------
+        def device_variations_store(device, params: Tuple[Any] = ()):
+            """
+            Store the current macro state as a variation.
+            """
+            device.store_variation()
+
+        self.osc_server.add_handler("/live/device/variations/store_variation", create_device_callback(device_variations_store))

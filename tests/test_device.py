@@ -5,8 +5,8 @@ import pytest
 # Device Variations tests
 #
 # To test variations:
-# 1. Create an Instrument Rack or Effect Rack on track 0
-# 2. Add at least 2 macro variations to the rack
+# 1. Create an Instrument Rack or Effect Rack on track 0 (first track)
+# 2. The tests will auto-create variations if the rack has none
 # 3. Run: pytest tests/test_device.py
 #
 # Note: These tests will be skipped if the device doesn't support variations
@@ -32,14 +32,68 @@ def _device_has_variations(client, track_id, device_id):
 @pytest.fixture(scope="module", autouse=True)
 def _check_rack_device(client):
     """
-    Check if a rack device with variations exists on the test track.
-    Skip all tests if not found.
+    Check if a rack device exists on the test track.
+    If found but has no variations, create some automatically for testing.
+    Cleanup: Delete auto-created variations after tests complete.
+    Skip all tests if no RackDevice found.
     """
-    if not _device_has_variations(client, RACK_TRACK_ID, RACK_DEVICE_ID):
+    created_variations = False
+
+    try:
+        # Check if device exists and get variation count
+        result = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
+        if not result or len(result) < 3:
+            pytest.skip(
+                f"No RackDevice found on track {RACK_TRACK_ID}, device {RACK_DEVICE_ID}. "
+                "Please add an Instrument Rack or Audio Effect Rack to run these tests."
+            )
+
+        variation_count = result[2]
+
+        # If RackDevice exists but has no variations, create some
+        if variation_count == 0:
+            print(f"\n🔧 Setting up test variations on track {RACK_TRACK_ID}, device {RACK_DEVICE_ID}...")
+
+            # Store current state as variation 1
+            client.send_message("/live/device/variations/store_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
+            wait_one_tick()
+
+            # Randomize macros to create different state
+            client.send_message("/live/device/variations/randomize_macros", (RACK_TRACK_ID, RACK_DEVICE_ID))
+            wait_one_tick()
+
+            # Store randomized state as variation 2
+            client.send_message("/live/device/variations/store_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
+            wait_one_tick()
+
+            created_variations = True
+            print(f"✅ Created 2 variations for testing")
+
+    except Exception as e:
         pytest.skip(
-            f"No RackDevice with variations found on track {RACK_TRACK_ID}, device {RACK_DEVICE_ID}. "
-            "Please create an Instrument Rack or Effect Rack with at least 2 variations to run these tests."
+            f"Could not access device on track {RACK_TRACK_ID}, device {RACK_DEVICE_ID}: {e}"
         )
+
+    # Yield to run tests
+    yield
+
+    # Cleanup: Delete variations we created
+    if created_variations:
+        try:
+            print(f"\n🧹 Cleaning up test variations...")
+            # Get current count
+            result = client.query("/live/device/get/variations/variation_count", (RACK_TRACK_ID, RACK_DEVICE_ID))
+            if result and len(result) >= 3:
+                count = result[2]
+                # Delete all variations (in reverse order to avoid index issues)
+                for i in range(count - 1, -1, -1):
+                    client.send_message("/live/device/set/variations/selected_variation_index", (RACK_TRACK_ID, RACK_DEVICE_ID, i))
+                    wait_one_tick()
+                    client.send_message("/live/device/variations/delete_selected_variation", (RACK_TRACK_ID, RACK_DEVICE_ID))
+                    wait_one_tick()
+                print(f"✅ Cleanup complete")
+        except Exception as e:
+            print(f"⚠️  Cleanup failed: {e}")
 
 #--------------------------------------------------------------------------------
 # Test Device Variations - Read-only properties

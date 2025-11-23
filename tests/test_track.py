@@ -72,7 +72,7 @@ def test_track_clips(client):
 #--------------------------------------------------------------------------------
 
 def test_track_devices(client):
-    track_id = 0
+    track_id = 1
     assert client.query("/live/track/get/num_devices", (track_id,)) == (track_id, 0,)
 
 #--------------------------------------------------------------------------------

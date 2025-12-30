@@ -507,6 +507,75 @@ For devices:
 
 ---
 
+### Chain properties
+
+Chains are collections of devices within rack devices (Drum Racks, Instrument Racks, Effect Racks). This API allows you to access and control devices nested within rack chains.
+
+**Navigation hierarchy**: Track → Rack Device → Chain → Chain Device → Parameters
+
+<details>
+<summary><b>Documentation</b>: Chain API</summary>
+
+#### Rack Discovery
+
+| Address                           | Query params                                    | Response params                                        | Description                              |
+|:----------------------------------|:------------------------------------------------|:-------------------------------------------------------|:-----------------------------------------|
+| /live/chain/get/num_chains        | track_id, rack_device_id                        | track_id, rack_device_id, num_chains                   | Get number of chains in rack device      |
+| /live/chain/get/num_devices       | track_id, rack_device_id, chain_id              | track_id, rack_device_id, chain_id, num_devices        | Get number of devices in chain           |
+
+#### Chain Device Discovery
+
+| Address                           | Query params                                    | Response params                                        | Description                              |
+|:----------------------------------|:------------------------------------------------|:-------------------------------------------------------|:-----------------------------------------|
+| /live/chain/device/get/devices/name | track_id, rack_device_id, chain_id            | track_id, rack_device_id, chain_id, [name, ...]        | Get all device names in chain            |
+| /live/chain/device/get/devices/type | track_id, rack_device_id, chain_id            | track_id, rack_device_id, chain_id, [type, ...]        | Get all device types in chain            |
+
+#### Chain Device Parameters - Bulk Operations
+
+| Address                                         | Query params                                                  | Response params                                                    | Description                                                                             |
+|:------------------------------------------------|:--------------------------------------------------------------|:-------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| /live/chain/device/get/num_parameters           | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, num_params    | Get the number of parameters exposed by the chain device                                |
+| /live/chain/device/get/parameters/name          | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, [name, ...]   | Get the list of parameter names exposed by the chain device                             |
+| /live/chain/device/get/parameters/value         | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, [value, ...]  | Get the chain device parameter values                                                   |
+| /live/chain/device/get/parameters/min           | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, [value, ...]  | Get the chain device parameter minimum values                                           |
+| /live/chain/device/get/parameters/max           | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, [value, ...]  | Get the chain device parameter maximum values                                           |
+| /live/chain/device/get/parameters/is_quantized  | track_id, rack_device_id, chain_id, chain_device_id           | track_id, rack_device_id, chain_id, chain_device_id, [value, ...]  | Get the list of is_quantized settings (i.e., whether the parameter must be an int/bool) |
+| /live/chain/device/set/parameters/value         | track_id, rack_device_id, chain_id, chain_device_id, val, ... |                                                                    | Set the chain device parameter values                                                   |
+
+#### Chain Device Parameters - Individual Operations
+
+| Address                                         | Query params                                                        | Response params                                                           | Description                                                             |
+|:------------------------------------------------|:--------------------------------------------------------------------|:--------------------------------------------------------------------------|:------------------------------------------------------------------------|
+| /live/chain/device/get/parameter/value          | track_id, rack_device_id, chain_id, chain_device_id, parameter_id   | track_id, rack_device_id, chain_id, chain_device_id, parameter_id, value  | Get a chain device parameter value                                      |
+| /live/chain/device/get/parameter/value_string   | track_id, rack_device_id, chain_id, chain_device_id, parameter_id   | track_id, rack_device_id, chain_id, chain_device_id, parameter_id, value  | Get the chain device parameter value as a readable string ex: 2500 Hz   |
+| /live/chain/device/get/parameter/name           | track_id, rack_device_id, chain_id, chain_device_id, parameter_id   | track_id, rack_device_id, chain_id, chain_device_id, parameter_id, name   | Get a chain device parameter name                                       |
+| /live/chain/device/set/parameter/value          | track_id, rack_device_id, chain_id, chain_device_id, parameter_id, value |                                                                      | Set a chain device parameter value                                      |
+
+**Notes:**
+- Use `/live/track/get/devices/can_have_chains` to identify which devices are racks
+- Rack devices include: Drum Rack, Instrument Rack, Audio Effect Rack, MIDI Effect Rack
+- Device types follow the same convention as `/live/device`: 1 = audio_effect, 2 = instrument, 4 = midi_effect
+- Chain devices have the same parameter interface as top-level devices
+
+**Example Usage:**
+```python
+# Get chains in drum rack on track 0, device 0
+num_chains = query("/live/chain/get/num_chains", (0, 0))
+# Returns: (0, 0, 128)  # 128 chains in drum rack
+
+# Get devices in first chain
+num_devices = query("/live/chain/get/num_devices", (0, 0, 0))
+# Returns: (0, 0, 0, 2)  # 2 devices in chain
+
+# Get parameter value from chain device
+value = query("/live/chain/device/get/parameter/value", (0, 0, 0, 0, 5))
+# Returns: (0, 0, 0, 0, 5, 0.75)  # Parameter 5 has value 0.75
+```
+
+</details>
+
+---
+
 ## MidiMap API
 
 Can be used to create assignments between MIDI CC and Live parameters.

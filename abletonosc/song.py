@@ -163,6 +163,52 @@ class SongHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 
 
+        def serialize_device(device):
+            """
+            Recursively serialize a device, including its parameters and chains (if it's a rack).
+            """
+            device_data = {
+                "class_name": device.class_name,
+                "type": device.type,
+                "name": device.name,
+                "parameters": []
+            }
+
+            # Export parameters
+            for parameter in device.parameters:
+                device_data["parameters"].append({
+                    "name": parameter.name,
+                    "value": parameter.value,
+                    "min": parameter.min,
+                    "max": parameter.max,
+                    "is_quantized": parameter.is_quantized,
+                })
+
+            # Check if device has chains (is a rack)
+            try:
+                chains = device.chains
+                device_data["chains"] = []
+
+                for chain_index, chain in enumerate(chains):
+                    chain_data = {
+                        "index": chain_index,
+                        "name": chain.name,
+                        "devices": []
+                    }
+
+                    # Recursively serialize chain devices
+                    for chain_device_index, chain_device in enumerate(chain.devices):
+                        chain_device_data = serialize_device(chain_device)
+                        chain_device_data["index"] = chain_device_index
+                        chain_data["devices"].append(chain_device_data)
+
+                    device_data["chains"].append(chain_data)
+            except AttributeError:
+                # Not a rack device, skip chains
+                pass
+
+            return device_data
+
         def song_export_structure(params):
             tracks = []
             for track_index, track in enumerate(self.song.tracks):
@@ -187,20 +233,8 @@ class SongHandler(AbletonOSCHandler):
                         track_data["clips"].append(clip_data)
 
                 for device_index, device in enumerate(track.devices):
-                    device_data = {
-                        "class_name": device.class_name,
-                        "type": device.type,
-                        "name": device.name,
-                        "parameters": []
-                    }
-                    for parameter in device.parameters:
-                        device_data["parameters"].append({
-                            "name": parameter.name,
-                            "value": parameter.value,
-                            "min": parameter.min,
-                            "max": parameter.max,
-                            "is_quantized": parameter.is_quantized,
-                        })
+                    device_data = serialize_device(device)
+                    device_data["index"] = device_index
                     track_data["devices"].append(device_data)
 
                 tracks.append(track_data)

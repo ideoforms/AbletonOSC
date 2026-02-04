@@ -61,8 +61,13 @@ class AbletonOSCHandler(Component):
         def property_changed_callback():
             if getter is None:
                 value = getattr(target, prop)
+            elif getter == "bang":
+                value = 1
             else:
-                value = getter(params)
+                try:
+                    value = getter(target, params)
+                except TypeError:
+                    value = getter(params)
             if type(value) is not tuple:
                 value = (value,)
             self.logger.info("Property %s changed of %s %s: %s" % (prop, self.class_identifier, str(params), value))
@@ -80,9 +85,10 @@ class AbletonOSCHandler(Component):
         self.listener_functions[listener_key] = property_changed_callback
         self.listener_objects[listener_key] = target
         #--------------------------------------------------------------------------------
-        # Immediately send the current value
+        # Immediately send the current value (skip for bang-only listeners)
         #--------------------------------------------------------------------------------
-        property_changed_callback()
+        if getter != "bang":
+            property_changed_callback()
 
     def _stop_listen(self, target, prop, params: Optional[Tuple[Any]] = ()) -> None:
         listener_key = (prop, tuple(params))

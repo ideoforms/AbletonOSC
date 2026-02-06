@@ -31,7 +31,6 @@ class OSCServer:
 
         self._local_addr = local_addr
         self._remote_addr = remote_addr
-        self._response_port = remote_addr[1]
 
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._socket.setblocking(0)
@@ -39,8 +38,8 @@ class OSCServer:
         self._callbacks = {}
 
         self.logger = logging.getLogger("abletonosc")
-        self.logger.info("Starting OSC server (local %s, response port %d)",
-                         str(self._local_addr), self._response_port)
+        self.logger.info("Starting OSC server (local %s, default remote %s)",
+                         str(self._local_addr), str(self._remote_addr))
 
     def add_handler(self, address: str, handler: Callable) -> None:
         """
@@ -91,11 +90,9 @@ class OSCServer:
 
             if rv is not None:
                 assert isinstance(rv, tuple)
-                remote_hostname, _ = remote_addr
-                response_addr = (remote_hostname, self._response_port)
                 self.send(address=message.address,
                           params=rv,
-                          remote_addr=response_addr)
+                          remote_addr=remote_addr)
         elif "*" in message.address:
             regex = message.address.replace("*", "[^/]+")
             for callback_address, callback in self._callbacks.items():
@@ -116,11 +113,9 @@ class OSCServer:
                         continue
                     if rv is not None:
                         assert isinstance(rv, tuple)
-                        remote_hostname, _ = remote_addr
-                        response_addr = (remote_hostname, self._response_port)
                         self.send(address=callback_address,
                                   params=rv,
-                                  remote_addr=response_addr)
+                                  remote_addr=remote_addr)
         else:
             self.logger.error("AbletonOSC: Unknown OSC address: %s" % message.address)
 
@@ -159,10 +154,8 @@ class OSCServer:
                 #--------------------------------------------------------------------------------
                 # Update the default reply address to the most recent client. Used when
                 # sending (e.g) /live/song/beat messages and listen updates.
-                #
-                # This is slightly ugly and prevents registering listeners from different IPs.
                 #--------------------------------------------------------------------------------
-                self._remote_addr = (remote_addr[0], OSC_RESPONSE_PORT)
+                self._remote_addr = remote_addr
                 self.parse_bundle(data, remote_addr)
 
         except socket.error as e:

@@ -94,6 +94,7 @@ class Manager(ControlSurface):
                 abletonosc.SongHandler(self),
                 abletonosc.ApplicationHandler(self),
                 abletonosc.ClipHandler(self),
+                abletonosc.ClipViewHandler(self),
                 abletonosc.ClipSlotHandler(self),
                 abletonosc.TrackHandler(self),
                 abletonosc.DeviceHandler(self),

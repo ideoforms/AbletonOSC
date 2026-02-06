@@ -329,15 +329,43 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 <details>
 <summary><b>Documentation</b>: Clip Slot API</summary>
 
-| Address                             | Query params                                                   | Response params                          | Description                                     |
-|:------------------------------------|:---------------------------------------------------------------|:-----------------------------------------|:------------------------------------------------|
-| /live/clip_slot/fire                | track_index, clip_index                                        |                                          | Fire play/pause of the specified clip slot      |
-| /live/clip_slot/create_clip         | track_index, clip_index, length                                |                                          | Create a clip in the slot                       |
-| /live/clip_slot/delete_clip         | track_index, clip_index                                        |                                          | Delete the clip in the slot                     |
-| /live/clip_slot/get/has_clip        | track_index, clip_index                                        | track_index, clip_index, has_clip        | Query whether the slot has a clip               |
-| /live/clip_slot/get/has_stop_button | track_index, clip_index                                        | track_index, clip_index, has_stop_button | Query whether the slot has a stop button        |
-| /live/clip_slot/set/has_stop_button | track_index, clip_index, has_stop_button                       |                                          | Add or remove stop button (1=on, 0=off)         |
-| /live/clip_slot/duplicate_clip_to   | track_index, clip_index, target_track_index, target_clip_index |                                          | Duplicate the clip to an empty target clip slot |
+| Address                                            | Query params                                                     | Response params                                 | Description                                                                                          |
+| -------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| /live/clip_slot/fire                               | track_index, clip_index                                          |                                                 | Fire play/pause of the specified clip slot                                                           |
+| /live/clip_slot/stop                               | track_index, clip_index                                          |                                                 | Stops playling/recording the specified clip slot                                                     |
+| /live/clip_slot/create/midi_clip                   | track_index, clip_index, length                                  |                                                 | Create a MIDI clip in the slot                                                                       |
+| /live/clip_slot/create/audio_clip                  | track_index, clip_index, file_path                               |                                                 | Create an audio clip from file in the slot                                                           |
+| /live/clip_slot/delete/clip                        | track_index, clip_index                                          |                                                 | Delete the clip in the slot                                                                          |
+| /live/clip_slot/duplicate_to                       | track_index, clip_index, target_track_index, target_clip_index   |                                                 | Duplicate the clip to a target clip slot                                                             |
+| /live/clip_slot/set/fire_button                    | track_index, clip_index, fire_button_state                       |                                                 | Set fire button state directly (1=on, 0=off)                                                         |
+| /live/clip_slot/get/color                          | track_index, clip_index                                          | track_index, clip_index, color                  | Get clip slot color; Group Track slots only                                                          |
+| /live/clip_slot/start_listen/color                 | track_index, clip_index                                          | track_index, clip_index, color                  | Listen for slot color changes; Group Track slots only                                                |
+| /live/clip_slot/stop_listen/color                  | track_index, clip_index                                          |                                                 | Stop listening for slot color changes; Group Track slots only                                        |
+| /live/clip_slot/get/color_index                    | track_index, clip_index                                          | track_index, clip_index, color_index            | Get clip slot color index (0-69); Group Track slots only                                             |
+| /live/clip_slot/start_listen/color_index           | track_index, clip_index                                          | track_index, clip_index, color_index            | Listen for slot color index changes; Group Track slots only                                          |
+| /live/clip_slot/stop_listen/color_index            | track_index, clip_index                                          |                                                 | Stop listening for slot color index changes; Group Track slots only                                  |
+| /live/clip_slot/get/controls_other_clips           | track_index, clip_index                                          | track_index, clip_index, controls_other_clips   | Get whether slot controls other clips; Group Track slots only                                        |
+| /live/clip_slot/start_listen/controls_other_clips  | track_index, clip_index                                          | track_index, clip_index, controls_other_clips   | Listen for controls_other_clips changes; Group Track slots only                                      |
+| /live/clip_slot/stop_listen/controls_other_clips   | track_index, clip_index                                          |                                                 | Stop listening for controls_other_clips changes; Group Track slots only                              |
+| /live/clip_slot/get/has_clip                       | track_index, clip_index                                          | track_index, clip_index, has_clip               | Query whether the slot has a clip                                                                    |
+| /live/clip_slot/start_listen/has_clip              | track_index, clip_index                                          | track_index, clip_index, has_clip               | Listen for has_clip changes                                                                          |
+| /live/clip_slot/stop_listen/has_clip               | track_index, clip_index                                          |                                                 | Stop listening for has_clip changes                                                                  |
+| /live/clip_slot/get/has_stop_button                | track_index, clip_index                                          | track_index, clip_index, has_stop_button        | Query whether the slot has a stop button                                                             |
+| /live/clip_slot/set/has_stop_button                | track_index, clip_index, has_stop_button                         |                                                 | Add or remove stop button (1=on, 0=off)                                                              |
+| /live/clip_slot/start_listen/has_stop_button       | track_index, clip_index                                          | track_index, clip_index, has_stop_button        | Listen for has_stop_button changes                                                                   |
+| /live/clip_slot/stop_listen/has_stop_button        | track_index, clip_index                                          |                                                 | Stop listening for has_stop_button changes                                                           |
+| /live/clip_slot/get/is_group_slot                  | track_index, clip_index                                          | track_index, clip_index, is_group_slot          | Query whether the slot is a group slot                                                               |
+| /live/clip_slot/get/is_playing                     | track_index, clip_index                                          | track_index, clip_index, is_playing             | Query whether the slot is playing (playing_status != 0)                                              |
+| /live/clip_slot/get/is_recording                   | track_index, clip_index                                          | track_index, clip_index, is_recording           | Query whether the slot is recording (playing_status == 2)                                            |
+| /live/clip_slot/get/is_triggered                   | track_index, clip_index                                          | track_index, clip_index, is_triggered           | Query whether the slot is triggered                                                                  |
+| /live/clip_slot/start_listen/is_triggered          | track_index, clip_index                                          | track_index, clip_index, is_triggered           | Listen for is_triggered changes                                                                      |
+| /live/clip_slot/stop_listen/is_triggered           | track_index, clip_index                                          |                                                 | Stop listening for is_triggered changes                                                              |
+| /live/clip_slot/get/playing_status                 | track_index, clip_index                                          | track_index, clip_index, playing_status         | Query slot playing_status: At least one clip in Group Track slot is (1=playing, 2=recording)         |
+| /live/clip_slot/start_listen/playing_status        | track_index, clip_index                                          | track_index, clip_index, playing_status         | Listen for playing_status changes                                                                    |
+| /live/clip_slot/stop_listen/playing_status         | track_index, clip_index                                          |                                                 | Stop listening for playing_status changes                                                            |
+| /live/clip_slot/get/will_record_on_start           | track_index, clip_index                                          | track_index, clip_index, will_record_on_start   | Query whether slot will record on start                                                              |
+| /live/clip_slot/create_clip                        | track_index, clip_index, length                                  |                                                 | Create a MIDI clip in the slot (kept for backwards-compatibility)                                                         |
+| /live/clip_slot/delete_clip                        | track_index, clip_index                                          |                                                 | Delete the clip in the slot (kept for backwards-compatibility)                                                            |
 
 </details>
 
@@ -345,73 +373,194 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 
 ## Clip API
 
-Represents an audio or MIDI clip. Can be used to start/stop clips, and query/modify their notes, name, gain, pitch, color, playing state/position, etc.
+Represents an audio or MIDI clip in session view. Can be used to start/stop clips, and query/modify their notes, name, gain, pitch, color, playing state/position, etc.
 
 <details>
 <summary><b>Documentation</b>: Clip API</summary>
 
-| Address                                  | Query params                                                        | Response params                                                                        | Description                                                                                                                                              |
-|:-----------------------------------------|:--------------------------------------------------------------------|:---------------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| /live/clip/fire                          | track_id, clip_id                                                   |                                                                                        | Start clip playback                                                                                                                                      |
-| /live/clip/stop                          | track_id, clip_id                                                   |                                                                                        | Stop clip playback                                                                                                                                       |
-| /live/clip/duplicate_loop                | track_id, clip_id                                                   |                                                                                        | Duplicates clip loop                                                                                                                                     |
-| /live/clip/get/notes                     | track_id, clip_id, [start_pitch, pitch_span, start_time, time_span] | track_id, clip_id, pitch, start_time, duration, velocity, mute, [pitch, start_time...] | Query the notes in a given clip, optionally including a start time/pitch and time/pitch span.                                                            |
-| /live/clip/add/notes                     | track_id, clip_id, pitch, start_time, duration, velocity, mute, ... |                                                                                        | Add new MIDI notes to a clip. pitch is MIDI note index, start_time and duration are beats in floats, velocity is MIDI velocity index, mute is true/false |
-| /live/clip/remove/notes                  | [start_pitch, pitch_span, start_time, time_span]                    |                                                                                        | Remove notes from a clip in a range of pitches and times. If no ranges specified, all notes are removed. Note that ordering has changed as of 2023-11.   |
-| /live/clip/get/color                     | track_id, clip_id                                                   | track_id, clip_id, color                                                               | Get clip color                                                                                                                                           |
-| /live/clip/set/color                     | track_id, clip_id, color                                            |                                                                                        | Set clip color                                                                                                                                           |
-| /live/clip/get/color_index               | track_id, clip_id                                                   | track_id, clip_id, color_index                                                               | Get clip color index (0-69)                                                                                                                                           |
-| /live/clip/set/color_index               | track_id, clip_id, color_index                                      |                                                                                        | Set clip color index (0-69)                                                                                                                                          |
-| /live/clip/get/name                      | track_id, clip_id                                                   | track_id, clip_id, name                                                                | Get clip name                                                                                                                                            |
-| /live/clip/set/name                      | track_id, clip_id, name                                             |                                                                                        | Set clip name                                                                                                                                            |
-| /live/clip/get/gain                      | track_id, clip_id                                                   | track_id, clip_id, gain                                                                | Get clip gain                                                                                                                                            |
-| /live/clip/set/gain                      | track_id, clip_id, gain                                             |                                                                                        | Set clip gain                                                                                                                                            |
-| /live/clip/get/length                    | track_id, clip_id                                                   | track_id, clip_id, length                                                              | Get clip length                                                                                                                                          |
-| /live/clip/get/sample_length              | track_id, clip_id                                                   | track_id, clip_id, sample_length                                                           | Get clip sample length                                                                                                                                 |
-| /live/clip/get/start_time              | track_id, clip_id                                                   | track_id, clip_id, start_time                                                           | Get clip start time                                                                                                                                 |
-| /live/clip/get/pitch_coarse              | track_id, clip_id                                                   | track_id, clip_id, semitones                                                           | Get clip coarse re-pitch                                                                                                                                 |
-| /live/clip/set/pitch_coarse              | track_id, clip_id, semitones                                        |                                                                                        | Set clip coarse re-pitch                                                                                                                                 |
-| /live/clip/get/pitch_fine                | track_id, clip_id                                                   | track_id, clip_id, cents                                                               | Get clip fine re-pitch                                                                                                                                   |
-| /live/clip/set/pitch_fine                | track_id, clip_id, cents                                            |                                                                                        | Set clip fine re-pitch                                                                                                                                   |
-| /live/clip/get/file_path                 | track_id, clip_id                                                   | track_id, clip_id, file_path                                                           | Get clip file path                                                                                                                                       |
-| /live/clip/get/is_audio_clip             | track_id, clip_id                                                   | track_id, clip_id, is_audio_clip                                                       | Query whether clip is audio                                                                                                                              |
-| /live/clip/get/is_midi_clip              | track_id, clip_id                                                   | track_id, clip_id, is_midi_clip                                                        | Query whether clip is MIDI                                                                                                                               |
-| /live/clip/get/is_playing                | track_id, clip_id                                                   | track_id, clip_id, is_playing                                                          | Query whether clip is playing                                                                                                                            |
-| /live/clip/get/is_overdubbing                | track_id, clip_id                                                   | track_id, clip_id, is_overdubbing                                                          | Query whether clip is overdubbing                                                                                                                            |
-| /live/clip/get/is_recording              | track_id, clip_id                                                   | track_id, clip_id, is_recording                                                        | Query whether clip is recording                                                                                                                          |
-| /live/clip/get/will_record_on_start                | track_id, clip_id                                                   | track_id, clip_id, will_record_on_start                                                          | Query whether clip will record on start                                                                                                                            |
-| /live/clip/get/playing_position          | track_id, clip_id                                                   | track_id, clip_id, playing_position                                                    | Get clip's playing position                                                                                                                              |
-| /live/clip/start_listen/playing_position | track_id, clip_id                                                   |                                                                                        | Start listening for clip's playing position. Replies are sent to /live/clip/get/playing_position, with args: track_id, clip_id, playing_position         |
-| /live/clip/stop_listen/playing_position  | track_id, clip_id                                                   |                                                                                        | Stop listening for clip's playing position.                                                                                                              |
-| /live/clip/get/loop_start                | track_id, clip_id                                                   | track_id, clip_id, loop_start                                                          | Get clip's loop start                                                                                                                                    |
-| /live/clip/set/loop_start                | track_id, clip_id, loop_start                                       |                                                                                        | Set clip's loop start                                                                                                                                    |
-| /live/clip/get/loop_end                  | track_id, clip_id                                                   | track_id, clip_id, loop_end                                                            | Get clip's loop end                                                                                                                                      |
-| /live/clip/set/loop_end                  | track_id, clip_id, loop_end                                         |                                                                                        | Set clip's loop end                                                                                                                                      |
-| /live/clip/get/warping                   | track_id, clip_id                                                   | track_id, clip_id, warping                                                             | Get clip's warp mode                                                                                                                                     |
-| /live/clip/set/warping                   | track_id, clip_id, warping                                          |                                                                                        | Set clip's warp mode                                                                                                                                     |
-| /live/clip/get/launch_mode                   | track_id, clip_id                                                   | track_id, clip_id, launch_mode                                                             | Get clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)                                                                                                                                    |
-| /live/clip/set/launch_mode                   | track_id, clip_id, launch_mode                                          |                                                                                        | Set clip's launch mode (0=Trigger, 1=Gate, 2=Toggle, 3=Repeat)                                                                                                                                     |
-| /live/clip/get/launch_quantization                   | track_id, clip_id                                                   | track_id, clip_id, launch_quantization                                                             | Get clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)                                                                                                                                    |
-| /live/clip/set/launch_quantization                   | track_id, clip_id, launch_quantization                                          |                                                                                        | Set clip's launch Quantization Value (0=Global, 1=None, 2=8Bars, 3=4Bars, 4=2Bars, 5=1Bar, 6=1/2, 7=1/2T, 8=1/4, 9=1/4T, 10=1/8, 11=1/8T, 12=1/16, 13=1/16T, 14=1/32)                                                                                                                                     |
-| /live/clip/get/ram_mode                   | track_id, clip_id                                                   | track_id, clip_id, ram_mode                                                             | Get clip's Ram Mode (0=False, 1=True)                                                                                                      |
-| /live/clip/set/ram_mode                   | track_id, clip_id, ram_mode                                          |                                                                                        | Set clip's Ram Mode (0=False, 1=True)                                                                                                                                     |
-| /live/clip/get/warp_mode                   | track_id, clip_id                                                   | track_id, clip_id, warp_mode                                                             | Get clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)                                                                                                     |
-| /live/clip/set/warp_mode                   | track_id, clip_id, warp_mode                                          |                                                                                        | Set clip's Warp Mode (0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=Invalid/Error, 6=Pro)                                                                                                                                    |
-| /live/clip/get/has_groove                   | track_id, clip_id                                                   | track_id, clip_id, has_groove                                                             | Get clip Groove state (0=False, 1=True)
-| /live/clip/get/legato                   | track_id, clip_id                                                   | track_id, clip_id, legato                                                             | Get clip's Legato state (0=False, 1=True)                                                                                                      |
-| /live/clip/set/legato                   | track_id, clip_id, legato                                          |                                                                                        | Set clip's Legato state (0=False, 1=True)                                                                                                                                     |
-| /live/clip/get/position                   | track_id, clip_id                                                   | track_id, clip_id, position                                                             | Get clip's position (LoopStart)                                                                                                     |
-| /live/clip/set/position                   | track_id, clip_id, position                                          |                                                                                        | Set clip's position (LoopStart)                                                                                                                                     |
-| /live/clip/get/muted                   | track_id, clip_id                                                   | track_id, clip_id, muted                                                             | Get clip's Muted state (0=False, 1=True)                                                                                                      |
-| /live/clip/set/muted                   | track_id, clip_id, muted                                          |                                                                                        | Set clip's Muted state (0=False, 1=True)                                                                                                                                     |
-| /live/clip/get/velocity_amount              | track_id, clip_id                                                   | track_id, clip_id, velocity_amount                                                       | Get clip's Velocity Amount (0.0-1.0 aka 0% to 100%)                                                                                                                                  |
-| /live/clip/set/velocity_amount              | track_id, clip_id, velocity_amount                                     |                                                                                        | Set clip's Velocity Amount (0.0-1.0 aka 0% to 100%)                                                                                               |
-| /live/clip/get/start_marker              | track_id, clip_id                                                   | track_id, clip_id, start_marker                                                        | Get clip's start marker                                                                                                                                  |
-| /live/clip/set/start_marker              | track_id, clip_id, start_marker                                     |                                                                                        | Set clip's start marker, expressed in floating-point beats                                                                                               |
-| /live/clip/get/end_marker                | track_id, clip_id                                                   | track_id, clip_id, end_marker                                                          | Get clip's end marker                                                                                                                                    |
-| /live/clip/set/end_marker                | track_id, clip_id, end_marker                                       |                                                                                        | Set clip's end marker, expressed in floating-point beats                                                                                                 |
+### Playback / Transport
 
+Playback actions plus timeline/loop state properties that affect clip transport.
+
+| Address                                            | Query params                               | Response params          | Description                                        |
+| -------------------------------------------------- | ------------------------------------------ | ------------------------ | -------------------------------------------------- |
+| /live/clip/fire                                    | track_id, clip_id                          |                          | Start clip playback                                |
+| /live/clip/stop                                    | track_id, clip_id                          |                          | Stop clip playback                                 |
+| /live/clip/set/fire_button                         | track_id, clip_id, state                   |                          | Set the clip’s fire button state                   |
+| /live/clip/scrub                                   | track_id, clip_id, scrub_pos               |                          | Begin scrubbing the clip at scrub_pos (beats)      |
+| /live/clip/stop/scrub                              | track_id, clip_id                          |                          | Stop scrubbing the clip                            |
+| /live/clip/move/playing_pos                        | track_id, clip_id, delta_beats             |                          | Move the current playing position by a beat offset |
+| /live/clip/crop                                    | track_id, clip_id                          |                          | Crop clip to current loop                          |
+| /live/clip/duplicate/loop                          | track_id, clip_id                          |                          | Duplicate the clip loop (preferred name)           |
+| /live/clip/quantize                                | track_id, clip_id, quantize, amount        |                          | Quantize notes (MIDI) or warp markers (audio)      |
+| /live/clip/quantize/pitch                          | track_id, clip_id, pitch, quantize, amount |                          | Quantize notes at a pitch (MIDI clips only)        |
+| /live/clip/get/start_marker                        | track_id, clip_id                          | track_id, clip_id, value | Start marker                                       |
+| /live/clip/set/start_marker                        | track_id, clip_id, value                   |                          | Start marker                                       |
+| /live/clip/[start/stop]_listen/start_marker        | track_id, clip_id                          | track_id, clip_id, value | Start marker                                       |
+| /live/clip/get/end_marker                          | track_id, clip_id                          | track_id, clip_id, value | End marker (beats/seconds)                         |
+| /live/clip/set/end_marker                          | track_id, clip_id, value                   |                          | End marker (beats/seconds)                         |
+| /live/clip/[start/stop]_listen/end_marker          | track_id, clip_id                          | track_id, clip_id, value | End marker (beats/seconds)                         |
+| /live/clip/get/start_time                          | track_id, clip_id                          | track_id, clip_id, value | Start time                                         |
+| /live/clip/[start/stop]_listen/start_time          | track_id, clip_id                          | track_id, clip_id, value | Start time                                         |
+| /live/clip/get/end_time                            | track_id, clip_id                          | track_id, clip_id, value | End time (beats/seconds)                           |
+| /live/clip/[start/stop]_listen/end_time            | track_id, clip_id                          | track_id, clip_id, value | End time (beats/seconds)                           |
+| /live/clip/set/looping                             | track_id, clip_id, value                   |                          | Loop enabled                                       |
+| /live/clip/[start/stop]_listen/looping             | track_id, clip_id                          | track_id, clip_id, value | Loop enabled                                       |
+| /live/clip/get/loop_start                          | track_id, clip_id                          | track_id, clip_id, value | Loop start                                         |
+| /live/clip/set/loop_start                          | track_id, clip_id, value                   |                          | Loop start                                         |
+| /live/clip/[start/stop]_listen/loop_start          | track_id, clip_id                          | track_id, clip_id, value | Loop start                                         |
+| /live/clip/get/loop_end                            | track_id, clip_id                          | track_id, clip_id, value | Loop end                                           |
+| /live/clip/set/loop_end                            | track_id, clip_id, value                   |                          | Loop end                                           |
+| /live/clip/[start/stop]_listen/loop_end            | track_id, clip_id                          | track_id, clip_id, value | Loop end                                           |
+| /live/clip/[start/stop]_listen/loop_jump           | track_id, clip_id                          | track_id, clip_id, 1     | Bang when loop crosses start                       |
+| /live/clip/get/looping                             | track_id, clip_id                          | track_id, clip_id, value | Loop enabled                                       |
+| /live/clip/get/is_overdubbing                      | track_id, clip_id                          | track_id, clip_id, value | Overdubbing flag                                   |
+| /live/clip/[start/stop]_listen/is_overdubbing      | track_id, clip_id                          | track_id, clip_id, value | Overdubbing flag                                   |
+| /live/clip/get/is_playing                          | track_id, clip_id                          | track_id, clip_id, value | Play state (setter supported)                      |
+| /live/clip/set/is_playing                          | track_id, clip_id, value                   |                          | Play state (setter supported)                      |
+| /live/clip/get/is_recording                        | track_id, clip_id                          | track_id, clip_id, value | Recording flag                                     |
+| /live/clip/[start/stop]_listen/is_recording        | track_id, clip_id                          | track_id, clip_id, value | Recording flag                                     |
+| /live/clip/get/is_triggered                        | track_id, clip_id                          | track_id, clip_id, value | Triggered flag                                     |
+| /live/clip/get/launch_mode                         | track_id, clip_id                          | track_id, clip_id, value | Launch mode                                        |
+| /live/clip/set/launch_mode                         | track_id, clip_id, value                   |                          | Launch mode                                        |
+| /live/clip/[start/stop]_listen/launch_mode         | track_id, clip_id                          | track_id, clip_id, value | Launch mode                                        |
+| /live/clip/get/launch_quantization                 | track_id, clip_id                          | track_id, clip_id, value | Launch quantization                                |
+| /live/clip/set/launch_quantization                 | track_id, clip_id, value                   |                          | Launch quantization                                |
+| /live/clip/[start/stop]_listen/launch_quantization | track_id, clip_id                          | track_id, clip_id, value | Launch quantization                                |
+| /live/clip/get/legato                              | track_id, clip_id                          | track_id, clip_id, value | Legato flag                                        |
+| /live/clip/set/legato                              | track_id, clip_id, value                   |                          | Legato flag                                        |
+| /live/clip/[start/stop]_listen/legato              | track_id, clip_id                          | track_id, clip_id, value | Legato flag                                        |
+| /live/clip/get/playing_position                    | track_id, clip_id                          | track_id, clip_id, value | Playing position                                   |
+| /live/clip/[start/stop]_listen/playing_position    | track_id, clip_id                          | track_id, clip_id, value | Playing position                                   |
+| /live/clip/[start/stop]_listen/playing_status      | track_id, clip_id                          | track_id, clip_id, 1     | Bang when play/trigger state changes               |
+| /live/clip/get/position                            | track_id, clip_id                          | track_id, clip_id, value | Loop position                                      |
+| /live/clip/set/position                            | track_id, clip_id, value                   |                          | Loop position                                      |
+| /live/clip/[start/stop]_listen/position            | track_id, clip_id                          | track_id, clip_id, value | Loop position                                      |
+
+### Warping (Audio Clips)
+
+Audio-only warp marker operations and warp-related properties, plus time conversion for warped clips.
+
+| Address                                     | Query params                                  | Response params                                  | Description                                           |
+| ------------------------------------------- | --------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| /live/clip/add/warp_marker                  | track_id, clip_id, beat_time[, sample_time]   |                                                  | Add a warp marker at beat_time (sample_time optional) |
+| /live/clip/move/warp_marker                 | track_id, clip_id, beat_time, beat_time_delta |                                                  | Move a warp marker by beat_time_delta                 |
+| /live/clip/remove/warp_marker               | track_id, clip_id, beat_time                  |                                                  | Remove a warp marker at beat_time                     |
+| /live/clip/get/available_warp_modes         | track_id, clip_id                             | track_id, clip_id, warp_mode…                    | Available warp modes                                  |
+| /live/clip/get/warp_mode                    | track_id, clip_id                             | track_id, clip_id, value                         | Warp mode                                             |
+| /live/clip/set/warp_mode                    | track_id, clip_id, value                      |                                                  | Warp mode                                             |
+| /live/clip/[start/stop]_listen/warp_mode    | track_id, clip_id                             | track_id, clip_id, value                         | Warp mode                                             |
+| /live/clip/get/warp_markers                 | track_id, clip_id                             | track_id, clip_id, beat_time_1, sample_time_1, … | Warp markers (shadow marker dropped)                  |
+| /live/clip/[start/stop]_listen/warp_markers | track_id, clip_id                             | track_id, clip_id, beat_time_1, sample_time_1, … | Warp markers (shadow marker dropped)                  |
+| /live/clip/get/warping                      | track_id, clip_id                             | track_id, clip_id, value                         | Warping enabled                                       |
+| /live/clip/set/warping                      | track_id, clip_id, value                      |                                                  | Warping enabled                                       |
+| /live/clip/[start/stop]_listen/warping      | track_id, clip_id                             | track_id, clip_id, value                         | Warping enabled                                       |
+| /live/clip/convert/time                     | track_id, clip_id, unit_from, unit_to, value  | track_id, clip_id, value                         | Convert time between samples/seconds/beats            |
+
+### Notes (MIDI Clips)
+
+MIDI-only note endpoints and note-number conversion.
+
+| Address                                | Query params                                                                      | Response params                                              | Description                                                                                               |
+| -------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| /live/clip/add/notes                   | track_id, clip_id, pitch, start, duration, velocity, mute, …                      |                                                              | Add notes                                                                                                 |
+| /live/clip/get/notes                   | track_id, clip_id[, pitch_start, pitch_span, time_start, time_span]               | track_id, clip_id, pitch, start, duration, velocity, mute, … | Get notes in range (or all if no range)                                                                   |
+| /live/clip/get/selected_notes          | track_id, clip_id                                                                 | track_id, clip_id, pitch, start, duration, velocity, mute, … | Get selected notes                                                                                        |
+| /live/clip/[start/stop]_listen/notes   | track_id, clip_id                                                                 | track_id, clip_id, notes…                                    | Notes listener                                                                                            |
+| /live/clip/replace/notes               | track_id, clip_id[, pitch_start, pitch_span, time_start, time_span], notes…       |                                                              | Replace notes in range (or all if no range)                                                               |
+| /live/clip/replace/selected_notes      | track_id, clip_id, notes…                                                         |                                                              | Replace selected notes                                                                                    |
+| /live/clip/remove/notes                | track_id, clip_id[, pitch_start, pitch_span, time_start, time_span]               |                                                              | Remove notes in range (or all if no range)                                                                |
+| /live/clip/remove/selected_notes       | track_id, clip_id                                                                 |                                                              | Remove selected notes                                                                                     |
+| /live/clip/duplicate/all_notes         | track_id, clip_id[, destination_time, transposition]                              |                                                              | Duplicate all notes. Default destination is end of last note                                              |
+| /live/clip/duplicate/region            | track_id, clip_id, from_time, time_span[, destination_time, pitch, transposition] |                                                              | Duplicate notes in a region. Default destination is end of time_span. Optionaly filter to a single pitch. |
+| /live/clip/duplicate/selected_notes    | track_id, clip_id[, destination_time, transposition]                              |                                                              | Duplicate selected notes. Default destination is end of last note                                         |
+| /live/clip/select/notes                | track_id, clip_id[, pitch_start, pitch_span, time_start, time_span]               |                                                              | Select notes in range (or all if no range)                                                                |
+| /live/clip/deselect/notes              | track_id, clip_id[, pitch_start, pitch_span, time_start, time_span]               |                                                              | Deselect notes in range (or all if no range)                                                              |
+| /live/clip/convert/note_number_to_name | track_id, clip_id, note_number                                                    | track_id, clip_id, name                                      | Convert MIDI note number to name                                                                          |
+
+### Clip.View
+
+Clip View UI actions and grid display properties.
+
+| Address                               | Query params             | Response params          | Description                   |
+| ------------------------------------- | ------------------------ | ------------------------ | ----------------------------- |
+| /live/clip/view/show/loop             | track_id, clip_id        |                          | Show loop braces in Clip View |
+| /live/clip/view/show/envelope         | track_id, clip_id        |                          | Show envelopes in Clip View   |
+| /live/clip/view/hide/envelope         | track_id, clip_id        |                          | Hide envelopes in Clip View   |
+| /live/clip/view/get/grid_is_triplet   | track_id, clip_id        | track_id, clip_id, value | Grid triplet flag             |
+| /live/clip/view/set/grid_is_triplet   | track_id, clip_id, value |                          | Grid triplet flag             |
+| /live/clip/view/get/grid_quantization | track_id, clip_id        | track_id, clip_id, value | Grid quantization             |
+| /live/clip/view/set/grid_quantization | track_id, clip_id, value |                          | Grid quantization             |
+
+### General Clip Properties
+
+General properties common to both audio and MIDI clips.
+
+| Address                                              | Query params             | Response params          | Description                 |
+| ---------------------------------------------------- | ------------------------ | ------------------------ | --------------------------- |
+| /live/clip/get/color                                 | track_id, clip_id        | track_id, clip_id, value | Clip color (RGB int)        |
+| /live/clip/set/color                                 | track_id, clip_id, value |                          | Clip color (RGB int)        |
+| /live/clip/[start/stop]_listen/color                 | track_id, clip_id        | track_id, clip_id, value | Clip color (RGB int)        |
+| /live/clip/get/color_index                           | track_id, clip_id        | track_id, clip_id, value | Clip color index            |
+| /live/clip/set/color_index                           | track_id, clip_id, value |                          | Clip color index            |
+| /live/clip/[start/stop]_listen/color_index           | track_id, clip_id        | track_id, clip_id, value | Clip color index            |
+| /live/clip/get/has_envelopes                         | track_id, clip_id        | track_id, clip_id, value | True if any envelopes exist |
+| /live/clip/[start/stop]_listen/has_envelopes         | track_id, clip_id        | track_id, clip_id, value | True if any envelopes exist |
+| /live/clip/get/has_groove                            | track_id, clip_id        | track_id, clip_id, value | True if groove is assigned  |
+| /live/clip/get/is_arrangement_clip                   | track_id, clip_id        | track_id, clip_id, value | Arrangement clip flag       |
+| /live/clip/get/is_session_clip                       | track_id, clip_id        | track_id, clip_id, value | Session clip flag           |
+| /live/clip/get/is_take_lane_clip                     | track_id, clip_id        | track_id, clip_id, value | Take lane clip flag         |
+| /live/clip/get/is_audio_clip                         | track_id, clip_id        | track_id, clip_id, value | Audio clip flag             |
+| /live/clip/get/is_midi_clip                          | track_id, clip_id        | track_id, clip_id, value | MIDI clip flag              |
+| /live/clip/get/length                                | track_id, clip_id        | track_id, clip_id, value | Clip length                 |
+| /live/clip/get/muted                                 | track_id, clip_id        | track_id, clip_id, value | Mute flag                   |
+| /live/clip/set/muted                                 | track_id, clip_id, value |                          | Mute flag                   |
+| /live/clip/[start/stop]_listen/muted                 | track_id, clip_id        | track_id, clip_id, value | Mute flag                   |
+| /live/clip/get/name                                  | track_id, clip_id        | track_id, clip_id, value | Clip name                   |
+| /live/clip/set/name                                  | track_id, clip_id, value |                          | Clip name                   |
+| /live/clip/[start/stop]_listen/name                  | track_id, clip_id        | track_id, clip_id, value | Clip name                   |
+| /live/clip/get/signature_denominator                 | track_id, clip_id        | track_id, clip_id, value | Signature denominator       |
+| /live/clip/set/signature_denominator                 | track_id, clip_id, value |                          | Signature denominator       |
+| /live/clip/[start/stop]_listen/signature_denominator | track_id, clip_id        | track_id, clip_id, value | Signature denominator       |
+| /live/clip/get/signature_numerator                   | track_id, clip_id        | track_id, clip_id, value | Signature numerator         |
+| /live/clip/set/signature_numerator                   | track_id, clip_id, value |                          | Signature numerator         |
+| /live/clip/[start/stop]_listen/signature_numerator   | track_id, clip_id        | track_id, clip_id, value | Signature numerator         |
+| /live/clip/get/velocity_amount                       | track_id, clip_id        | track_id, clip_id, value | Velocity amount             |
+| /live/clip/set/velocity_amount                       | track_id, clip_id, value |                          | Velocity amount             |
+| /live/clip/[start/stop]_listen/velocity_amount       | track_id, clip_id        | track_id, clip_id, value | Velocity amount             |
+| /live/clip/get/will_record_on_start                  | track_id, clip_id        | track_id, clip_id, value | Will record on start        |
+
+### Audio Clip Properties
+
+Audio clip only properties (file path, gain, pitch, RAM mode, and sample info).
+
+| Address                                     | Query params             | Response params          | Description                           |
+| ------------------------------------------- | ------------------------ | ------------------------ | ------------------------------------- |
+| /live/clip/get/file_path                    | track_id, clip_id        | track_id, clip_id, value | File path (listener fires on replace) |
+| /live/clip/[start/stop]_listen/file_path    | track_id, clip_id        | track_id, clip_id, value | File path (listener fires on replace) |
+| /live/clip/get/gain                         | track_id, clip_id        | track_id, clip_id, value | Clip gain                             |
+| /live/clip/set/gain                         | track_id, clip_id, value |                          | Clip gain                             |
+| /live/clip/[start/stop]_listen/gain         | track_id, clip_id        | track_id, clip_id, value | Clip gain                             |
+| /live/clip/get/gain_display_string          | track_id, clip_id        | track_id, clip_id, value | Gain display string                   |
+| /live/clip/get/pitch_coarse                 | track_id, clip_id        | track_id, clip_id, value | Pitch coarse                          |
+| /live/clip/set/pitch_coarse                 | track_id, clip_id, value |                          | Pitch coarse                          |
+| /live/clip/[start/stop]_listen/pitch_coarse | track_id, clip_id        | track_id, clip_id, value | Pitch coarse                          |
+| /live/clip/get/pitch_fine                   | track_id, clip_id        | track_id, clip_id, value | Pitch fine                            |
+| /live/clip/set/pitch_fine                   | track_id, clip_id, value |                          | Pitch fine                            |
+| /live/clip/[start/stop]_listen/pitch_fine   | track_id, clip_id        | track_id, clip_id, value | Pitch fine                            |
+| /live/clip/get/ram_mode                     | track_id, clip_id        | track_id, clip_id, value | RAM mode (audio)                      |
+| /live/clip/set/ram_mode                     | track_id, clip_id, value |                          | RAM mode (audio)                      |
+| /live/clip/[start/stop]_listen/ram_mode     | track_id, clip_id        | track_id, clip_id, value | RAM mode (audio)                      |
+| /live/clip/get/sample_length                | track_id, clip_id        | track_id, clip_id, value | Sample length                         |
+| /live/clip/get/sample_rate                  | track_id, clip_id        | track_id, clip_id, value | Sample rate                           |
 </details>
+
+---
+
+## Arrangement Clip API
+
+Represents an audio or MIDI clip in Arrangement view. Endpoints mirror `/live/clip/*` but use the
+`/live/arrangement_clip/*` namespace. Clips are indexed by the order in which they appear in the arrangement.
 
 ---
 
@@ -557,4 +706,3 @@ For code contributions and feedback, many thanks to:
 - Mark Marijnissen ([markmarijnissen](https://github.com/markmarijnissen))
 - [capturcus](https://github.com/capturcus)
 - Esa Ruoho a.k.a. Lackluster ([esaruoho](https://github.com/esaruoho))
-

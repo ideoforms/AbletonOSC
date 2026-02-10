@@ -231,9 +231,17 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 ### Track methods
 
-| Address                    | Query params | Response params | Description             |
-|:---------------------------|:-------------|:----------------|:------------------------|
-| /live/track/stop_all_clips | track_id     |                 | Stop all clips on track |
+| Address                                   | Query params                                | Response params               | Description                                                                             |
+| :---------------------------------------- | :------------------------------------------ | :---------------------------- | :-------------------------------------------------------------------------------------- |
+| /live/track/create/audio_clip             | track_id, file_path, position               |                               | Create an arrangement audio clip from an absolute file path at the given position.      |
+| /live/track/create/midi_clip              | track_id, start_time, length                |                               | Create an empty MIDI clip in arrangement at the given time and length.                  |
+| /live/track/delete/arrangement_clip       | track_id, arrangement_clip_index            |                               | Delete an arrangement clip by index in track.arrangement_clips.                         |
+| /live/track/delete/clip                   | track_id, clip_slot_index                   |                               | Delete a session clip in the given clip slot.                                           |
+| /live/track/delete/device                 | track_id, device_index                      |                               | Delete device at the given index in the device chain.                                   |
+| /live/track/duplicate/clip_slot           | track_id, clip_slot_index                   | track_id, new_clip_slot_index | Duplicate the clip in the given slot to the next free slot (returns destination index). |
+| /live/track/duplicate/clip_to_arrangement | track_id, clip_slot_index, destination_time |                               | Duplicate the session clip in the given slot to arrangement at destination_time.        |
+| /live/track/jump_in_running_session_clip  | track_id, beats                             |                               | Jump forward/backward in the currently running session clip by the given beat offset.   |
+| /live/track/stop/all_clips                | track_id                                    |                               | Stops all playing/fired clips on the track.                                             |
 
 ### Track properties
 
@@ -242,79 +250,205 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 #### Getters
 
-| Address                                           | Query params      | Response params            | Description                                       |
-|:--------------------------------------------------|:------------------|:---------------------------|:--------------------------------------------------|
-| /live/track/get/arm                               | track_id          | track_id, armed            | Query whether track is armed                      |
-| /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...     | List input channels (e.g. "1", "2", "1/2", ...)   |
-| /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...        | List input routes (e.g. "Ext. In", ...)           |
-| /live/track/get/available_output_routing_channels | track_id          | track_id, channel, ...     | List output channels (e.g. "1", "2", "1/2", ...)  |
-| /live/track/get/available_output_routing_types    | track_id          | track_id, type, ...        | List output routes (e.g. "Ext. Out", ...)         |
-| /live/track/get/can_be_armed                      | track_id          | track_id, can_be_armed     | Query whether track can be armed                  |
-| /live/track/get/color                             | track_id          | track_id, color            | Query track color                                 |
-| /live/track/get/color_index                       | track_id          | track_id, color_index      | Query track color index                           |
-| /live/track/get/current_monitoring_state          | track_id          | track_id, state            | Query current monitoring state (1=on, 0=off)      |
-| /live/track/get/fired_slot_index                  | track_id          | track_id, index            | Query currently-fired slot                        |
-| /live/track/get/fold_state                        | track_id          | track_id, fold_state       | Query folded state (for groups)                   |
-| /live/track/get/has_audio_input                   | track_id          | track_id, has_audio_input  | Query has_audio_input                             |
-| /live/track/get/has_audio_output                  | track_id          | track_id, has_audio_output | Query has_audio_output                            |
-| /live/track/get/has_midi_input                    | track_id          | track_id, has_midi_input   | Query has_midi_input                              |
-| /live/track/get/has_midi_output                   | track_id          | track_id, has_midi_output  | Query has_midi_output                             |
-| /live/track/get/input_routing_channel             | track_id          | track_id, channel          | Query current input routing channel               |
-| /live/track/get/input_routing_type                | track_id          | track_id, type             | Query current input routing type                  |
-| /live/track/get/output_routing_channel            | track_id          | track_id, channel          | Query current output routing channel              |
-| /live/track/get/output_meter_left                 | track_id          | track_id, level            | Query current output level, left channel          |
-| /live/track/get/output_meter_level                | track_id          | track_id, level            | Query current output level, both channels         |
-| /live/track/get/output_meter_right                | track_id          | track_id, level            | Query current output level, right channel         |
-| /live/track/get/output_routing_type               | track_id          | track_id, type             | Query current output routing type                 |
-| /live/track/get/is_foldable                       | track_id          | track_id, is_foldable      | Query whether track is foldable, i.e. is a group  |
-| /live/track/get/is_grouped                        | track_id          | track_id, is_grouped       | Query whether track is in a group                 |
-| /live/track/get/is_visible                        | track_id          | track_id, is_visible       | Query whether track is visible (1=on, 0=off)      |
-| /live/track/get/mute                              | track_id          | track_id, mute             | Query track mute (1=on, 0=off)                    |
-| /live/track/get/name                              | track_id          | track_id, name             | Query track name                                  |
-| /live/track/get/panning                           | track_id          | track_id, panning          | Query track panning                               |
-| /live/track/get/playing_slot_index                | track_id          | track_id, index            | Query currently-playing slot                      |
-| /live/track/get/send                              | track_id, send_id | track_id, send_id, value   | Query track send                                  |
-| /live/track/get/solo                              | track_id          | track_id, solo             | Query track solo on/off                           |
-| /live/track/get/volume                            | track_id          | track_id, volume           | Query track volume                                |
+| Address                                           | Query params      | Response params             | Description                                                                                   |
+| :------------------------------------------------ | :---------------- | :-------------------------- | :-------------------------------------------------------------------------------------------- |
+| /live/track/get/arm                               | track_id          | track_id, armed             | Query whether track is armed                                                                  |
+| /live/track/get/arrangement_clips/length          | track_id          | track_id, [length, ...]     | Query all arrangement view clip lengths on track                                              |
+| /live/track/get/arrangement_clips/name            | track_id          | track_id, [name, ....]      | Query all arrangement view clip names on track                                                |
+| /live/track/get/arrangement_clips/start_time      | track_id          | track_id, [start_time, ...] | Query all arrangement view clip times on track                                                |
+| /live/track/get/available_input_routing_channels  | track_id          | track_id, channel, ...      | List input channels (e.g. "1", "2", "1/2", ...)                                               |
+| /live/track/get/available_input_routing_types     | track_id          | track_id, type, ...         | List input routes (e.g. "Ext. In", ...)                                                       |
+| /live/track/get/available_output_routing_channels | track_id          | track_id, channel, ...      | List output channels (e.g. "1", "2", "1/2", ...)                                              |
+| /live/track/get/available_output_routing_types    | track_id          | track_id, type, ...         | List output routes (e.g. "Ext. Out", ...)                                                     |
+| /live/track/get/back_to_arranger                  | track_id          | track_id, value             | Single Track Back to Arrangement state (1=lit). Setting to 0 returns to arrangement playback. |
+| /live/track/get/can_be_armed                      | track_id          | track_id, can_be_armed      | Query whether track can be armed                                                              |
+| /live/track/get/can_be_frozen                     | track_id          | track_id, value             | 1 if track can be frozen.                                                                     |
+| /live/track/get/can_show_chains                   | track_id          | track_id, value             | 1 if track has an Instrument Rack that can show chains.                                       |
+| /live/track/get/clips/color                       | track_id          | track_id, [color, ...]      | Query all clip colors on track                                                                |
+| /live/track/get/clips/length                      | track_id          | track_id, [length, ...]     | Query all clip lengths on track                                                               |
+| /live/track/get/clips/name                        | track_id          | track_id, [name, ....]      | Query all clip names on track                                                                 |
+| /live/track/get/color                             | track_id          | track_id, color             | Query track color                                                                             |
+| /live/track/get/color_index                       | track_id          | track_id, color_index       | Query track color index                                                                       |
+| /live/track/get/crossfade_assign                  | track_id          | track_id, value             | Crossfader assignment (A/B/None).                                                             |
+| /live/track/get/current_input_routing             | track_id          | track_id, value             | Current input routing name.                                                                   |
+| /live/track/get/current_input_sub_routing         | track_id          | track_id, value             | Current input sub‑routing name.                                                               |
+| /live/track/get/current_monitoring_state          | track_id          | track_id, state             | Query current monitoring state (1=on, 0=off)                                                  |
+| /live/track/get/current_output_routing            | track_id          | track_id, value             | Current output routing name.                                                                  |
+| /live/track/get/current_output_sub_routing        | track_id          | track_id, value             | Current output sub‑routing name.                                                              |
+| /live/track/get/devices/can_have_chains           | track_id          | track_id, [bool, ...]       | Query whether devices can have chains                                                         |
+| /live/track/get/devices/class_name                | track_id          | track_id, [class, ...]      | Query all device class names on track                                                         |
+| /live/track/get/devices/name                      | track_id          | track_id, [name, ...]       | Query all device names on track                                                               |
+| /live/track/get/devices/type                      | track_id          | track_id, [type, ...]       | Query all devices types on track                                                              |
+| /live/track/get/fired_slot_index                  | track_id          | track_id, index             | Query currently-fired slot                                                                    |
+| /live/track/get/fold_state                        | track_id          | track_id, fold_state        | Query folded state (for groups)                                                               |
+| /live/track/get/has_audio_input                   | track_id          | track_id, has_audio_input   | Query has_audio_input                                                                         |
+| /live/track/get/has_audio_output                  | track_id          | track_id, has_audio_output  | Query has_audio_output                                                                        |
+| /live/track/get/has_midi_input                    | track_id          | track_id, has_midi_input    | Query has_midi_input                                                                          |
+| /live/track/get/has_midi_output                   | track_id          | track_id, has_midi_output   | Query has_midi_output                                                                         |
+| /live/track/get/implicit_arm                      | track_id          | track_id, value             | Secondary arm state used by Push.                                                             |
+| /live/track/get/input_meter_left                  | track_id          | track_id, value             | Input meter left channel peak (0.0–1.0).                                                      |
+| /live/track/get/input_meter_level                 | track_id          | track_id, value             | Input meter hold peak (0.0–1.0).                                                              |
+| /live/track/get/input_meter_right                 | track_id          | track_id, value             | Input meter right channel peak (0.0–1.0).                                                     |
+| /live/track/get/input_routing_channel             | track_id          | track_id, channel           | Query current input routing channel                                                           |
+| /live/track/get/input_routing_type                | track_id          | track_id, type              | Query current input routing type                                                              |
+| /live/track/get/input_routings                    | track_id          | track_id, value             | List of available input routings (display names).                                             |
+| /live/track/get/input_sub_routings                | track_id          | track_id, value             | List of available input sub‑routings (display names).                                         |
+| /live/track/get/is_foldable                       | track_id          | track_id, is_foldable       | Query whether track is foldable, i.e. is a group                                              |
+| /live/track/get/is_frozen                         | track_id          | track_id, value             | 1 if track is currently frozen.                                                               |
+| /live/track/get/is_grouped                        | track_id          | track_id, is_grouped        | Query whether track is in a group                                                             |
+| /live/track/get/is_part_of_selection              | track_id          | track_id, value             | 1 if track is part of current selection.                                                      |
+| /live/track/get/is_showing_chains                 | track_id          | track_id, value             | Whether Instrument Rack chains are shown in Session View.                                     |
+| /live/track/get/is_visible                        | track_id          | track_id, is_visible        | Query whether track is visible (1=on, 0=off)                                                  |
+| /live/track/get/left_split_stereo                 | track_id          | track_id, value             | Left split stereo panning parameter.                                                          |
+| /live/track/get/mute                              | track_id          | track_id, mute              | Query track mute (1=on, 0=off)                                                                |
+| /live/track/get/muted_via_solo                    | track_id          | track_id, value             | 1 if track is muted because another track is soloed.                                          |
+| /live/track/get/name                              | track_id          | track_id, name              | Query track name                                                                              |
+| /live/track/get/num_devices                       | track_id          | track_id, num_devices       | Query the number of devices on the track                                                      |
+| /live/track/get/output_meter_left                 | track_id          | track_id, level             | Query current output level, left channel                                                      |
+| /live/track/get/output_meter_level                | track_id          | track_id, level             | Query current output level, both channels                                                     |
+| /live/track/get/output_meter_right                | track_id          | track_id, level             | Query current output level, right channel                                                     |
+| /live/track/get/output_routing_channel            | track_id          | track_id, channel           | Query current output routing channel                                                          |
+| /live/track/get/output_routing_type               | track_id          | track_id, type              | Query current output routing type                                                             |
+| /live/track/get/output_routings                   | track_id          | track_id, value             | List of available output routings (display names).                                            |
+| /live/track/get/output_sub_routings               | track_id          | track_id, value             | List of available output sub‑routings (display names).                                        |
+| /live/track/get/panning                           | track_id          | track_id, panning           | Query track panning                                                                           |
+| /live/track/get/panning_mode                      | track_id          | track_id, value             | Track panning mode.                                                                           |
+| /live/track/get/performance_impact                | track_id          | track_id, value             | Performance impact of this track.                                                             |
+| /live/track/get/playing_slot_index                | track_id          | track_id, index             | Query currently-playing slot                                                                  |
+| /live/track/get/right_split_stereo                | track_id          | track_id, value             | Right split stereo panning parameter.                                                         |
+| /live/track/get/send                              | track_id, send_id | track_id, send_id, value    | Query track send amount.                                                                      |
+| /live/track/get/solo                              | track_id          | track_id, solo              | Query track solo on/off                                                                       |
+| /live/track/get/track_activator                   | track_id          | track_id, value             | Track activator (on/off).                                                                     |
+| /live/track/get/volume                            | track_id          | track_id, volume            | Query track volume                                                                            |
 
 #### Setters
 
-| Address                                  | Query params             | Response params | Description                       |
-|:-----------------------------------------|:-------------------------|:----------------|:----------------------------------|
-| /live/track/set/arm                      | track_id, armed          |                 | Set track arm state (1=on, 0=off) |
-| /live/track/set/color                    | track_id, color          |                 | Set track color                   |
-| /live/track/set/color_index              | track_id, color_index    |                 | Set track color index             |
-| /live/track/set/current_monitoring_state | track_id, state          |                 | Set monitoring on/off             |
-| /live/track/set/fold_state               | track_id, fold_state     |                 | Set group folded (1=on, 0=off)    |
-| /live/track/set/input_routing_channel    | track_id, channel        |                 | Set input routing channel         |
-| /live/track/set/input_routing_type       | track_id, type           |                 | Set input routing type            |
-| /live/track/set/mute                     | track_id, mute           |                 | Set track mute (1=on, 0=off)      |
-| /live/track/set/name                     | track_id, name           |                 | Set track name                    |
-| /live/track/set/output_routing_channel   | track_id, channel        |                 | Set output routing channel        |
-| /live/track/set/output_routing_type      | track_id, type           |                 | Set output routing type           |
-| /live/track/set/panning                  | track_id, panning        |                 | Set track panning                 |
-| /live/track/set/send                     | track_id, send_id, value |                 | Set track send                    |
-| /live/track/set/solo                     | track_id, solo           |                 | Set track solo (1=on, 0=off)      |
-| /live/track/set/volume                   | track_id, volume         |                 | Set track volume                  |
+| Address                                    | Query params             | Response params | Description                                                                                   |
+| :----------------------------------------- | :----------------------- | :-------------- | :-------------------------------------------------------------------------------------------- |
+| /live/track/set/arm                        | track_id, armed          |                 | Set track arm state (1=on, 0=off)                                                             |
+| /live/track/set/back_to_arranger           | track_id, value          |                 | Single Track Back to Arrangement state (1=lit). Setting to 0 returns to arrangement playback. |
+| /live/track/set/color                      | track_id, color          |                 | Set track color                                                                               |
+| /live/track/set/color_index                | track_id, color_index    |                 | Set track color index                                                                         |
+| /live/track/set/crossfade_assign           | track_id, value          |                 | Crossfader assignment (A/B/None).                                                             |
+| /live/track/set/current_input_routing      | track_id, value          |                 | Current input routing name.                                                                   |
+| /live/track/set/current_input_sub_routing  | track_id, value          |                 | Current input sub‑routing name.                                                               |
+| /live/track/set/current_monitoring_state   | track_id, state          |                 | Set monitoring on/off                                                                         |
+| /live/track/set/current_output_routing     | track_id, value          |                 | Current output routing name.                                                                  |
+| /live/track/set/current_output_sub_routing | track_id, value          |                 | Current output sub‑routing name.                                                              |
+| /live/track/set/fold_state                 | track_id, fold_state     |                 | Set group folded (1=on, 0=off)                                                                |
+| /live/track/set/implicit_arm               | track_id, value          |                 | Secondary arm state used by Push.                                                             |
+| /live/track/set/input_routing_channel      | track_id, channel        |                 | Set input routing channel                                                                     |
+| /live/track/set/input_routing_type         | track_id, type           |                 | Set input routing type                                                                        |
+| /live/track/set/is_showing_chains          | track_id, value          |                 | Whether Instrument Rack chains are shown in Session View.                                     |
+| /live/track/set/left_split_stereo          | track_id, value          |                 | Left split stereo panning parameter.                                                          |
+| /live/track/set/mute                       | track_id, mute           |                 | Set track mute (1=on, 0=off)                                                                  |
+| /live/track/set/name                       | track_id, name           |                 | Set track name                                                                                |
+| /live/track/set/output_routing_channel     | track_id, channel        |                 | Set output routing channel                                                                    |
+| /live/track/set/output_routing_type        | track_id, type           |                 | Set output routing type                                                                       |
+| /live/track/set/panning                    | track_id, panning        |                 | Set track panning                                                                             |
+| /live/track/set/panning_mode               | track_id, value          |                 | Track panning mode.                                                                           |
+| /live/track/set/right_split_stereo         | track_id, value          |                 | Right split stereo panning parameter.                                                         |
+| /live/track/set/send                       | track_id, send_id, value |                 | Set track send amount.                                                                        |
+| /live/track/set/solo                       | track_id, solo           |                 | Set track solo (1=on, 0=off)                                                                  |
+| /live/track/set/track_activator            | track_id, value          |                 | Track activator (on/off).                                                                     |
+| /live/track/set/volume                     | track_id, volume         |                 | Set track volume                                                                              |
+
+#### Listeners
+
+| Address                                           | Query params | Response params | Description                                                                                   |
+| :------------------------------------------------ | :----------- | :-------------- | :-------------------------------------------------------------------------------------------- |
+| /live/track/start_listen/arm                      | track_id     | track_id, value | Query whether track is armed                                                                  |
+| /live/track/start_listen/back_to_arranger         | track_id     | track_id, value | Single Track Back to Arrangement state (1=lit). Setting to 0 returns to arrangement playback. |
+| /live/track/start_listen/color                    | track_id     | track_id, value | Query track color                                                                             |
+| /live/track/start_listen/color_index              | track_id     | track_id, value | Query track color index                                                                       |
+| /live/track/start_listen/crossfade_assign         | track_id     | track_id, value | Crossfader assignment (A/B/None).                                                             |
+| /live/track/start_listen/current_monitoring_state | track_id     | track_id, value | Query current monitoring state (1=on, 0=off)                                                  |
+| /live/track/start_listen/fired_slot_index         | track_id     | track_id, value | Blinking slot index (-1 none, -2 clip stop).                                                  |
+| /live/track/start_listen/has_audio_input          | track_id     | track_id, value | Query has_audio_input                                                                         |
+| /live/track/start_listen/has_audio_output         | track_id     | track_id, value | Query has_audio_output                                                                        |
+| /live/track/start_listen/has_midi_input           | track_id     | track_id, value | Query has_midi_input                                                                          |
+| /live/track/start_listen/has_midi_output          | track_id     | track_id, value | Query has_midi_output                                                                         |
+| /live/track/start_listen/implicit_arm             | track_id     | track_id, value | Secondary arm state used by Push.                                                             |
+| /live/track/start_listen/input_meter_left         | track_id     | track_id, value | Input meter left channel peak (0.0–1.0).                                                      |
+| /live/track/start_listen/input_meter_level        | track_id     | track_id, value | Input meter hold peak (0.0–1.0).                                                              |
+| /live/track/start_listen/input_meter_right        | track_id     | track_id, value | Input meter right channel peak (0.0–1.0).                                                     |
+| /live/track/start_listen/is_frozen                | track_id     | track_id, value | 1 if track is currently frozen.                                                               |
+| /live/track/start_listen/is_showing_chains        | track_id     | track_id, value | Whether Instrument Rack chains are shown in Session View.                                     |
+| /live/track/start_listen/left_split_stereo        | track_id     | track_id, value | Left split stereo panning parameter.                                                          |
+| /live/track/start_listen/mute                     | track_id     | track_id, value | Query track mute (1=on, 0=off)                                                                |
+| /live/track/start_listen/muted_via_solo           | track_id     | track_id, value | 1 if track is muted because another track is soloed.                                          |
+| /live/track/start_listen/name                     | track_id     | track_id, value | Query track name                                                                              |
+| /live/track/start_listen/output_meter_left        | track_id     | track_id, value | Query current output level, left channel                                                      |
+| /live/track/start_listen/output_meter_level       | track_id     | track_id, value | Query current output level, both channels                                                     |
+| /live/track/start_listen/output_meter_right       | track_id     | track_id, value | Query current output level, right channel                                                     |
+| /live/track/start_listen/panning                  | track_id     | track_id, value | Query track panning                                                                           |
+| /live/track/start_listen/panning_mode             | track_id     | track_id, value | Track panning mode.                                                                           |
+| /live/track/start_listen/performance_impact       | track_id     | track_id, value | Performance impact of this track.                                                             |
+| /live/track/start_listen/playing_slot_index       | track_id     | track_id, value | Playing slot index (-1 arrangement, -2 clip stop fired).                                      |
+| /live/track/start_listen/right_split_stereo       | track_id     | track_id, value | Right split stereo panning parameter.                                                         |
+| /live/track/start_listen/solo                     | track_id     | track_id, value | Query track solo on/off                                                                       |
+| /live/track/start_listen/track_activator          | track_id     | track_id, value | Track activator (on/off).                                                                     |
+| /live/track/start_listen/volume                   | track_id     | track_id, value | Query track volume                                                                            |
+| /live/track/stop_listen/arm                       | track_id     |                 | Query whether track is armed                                                                  |
+| /live/track/stop_listen/back_to_arranger          | track_id     |                 | Single Track Back to Arrangement state (1=lit). Setting to 0 returns to arrangement playback. |
+| /live/track/stop_listen/color                     | track_id     |                 | Query track color                                                                             |
+| /live/track/stop_listen/color_index               | track_id     |                 | Query track color index                                                                       |
+| /live/track/stop_listen/crossfade_assign          | track_id     |                 | Crossfader assignment (A/B/None).                                                             |
+| /live/track/stop_listen/current_monitoring_state  | track_id     |                 | Query current monitoring state (1=on, 0=off)                                                  |
+| /live/track/stop_listen/fired_slot_index          | track_id     |                 | Blinking slot index (-1 none, -2 clip stop).                                                  |
+| /live/track/stop_listen/has_audio_input           | track_id     |                 | Query has_audio_input                                                                         |
+| /live/track/stop_listen/has_audio_output          | track_id     |                 | Query has_audio_output                                                                        |
+| /live/track/stop_listen/has_midi_input            | track_id     |                 | Query has_midi_input                                                                          |
+| /live/track/stop_listen/has_midi_output           | track_id     |                 | Query has_midi_output                                                                         |
+| /live/track/stop_listen/implicit_arm              | track_id     |                 | Secondary arm state used by Push.                                                             |
+| /live/track/stop_listen/input_meter_left          | track_id     |                 | Input meter left channel peak (0.0–1.0).                                                      |
+| /live/track/stop_listen/input_meter_level         | track_id     |                 | Input meter hold peak (0.0–1.0).                                                              |
+| /live/track/stop_listen/input_meter_right         | track_id     |                 | Input meter right channel peak (0.0–1.0).                                                     |
+| /live/track/stop_listen/is_frozen                 | track_id     |                 | 1 if track is currently frozen.                                                               |
+| /live/track/stop_listen/is_showing_chains         | track_id     |                 | Whether Instrument Rack chains are shown in Session View.                                     |
+| /live/track/stop_listen/left_split_stereo         | track_id     |                 | Left split stereo panning parameter.                                                          |
+| /live/track/stop_listen/mute                      | track_id     |                 | Query track mute (1=on, 0=off)                                                                |
+| /live/track/stop_listen/muted_via_solo            | track_id     |                 | 1 if track is muted because another track is soloed.                                          |
+| /live/track/stop_listen/name                      | track_id     |                 | Query track name                                                                              |
+| /live/track/stop_listen/output_meter_left         | track_id     |                 | Query current output level, left channel                                                      |
+| /live/track/stop_listen/output_meter_level        | track_id     |                 | Query current output level, both channels                                                     |
+| /live/track/stop_listen/output_meter_right        | track_id     |                 | Query current output level, right channel                                                     |
+| /live/track/stop_listen/panning                   | track_id     |                 | Query track panning                                                                           |
+| /live/track/stop_listen/panning_mode              | track_id     |                 | Track panning mode.                                                                           |
+| /live/track/stop_listen/performance_impact        | track_id     |                 | Performance impact of this track.                                                             |
+| /live/track/stop_listen/playing_slot_index        | track_id     |                 | Playing slot index (-1 arrangement, -2 clip stop fired).                                      |
+| /live/track/stop_listen/right_split_stereo        | track_id     |                 | Right split stereo panning parameter.                                                         |
+| /live/track/stop_listen/solo                      | track_id     |                 | Query track solo on/off                                                                       |
+| /live/track/stop_listen/track_activator           | track_id     |                 | Track activator (on/off).                                                                     |
+| /live/track/stop_listen/volume                    | track_id     |                 | Query track volume                                                                            |
+
+### Track View
+
+| Address                                 | Query params    | Response params | Description                             |
+| :-------------------------------------- | :-------------- | :-------------- | :-------------------------------------- |
+| /live/track/view/get/device_insert_mode | track_id        | track_id, value | Whether device insert mode is enabled.  |
+| /live/track/view/get/is_collapsed       | track_id        | track_id, value | Whether track is collapsed in view.     |
+| /live/track/view/set/is_collapsed       | track_id, value |                 | Set whether track is collapsed in view. |
 
 ### Track: Properties of multiple clips
 
-| Address                                      | Query params | Response params             | Description                                      |
-|:---------------------------------------------|:-------------|:----------------------------|:-------------------------------------------------|
-| /live/track/get/clips/name                   | track_id     | track_id, [name, ....]      | Query all clip names on track                    |
-| /live/track/get/clips/length                 | track_id     | track_id, [length, ...]     | Query all clip lengths on track                  |
-| /live/track/get/clips/color                  | track_id     | track_id, [color, ...]      | Query all clip colors on track                   |
-| /live/track/get/arrangement_clips/name       | track_id     | track_id, [name, ....]      | Query all arrangement view clip names on track   |
-| /live/track/get/arrangement_clips/length     | track_id     | track_id, [length, ...]     | Query all arrangement view clip lengths on track |
-| /live/track/get/arrangement_clips/start_time | track_id     | track_id, [start_time, ...] | Query all arrangement view clip times on track   |
+| Address                                      | Query params | Response params       | Description                                      |
+| :------------------------------------------- | :----------- | :-------------------- | :----------------------------------------------- |
+| /live/track/get/clips/name                   | track_id     | track_id, [values...] | Query all clip names on track                    |
+| /live/track/get/clips/length                 | track_id     | track_id, [values...] | Query all clip lengths on track                  |
+| /live/track/get/clips/color                  | track_id     | track_id, [values...] | Query all clip colors on track                   |
+| /live/track/get/arrangement_clips/name       | track_id     | track_id, [values...] | Query all arrangement view clip names on track   |
+| /live/track/get/arrangement_clips/length     | track_id     | track_id, [values...] | Query all arrangement view clip lengths on track |
+| /live/track/get/arrangement_clips/start_time | track_id     | track_id, [values...] | Query all arrangement view clip times on track   |
 
 ### Track: Properties of devices
-| Address                            | Query params | Response params        | Description                              |
-|:-----------------------------------|:-------------|:-----------------------|:-----------------------------------------|
-| /live/track/get/num_devices        | track_id     | track_id, num_devices  | Query the number of devices on the track |
-| /live/track/get/devices/name       | track_id     | track_id, [name, ...]  | Query all device names on track          |
-| /live/track/get/devices/type       | track_id     | track_id, [type, ...]  | Query all devices types on track         |
-| /live/track/get/devices/class_name | track_id     | track_id, [class, ...] | Query all device class names on track    |
+| Address                                 | Query params | Response params       | Description                              |
+| :-------------------------------------- | :----------- | :-------------------- | :--------------------------------------- |
+| /live/track/get/num_devices             | track_id     | track_id, [values...] | Query the number of devices on the track |
+| /live/track/get/devices/name            | track_id     | track_id, [values...] | Query all device names on track          |
+| /live/track/get/devices/type            | track_id     | track_id, [values...] | Query all devices types on track         |
+| /live/track/get/devices/class_name      | track_id     | track_id, [values...] | Query all device class names on track    |
+| /live/track/get/devices/can_have_chains | track_id     | track_id, [bool, ...] | Query whether devices can have chains    |
 
 See [Device API](#device-api) for details on Device type/class_names.
  
@@ -329,15 +463,43 @@ A Clip Slot represents a container for a clip. It is used to create and delete c
 <details>
 <summary><b>Documentation</b>: Clip Slot API</summary>
 
-| Address                             | Query params                                                   | Response params                          | Description                                     |
-|:------------------------------------|:---------------------------------------------------------------|:-----------------------------------------|:------------------------------------------------|
-| /live/clip_slot/fire                | track_index, clip_index                                        |                                          | Fire play/pause of the specified clip slot      |
-| /live/clip_slot/create_clip         | track_index, clip_index, length                                |                                          | Create a clip in the slot                       |
-| /live/clip_slot/delete_clip         | track_index, clip_index                                        |                                          | Delete the clip in the slot                     |
-| /live/clip_slot/get/has_clip        | track_index, clip_index                                        | track_index, clip_index, has_clip        | Query whether the slot has a clip               |
-| /live/clip_slot/get/has_stop_button | track_index, clip_index                                        | track_index, clip_index, has_stop_button | Query whether the slot has a stop button        |
-| /live/clip_slot/set/has_stop_button | track_index, clip_index, has_stop_button                       |                                          | Add or remove stop button (1=on, 0=off)         |
-| /live/clip_slot/duplicate_clip_to   | track_index, clip_index, target_track_index, target_clip_index |                                          | Duplicate the clip to an empty target clip slot |
+| Address                                            | Query params                                                     | Response params                                 | Description                                                                                          |
+| -------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| /live/clip_slot/fire                               | track_index, clip_index                                          |                                                 | Fire play/pause of the specified clip slot                                                           |
+| /live/clip_slot/stop                               | track_index, clip_index                                          |                                                 | Stops playling/recording the specified clip slot                                                     |
+| /live/clip_slot/create/midi_clip                   | track_index, clip_index, length                                  |                                                 | Create a MIDI clip in the slot                                                                       |
+| /live/clip_slot/create/audio_clip                  | track_index, clip_index, file_path                               |                                                 | Create an audio clip from file in the slot                                                           |
+| /live/clip_slot/delete/clip                        | track_index, clip_index                                          |                                                 | Delete the clip in the slot                                                                          |
+| /live/clip_slot/duplicate_to                       | track_index, clip_index, target_track_index, target_clip_index   |                                                 | Duplicate the clip to a target clip slot                                                             |
+| /live/clip_slot/set/fire_button                    | track_index, clip_index, fire_button_state                       |                                                 | Set fire button state directly (1=on, 0=off)                                                         |
+| /live/clip_slot/get/color                          | track_index, clip_index                                          | track_index, clip_index, color                  | Get clip slot color; Group Track slots only                                                          |
+| /live/clip_slot/start_listen/color                 | track_index, clip_index                                          | track_index, clip_index, color                  | Listen for slot color changes; Group Track slots only                                                |
+| /live/clip_slot/stop_listen/color                  | track_index, clip_index                                          |                                                 | Stop listening for slot color changes; Group Track slots only                                        |
+| /live/clip_slot/get/color_index                    | track_index, clip_index                                          | track_index, clip_index, color_index            | Get clip slot color index (0-69); Group Track slots only                                             |
+| /live/clip_slot/start_listen/color_index           | track_index, clip_index                                          | track_index, clip_index, color_index            | Listen for slot color index changes; Group Track slots only                                          |
+| /live/clip_slot/stop_listen/color_index            | track_index, clip_index                                          |                                                 | Stop listening for slot color index changes; Group Track slots only                                  |
+| /live/clip_slot/get/controls_other_clips           | track_index, clip_index                                          | track_index, clip_index, controls_other_clips   | Get whether slot controls other clips; Group Track slots only                                        |
+| /live/clip_slot/start_listen/controls_other_clips  | track_index, clip_index                                          | track_index, clip_index, controls_other_clips   | Listen for controls_other_clips changes; Group Track slots only                                      |
+| /live/clip_slot/stop_listen/controls_other_clips   | track_index, clip_index                                          |                                                 | Stop listening for controls_other_clips changes; Group Track slots only                              |
+| /live/clip_slot/get/has_clip                       | track_index, clip_index                                          | track_index, clip_index, has_clip               | Query whether the slot has a clip                                                                    |
+| /live/clip_slot/start_listen/has_clip              | track_index, clip_index                                          | track_index, clip_index, has_clip               | Listen for has_clip changes                                                                          |
+| /live/clip_slot/stop_listen/has_clip               | track_index, clip_index                                          |                                                 | Stop listening for has_clip changes                                                                  |
+| /live/clip_slot/get/has_stop_button                | track_index, clip_index                                          | track_index, clip_index, has_stop_button        | Query whether the slot has a stop button                                                             |
+| /live/clip_slot/set/has_stop_button                | track_index, clip_index, has_stop_button                         |                                                 | Add or remove stop button (1=on, 0=off)                                                              |
+| /live/clip_slot/start_listen/has_stop_button       | track_index, clip_index                                          | track_index, clip_index, has_stop_button        | Listen for has_stop_button changes                                                                   |
+| /live/clip_slot/stop_listen/has_stop_button        | track_index, clip_index                                          |                                                 | Stop listening for has_stop_button changes                                                           |
+| /live/clip_slot/get/is_group_slot                  | track_index, clip_index                                          | track_index, clip_index, is_group_slot          | Query whether the slot is a group slot                                                               |
+| /live/clip_slot/get/is_playing                     | track_index, clip_index                                          | track_index, clip_index, is_playing             | Query whether the slot is playing (playing_status != 0)                                              |
+| /live/clip_slot/get/is_recording                   | track_index, clip_index                                          | track_index, clip_index, is_recording           | Query whether the slot is recording (playing_status == 2)                                            |
+| /live/clip_slot/get/is_triggered                   | track_index, clip_index                                          | track_index, clip_index, is_triggered           | Query whether the slot is triggered                                                                  |
+| /live/clip_slot/start_listen/is_triggered          | track_index, clip_index                                          | track_index, clip_index, is_triggered           | Listen for is_triggered changes                                                                      |
+| /live/clip_slot/stop_listen/is_triggered           | track_index, clip_index                                          |                                                 | Stop listening for is_triggered changes                                                              |
+| /live/clip_slot/get/playing_status                 | track_index, clip_index                                          | track_index, clip_index, playing_status         | Query slot playing_status: At least one clip in Group Track slot is (1=playing, 2=recording)         |
+| /live/clip_slot/start_listen/playing_status        | track_index, clip_index                                          | track_index, clip_index, playing_status         | Listen for playing_status changes                                                                    |
+| /live/clip_slot/stop_listen/playing_status         | track_index, clip_index                                          |                                                 | Stop listening for playing_status changes                                                            |
+| /live/clip_slot/get/will_record_on_start           | track_index, clip_index                                          | track_index, clip_index, will_record_on_start   | Query whether slot will record on start                                                              |
+| /live/clip_slot/create_clip                        | track_index, clip_index, length                                  |                                                 | Create a MIDI clip in the slot (kept for backwards-compatibility)                                                         |
+| /live/clip_slot/delete_clip                        | track_index, clip_index                                          |                                                 | Delete the clip in the slot (kept for backwards-compatibility)                                                            |
 
 </details>
 
@@ -557,4 +719,3 @@ For code contributions and feedback, many thanks to:
 - Mark Marijnissen ([markmarijnissen](https://github.com/markmarijnissen))
 - [capturcus](https://github.com/capturcus)
 - Esa Ruoho a.k.a. Lackluster ([esaruoho](https://github.com/esaruoho))
-

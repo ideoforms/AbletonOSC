@@ -8,7 +8,7 @@ from .application import ApplicationHandler
 from .song import SongHandler
 from .clip import ClipHandler
 from .clip_slot import ClipSlotHandler
-from .track import TrackHandler
+from .track import TrackHandler, TrackViewHandler
 from .device import DeviceHandler
 from .scene import SceneHandler
 from .view import ViewHandler

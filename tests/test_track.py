@@ -76,6 +76,88 @@ def test_track_devices(client):
     assert client.query("/live/track/get/num_devices", (track_id,)) == (track_id, 0,)
 
 #--------------------------------------------------------------------------------
+# Test track properties - master track
+#--------------------------------------------------------------------------------
+
+def test_track_master_get_name(client):
+    result = client.query("/live/track/get/name", ("master",))
+    assert result[0] == "master"
+    assert result[1] == "Main"
+
+def test_track_main_alias(client):
+    result_master = client.query("/live/track/get/name", ("master",))
+    result_main = client.query("/live/track/get/name", ("main",))
+    assert result_master[0] == "master"
+    assert result_main[0] == "master"
+    assert result_master[1] == result_main[1]
+
+def test_track_master_volume(client):
+    client.send_message("/live/track/set/volume", ("master", 0.5))
+    wait_one_tick()
+    assert client.query("/live/track/get/volume", ("master",)) == ("master", 0.5)
+    client.send_message("/live/track/set/volume", ("master", 1.0))
+    wait_one_tick()
+
+def test_track_master_num_devices(client):
+    result = client.query("/live/track/get/num_devices", ("master",))
+    assert result[0] == "master"
+    assert isinstance(result[1], int)
+
+#--------------------------------------------------------------------------------
+# Test track properties - return tracks
+#--------------------------------------------------------------------------------
+
+def test_track_return_get_name(client):
+    result = client.query("/live/track/get/name", ("A",))
+    assert result is not None
+    assert result[0] == "A"
+
+def test_track_return_volume(client):
+    client.send_message("/live/track/set/volume", ("A", 0.5))
+    wait_one_tick()
+    assert client.query("/live/track/get/volume", ("A",)) == ("A", 0.5)
+    client.send_message("/live/track/set/volume", ("A", 1.0))
+    wait_one_tick()
+
+
+def test_track_return_num_devices(client):
+    result = client.query("/live/track/get/num_devices", ("A",))
+    assert result[0] == "A"
+    assert isinstance(result[1], int)
+
+#--------------------------------------------------------------------------------
+# Test that numeric indices still work (regression)
+#--------------------------------------------------------------------------------
+
+def test_track_numeric_index_regression(client):
+    result = client.query("/live/track/get/name", (0,))
+    assert result[0] == 0
+    assert isinstance(result[1], str)
+
+def test_track_numeric_index_volume_regression(client):
+    client.send_message("/live/track/set/volume", (2, 0.5))
+    wait_one_tick()
+    assert client.query("/live/track/get/volume", (2,)) == (2, 0.5)
+    client.send_message("/live/track/set/volume", (2, 1.0))
+    wait_one_tick()
+
+#--------------------------------------------------------------------------------
+# Test listeners - master track
+#--------------------------------------------------------------------------------
+
+def test_track_listen_master_volume(client):
+    client.send_message("/live/track/set/volume", ("master", 1.0))
+    client.send_message("/live/track/start_listen/volume", ("master",))
+    assert client.await_message("/live/track/get/volume", TICK_DURATION * 2) == ("master", 1.0)
+
+    client.send_message("/live/track/set/volume", ("master", 0.5))
+    assert client.await_message("/live/track/get/volume", TICK_DURATION * 2) == ("master", 0.5)
+
+    client.send_message("/live/track/stop_listen/volume", ("master",))
+    client.send_message("/live/track/set/volume", ("master", 1.0))
+    wait_one_tick()
+
+#--------------------------------------------------------------------------------
 # Test track properties - listeners
 #--------------------------------------------------------------------------------
 

@@ -164,8 +164,8 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
 | /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  |
 | /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  |
-| /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          |
-| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. |
+| /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range); with no params or `index_max=-1`, includes master and return tracks |
+| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips (see below); with `track_index_max=-1`, includes master and return tracks |
 
 
 #### Querying track/clip data in bulk with /live/song/get/track_data
@@ -239,6 +239,7 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
  - Changes for any Track property can be listened for by calling `/live/track/start_listen/<property> <track_index>`
  - Responses will be sent to `/live/track/get/<property>`, with parameters `<track_index> <property_value>`
+ - `track_id` can be a numeric index, `"master"` (or `"main"`), or a return track prefix (e.g. `"A"`, `"B"`). The wildcard `*` includes all regular tracks, master, and return tracks.
 
 #### Getters
 
@@ -478,6 +479,7 @@ Represents an instrument or effect.
 ### Device properties
 
 - Changes for any Parameter property can be listened for by calling `/live/device/start_listen/parameter/value <track_index> <device index> <parameter_index>`
+- `track_id` can be a numeric index, `"master"` (or `"main"`), or a return track prefix (e.g. `"A"`, `"B"`).
 
 | Address                                  | Query params                             | Response params                          | Description                                                                             |
 |:-----------------------------------------|:-----------------------------------------|:-----------------------------------------|:----------------------------------------------------------------------------------------|

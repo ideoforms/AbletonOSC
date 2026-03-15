@@ -21,6 +21,36 @@ class AbletonOSCHandler(Component):
     def clear_api(self):
         self._clear_listeners()
 
+    def _resolve_track(self, track_param):
+        """
+        Resolve a track parameter to a (track_obj, track_identifier) tuple.
+        
+        Args:
+            track_param: Can be:
+                - An int or numeric value: index into self.song.tracks
+                - "master" or "main" (case-insensitive): self.song.master_track
+                - A return track prefix (e.g. "A"): matched against self.song.return_tracks names
+        
+        Returns:
+            Tuple of (track_obj, track_identifier) or None if the identifier is invalid.
+        """
+        if isinstance(track_param, str):
+            if track_param.lower() in ("master", "main"):
+                return (self.song.master_track, "master")
+            else:
+                for idx, rt in enumerate(self.song.return_tracks):
+                    if rt.name.startswith(track_param + "-"):
+                        return (self.song.return_tracks[idx], track_param)
+                self.logger.error(
+                    "AbletonOSC: Invalid track identifier '%s'. "
+                    "Must be a numeric track index, 'master'/'main', "
+                    "or one of the return track prefixes." % track_param
+                )
+                return None
+        else:
+            track_index = int(track_param)
+            return (self.song.tracks[track_index], track_index)
+
     #--------------------------------------------------------------------------------
     # Generic callbacks
     #--------------------------------------------------------------------------------

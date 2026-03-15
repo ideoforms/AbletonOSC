@@ -100,12 +100,19 @@ class SongHandler(AbletonOSCHandler):
 
         def song_get_track_names(params):
             if len(params) == 0:
-                track_index_min, track_index_max = 0, len(self.song.tracks)
+                track_names = [track.name for track in self.song.tracks]
+                track_names.append(self.song.master_track.name)
+                track_names.extend([rt.name for rt in self.song.return_tracks])
+                return tuple(track_names)
             else:
                 track_index_min, track_index_max = params
                 if track_index_max == -1:
-                    track_index_max = len(self.song.tracks)
-            return tuple(self.song.tracks[index].name for index in range(track_index_min, track_index_max))
+                    track_names = [self.song.tracks[index].name for index in range(track_index_min, len(self.song.tracks))]
+                    track_names.append(self.song.master_track.name)
+                    track_names.extend([rt.name for rt in self.song.return_tracks])
+                    return tuple(track_names)
+                else:
+                    return tuple(self.song.tracks[index].name for index in range(track_index_min, track_index_max))
         self.osc_server.add_handler("/live/song/get/track_names", song_get_track_names)
 
         def song_get_track_data(params):
@@ -125,13 +132,25 @@ class SongHandler(AbletonOSCHandler):
             track_index_min, track_index_max, *properties = params
             track_index_min = int(track_index_min)
             track_index_max = int(track_index_max)
-            self.logger.info("Getting track data: %s (tracks %d..%d)" %
-                             (properties, track_index_min, track_index_max))
+            
+            tracks_to_process = []
+            include_master_returns = (track_index_max == -1)
+            
             if track_index_max == -1:
                 track_index_max = len(self.song.tracks)
-            rv = []
+            
             for track_index in range(track_index_min, track_index_max):
-                track = self.song.tracks[track_index]
+                tracks_to_process.append(self.song.tracks[track_index])
+            
+            if include_master_returns:
+                tracks_to_process.append(self.song.master_track)
+                tracks_to_process.extend(self.song.return_tracks)
+            
+            self.logger.info("Getting track data: %s (tracks %d..%d, include_master_returns=%s)" %
+                             (properties, track_index_min, track_index_max, include_master_returns))
+            
+            rv = []
+            for track in tracks_to_process:
                 for prop in properties:
                     obj, property_name = prop.split(".")
                     if obj == "track":
@@ -146,24 +165,51 @@ class SongHandler(AbletonOSCHandler):
                                 value = list(self.song.tracks).index(value)
                         rv.append(value)
                     elif obj == "clip":
-                        for clip_slot in track.clip_slots:
-                            if clip_slot.clip is not None:
-                                rv.append(getattr(clip_slot.clip, property_name))
-                            else:
-                                rv.append(None)
+                        if hasattr(track, 'clip_slots'):
+                            for clip_slot in track.clip_slots:
+                                if clip_slot.clip is not None:
+                                    rv.append(getattr(clip_slot.clip, property_name))
+                                else:
+                                    rv.append(None)
+                        else:
+                            rv.append(None)
                     elif obj == "clip_slot":
-                        for clip_slot in track.clip_slots:
-                            rv.append(getattr(clip_slot, property_name))
+                        if hasattr(track, 'clip_slots'):
+                            for clip_slot in track.clip_slots:
+                                rv.append(getattr(clip_slot, property_name))
+                        else:
+                            rv.append(None)
                     elif obj == "device":
                         for device in track.devices:
                             rv.append(getattr(device, property_name))
                     else:
-                        self.logger.error("Unknown object identifier in get/track_data: %s" % obj)
+                        self.logger.error("AbletonOSC: Unknown object identifier in get/track_data: %s" % obj)
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 
 
         def song_export_structure(params):
+            def extract_device_data(devices):
+                """Helper to extract device data for any track type."""
+                device_list = []
+                for device_index, device in enumerate(devices):
+                    device_data = {
+                        "class_name": device.class_name,
+                        "type": device.type,
+                        "name": device.name,
+                        "parameters": []
+                    }
+                    for parameter in device.parameters:
+                        device_data["parameters"].append({
+                            "name": parameter.name,
+                            "value": parameter.value,
+                            "min": parameter.min,
+                            "max": parameter.max,
+                            "is_quantized": parameter.is_quantized,
+                        })
+                    device_list.append(device_data)
+                return device_list
+            
             tracks = []
             for track_index, track in enumerate(self.song.tracks):
                 group_track = None
@@ -186,26 +232,27 @@ class SongHandler(AbletonOSCHandler):
                         }
                         track_data["clips"].append(clip_data)
 
-                for device_index, device in enumerate(track.devices):
-                    device_data = {
-                        "class_name": device.class_name,
-                        "type": device.type,
-                        "name": device.name,
-                        "parameters": []
-                    }
-                    for parameter in device.parameters:
-                        device_data["parameters"].append({
-                            "name": parameter.name,
-                            "value": parameter.value,
-                            "min": parameter.min,
-                            "max": parameter.max,
-                            "is_quantized": parameter.is_quantized,
-                        })
-                    track_data["devices"].append(device_data)
-
+                track_data["devices"] = extract_device_data(track.devices)
                 tracks.append(track_data)
+            
+            master_track = {
+                "name": self.song.master_track.name,
+                "devices": extract_device_data(self.song.master_track.devices)
+            }
+            
+            return_tracks = []
+            for rt_index, rt in enumerate(self.song.return_tracks):
+                return_track_data = {
+                    "index": rt_index,
+                    "name": rt.name,
+                    "devices": extract_device_data(rt.devices)
+                }
+                return_tracks.append(return_track_data)
+            
             song = {
-                "tracks": tracks
+                "tracks": tracks,
+                "master_track": master_track,
+                "return_tracks": return_tracks
             }
 
             if sys.platform == "darwin":

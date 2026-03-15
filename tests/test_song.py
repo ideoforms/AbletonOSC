@@ -197,3 +197,71 @@ def test_song_undo_redo(client):
     wait_one_tick()
     assert client.query("/live/song/get/num_scenes") == (9,)
     client.send_message("/live/song/delete_scene", [8])
+
+#--------------------------------------------------------------------------------
+# Test song - track names with master/return tracks
+#--------------------------------------------------------------------------------
+
+def test_song_get_track_names_no_params_includes_main_and_returns(client):
+    """No params: should return all regular tracks + master + return tracks."""
+    result = client.query("/live/song/get/track_names")
+    # 4 regular tracks + Master + at least one return track (A)
+    assert len(result) > 4
+    # Master track name should be present
+    assert "Main" in result
+
+def test_song_get_track_names_open_ended_includes_main_and_returns(client):
+    """Range ending in -1: should include master and return tracks."""
+    result = client.query("/live/song/get/track_names", (0, -1))
+    assert "Main" in result
+
+def test_song_get_track_names_explicit_range_excludes_main_and_returns(client):
+    """Explicit numeric range: should include only regular tracks, no master/returns."""
+    result = client.query("/live/song/get/track_names", (0, 2))
+    assert len(result) == 2
+    assert "Main" not in result
+
+def test_song_get_track_names_partial_open_ended_includes_main_and_returns(client):
+    """Range starting mid-list, ending at -1: includes remaining regular tracks + master + returns."""
+    result = client.query("/live/song/get/track_names", (2, -1))
+    assert "Main" in result
+
+#--------------------------------------------------------------------------------
+# Test song - track data with master/return tracks
+#--------------------------------------------------------------------------------
+
+def test_song_get_track_data_open_ended_includes_main_and_returns(client):
+    """track_data with -1 range should include master and return track names."""
+    result = client.query("/live/song/get/track_data", (0, -1, "track.name"))
+    assert result is not None
+    assert "Main" in result
+
+def test_song_get_track_data_explicit_range_excludes_main(client):
+    """track_data with explicit range should not include master track name."""
+    result = client.query("/live/song/get/track_data", (0, 2, "track.name"))
+    assert result is not None
+    assert "Main" not in result
+
+def test_song_get_track_data_clip_property_with_master_does_not_crash(client):
+    """
+    Querying a clip property across the full range (including master/return tracks
+    that have no clip_slots) should not raise an error - master/returns return None.
+    """
+    result = client.query("/live/song/get/track_data", (0, -1, "clip.name"))
+    assert result is not None
+
+def test_song_get_track_data_clip_slot_property_with_master_does_not_crash(client):
+    """
+    Querying a clip_slot property across the full range should not raise for
+    master/return tracks that have no clip_slots.
+    """
+    result = client.query("/live/song/get/track_data", (0, -1, "clip_slot.has_clip"))
+    assert result is not None
+
+def test_song_get_track_data_device_property_with_master(client):
+    """
+    Querying a device property across the full range (including master/return tracks)
+    should not crash. Master/return tracks with no devices yield an empty contribution.
+    """
+    result = client.query("/live/song/get/track_data", (0, -1, "device.name"))
+    assert result is not None

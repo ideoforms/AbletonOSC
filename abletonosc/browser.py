@@ -1,6 +1,22 @@
 """
 Browser handler for AbletonOSC.
 Exposes Live's Browser API for loading audio files into the session.
+
+Endpoints:
+    /live/browser/get/user_folders - List user folders in Places
+    /live/browser/get/samples - List items in Samples root
+    /live/browser/list [path] - List items at a browser path
+    /live/browser/load [path] - Load item to current selection
+    /live/browser/preview [path] - Preview audio file
+    /live/browser/stop_preview - Stop preview
+    /live/browser/load_to_slot [path, track, slot] - Load to Session clip slot
+    /live/browser/load_to_arrangement [path, track, beat] - Load to Arrangement view
+
+Known Limitations:
+    - Session view loading (load_to_slot) is reliable via highlighted_clip_slot
+    - Arrangement view loading depends on UI state and may require additional
+      automation for consistent results. The Live API does not expose direct
+      arrangement clip insertion at a specific position.
 """
 
 import Live

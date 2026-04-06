@@ -30,6 +30,8 @@ class TrackHandler(AbletonOSCHandler):
             return track_callback
 
         methods = [
+            "create_audio_clip",
+            "create_midi_clip",
             "delete_device",
             "stop_all_clips"
         ]

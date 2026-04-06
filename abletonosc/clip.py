@@ -64,18 +64,23 @@ class ClipHandler(AbletonOSCHandler):
             return clip_callback
 
         methods = [
+            "crop",
+            "deselect_all_notes",
+            "duplicate_loop",
             "fire",
+            "quantize",
+            "remove_notes_by_id",
+            "select_all_notes",
             "stop",
-            "duplicate_loop", 
-            "remove_notes_by_id"
         ]
         properties_r = [
             "end_time",
             "file_path",
             "gain_display_string",
             "has_groove",
-            "is_midi_clip",
+            "is_arrangement_clip",
             "is_audio_clip",
+            "is_midi_clip",
             "is_overdubbing",
             "is_playing",
             "is_recording",
@@ -83,13 +88,11 @@ class ClipHandler(AbletonOSCHandler):
             "length",
             "playing_position",
             "sample_length",
+            "sample_rate",
+            "signature_denominator",
+            "signature_numerator",
             "start_time",
-            "will_record_on_start"
-            ## TODO list:
-            ##"groove", ## if other than None, says "Error handling OSC message: Infered arg_value type is not supported"
-            ## is_arrangement_clip            
-            ##"warp_markers", ## "Infered arg_value type is not supported"
-            ##"view", ##"Infered arg_value type is not supported"
+            "will_record_on_start",
         ]
         properties_rw = [
             "color",
@@ -166,6 +169,114 @@ class ClipHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
         self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
+
+        #--------------------------------------------------------------------------------
+        # Extended notes: 8 fields per note (pitch, start, dur, vel, mute,
+        # probability, velocity_deviation, release_velocity)
+        #--------------------------------------------------------------------------------
+        def clip_get_notes_extended(clip, params: Tuple[Any] = ()):
+            if len(params) == 4:
+                pitch_start, pitch_span, time_start, time_span = params
+            elif len(params) == 0:
+                pitch_start, pitch_span, time_start, time_span = 0, 127, -8192, 16384
+            else:
+                raise ValueError("Invalid args for get/notes_extended: 0 or 4 required")
+            notes = clip.get_notes_extended(pitch_start, pitch_span, time_start, time_span)
+            result = []
+            for note in notes:
+                result += [
+                    note.pitch, note.start_time, note.duration, note.velocity, note.mute,
+                    getattr(note, 'probability', 1.0),
+                    getattr(note, 'velocity_deviation', 0.0),
+                    getattr(note, 'release_velocity', 64),
+                ]
+            return tuple(result)
+
+        def clip_add_notes_extended(clip, params: Tuple[Any] = ()):
+            notes = []
+            for offset in range(0, len(params), 8):
+                if offset + 7 >= len(params):
+                    break
+                try:
+                    spec = Live.Clip.MidiNoteSpecification(
+                        pitch=int(params[offset]),
+                        start_time=float(params[offset + 1]),
+                        duration=float(params[offset + 2]),
+                        velocity=float(params[offset + 3]),
+                        mute=bool(int(params[offset + 4])),
+                        probability=float(params[offset + 5]),
+                        velocity_deviation=float(params[offset + 6]),
+                        release_velocity=int(params[offset + 7]),
+                    )
+                except TypeError:
+                    # Fallback for Live versions without extended note support
+                    spec = Live.Clip.MidiNoteSpecification(
+                        pitch=int(params[offset]),
+                        start_time=float(params[offset + 1]),
+                        duration=float(params[offset + 2]),
+                        velocity=float(params[offset + 3]),
+                        mute=bool(int(params[offset + 4])),
+                    )
+                notes.append(spec)
+            if notes:
+                clip.add_new_notes(tuple(notes))
+
+        self.osc_server.add_handler("/live/clip/get/notes_extended", create_clip_callback(clip_get_notes_extended))
+        self.osc_server.add_handler("/live/clip/add/notes_extended", create_clip_callback(clip_add_notes_extended))
+
+        #--------------------------------------------------------------------------------
+        # Warp markers (audio clips only)
+        #--------------------------------------------------------------------------------
+        def clip_get_warp_markers(clip, params: Tuple[Any] = ()):
+            markers = list(clip.warp_markers)
+            result = []
+            # Drop the trailing shadow marker
+            for marker in markers[:-1] if len(markers) > 1 else markers:
+                result.append(marker.beat_time)
+                result.append(marker.sample_time)
+            return tuple(result)
+
+        def clip_add_warp_marker(clip, params: Tuple[Any] = ()):
+            beat_time, sample_time = float(params[0]), float(params[1])
+            # Live 12: WarpMarker(sample_time, beat_time) — note: sample_time first
+            marker = Live.Clip.WarpMarker(sample_time, beat_time)
+            clip.add_warp_marker(marker)
+
+        def clip_move_warp_marker(clip, params: Tuple[Any] = ()):
+            marker_index = int(params[0])
+            new_beat_time = float(params[1])
+            markers = list(clip.warp_markers)
+            if marker_index < len(markers) - 1:
+                clip.move_warp_marker(markers[marker_index].beat_time, new_beat_time)
+
+        def clip_remove_warp_marker(clip, params: Tuple[Any] = ()):
+            marker_index = int(params[0])
+            markers = list(clip.warp_markers)
+            if marker_index < len(markers) - 1:
+                clip.remove_warp_marker(markers[marker_index].beat_time)
+
+        self.osc_server.add_handler("/live/clip/get/warp_markers", create_clip_callback(clip_get_warp_markers))
+        self.osc_server.add_handler("/live/clip/add/warp_marker", create_clip_callback(clip_add_warp_marker))
+        self.osc_server.add_handler("/live/clip/move/warp_marker", create_clip_callback(clip_move_warp_marker))
+        self.osc_server.add_handler("/live/clip/remove/warp_marker", create_clip_callback(clip_remove_warp_marker))
+
+        #--------------------------------------------------------------------------------
+        # Time conversion (beats <-> samples)
+        #--------------------------------------------------------------------------------
+        def clip_convert_time(clip, params: Tuple[Any] = ()):
+            time_value = float(params[0])
+            from_unit = str(params[1])
+            to_unit = str(params[2])
+            if from_unit == "beats" and to_unit == "samples":
+                return (clip.beat_to_sample_time(time_value),)
+            elif from_unit == "samples" and to_unit == "beats":
+                return (clip.sample_to_beat_time(time_value),)
+            elif from_unit == to_unit:
+                return (time_value,)
+            else:
+                raise ValueError("Unsupported conversion: %s to %s" % (from_unit, to_unit))
+
+        self.osc_server.add_handler("/live/clip/convert/time", create_clip_callback(clip_convert_time))
 
         def clips_filter_handler(params: Tuple):
             # TODO: Pre-cache clip notes

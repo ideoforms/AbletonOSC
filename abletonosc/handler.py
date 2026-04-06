@@ -106,6 +106,53 @@ class AbletonOSCHandler(Component):
         else:
             self.logger.warning("No listener function found for property: %s (%s)" % (prop, str(params)))
 
+    def _has_chains(self, device):
+        """Check if device has chains (works for Drum Racks where can_have_chains is False)."""
+        try:
+            return hasattr(device, 'chains') and len(device.chains) > 0
+        except Exception:
+            return False
+
+    def _resolve_track(self, track_param):
+        """
+        Resolve a track parameter to (track_object, identifier).
+
+        Accepts:
+          - int or numeric string: self.song.tracks[index] → (track, int)
+          - "master": self.song.master_track → (track, "master")
+          - "return_0", "return_1", ...: self.song.return_tracks[n] → (track, "return_N")
+          - "return_A", "return_B", ...: letter mapped to index → (track, "return_N")
+
+        Returns: (track_object, identifier)
+        Raises: ValueError if track_param cannot be resolved
+        """
+        param = track_param
+        if isinstance(param, (int, float)):
+            index = int(param)
+            return self.song.tracks[index], index
+
+        param_str = str(param)
+
+        if param_str.lower() in ("master", "main"):
+            return self.song.master_track, "master"
+
+        if param_str.lower().startswith("return_"):
+            suffix = param_str[7:]
+            if suffix.isdigit():
+                index = int(suffix)
+            elif len(suffix) == 1 and suffix.isalpha():
+                index = ord(suffix.upper()) - ord("A")
+            else:
+                raise ValueError("Invalid return track identifier: %s" % param_str)
+            return self.song.return_tracks[index], "return_%d" % index
+
+        # Fallback: try as numeric index
+        try:
+            index = int(param_str)
+            return self.song.tracks[index], index
+        except (ValueError, IndexError):
+            raise ValueError("Cannot resolve track: %s" % param_str)
+
     def _clear_listeners(self):
         """
         Clears all listener functions, to prevent listeners continuing to report after a reload.

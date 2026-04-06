@@ -13,23 +13,28 @@ class TrackHandler(AbletonOSCHandler):
                                   include_track_id: bool = False):
             def track_callback(params: Tuple[Any]):
                 if params[0] == "*":
-                    track_indices = list(range(len(self.song.tracks)))
+                    targets = [(self.song.tracks[i], i) for i in range(len(self.song.tracks))]
+                    targets.append((self.song.master_track, "master"))
+                    for i, rt in enumerate(self.song.return_tracks):
+                        targets.append((rt, "return_%d" % i))
                 else:
-                    track_indices = [int(params[0])]
+                    track, track_id = self._resolve_track(params[0])
+                    targets = [(track, track_id)]
 
-                for track_index in track_indices:
-                    track = self.song.tracks[track_index]
+                for track, track_id in targets:
                     if include_track_id:
-                        rv = func(track, *args, tuple([track_index] + params[1:]))
+                        rv = func(track, *args, tuple([track_id] + list(params[1:])))
                     else:
                         rv = func(track, *args, tuple(params[1:]))
 
                     if rv is not None:
-                        return (track_index, *rv)
+                        return (track_id, *rv)
 
             return track_callback
 
         methods = [
+            "create_audio_clip",
+            "create_midi_clip",
             "delete_device",
             "stop_all_clips"
         ]
@@ -103,18 +108,26 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/set/send", create_track_callback(track_set_send))
 
         def track_delete_clip(track, params: Tuple[Any]):
+            if not hasattr(track, 'clip_slots'):
+                return
             clip_index, = params
             track.clip_slots[clip_index].delete_clip()
 
         self.osc_server.add_handler("/live/track/delete_clip", create_track_callback(track_delete_clip))
 
         def track_get_clip_names(track, _):
+            if not hasattr(track, 'clip_slots'):
+                return ()
             return tuple(clip_slot.clip.name if clip_slot.clip else None for clip_slot in track.clip_slots)
 
         def track_get_clip_lengths(track, _):
+            if not hasattr(track, 'clip_slots'):
+                return ()
             return tuple(clip_slot.clip.length if clip_slot.clip else None for clip_slot in track.clip_slots)
 
         def track_get_clip_colors(track, _):
+            if not hasattr(track, 'clip_slots'):
+                return ()
             return tuple(clip_slot.clip.color if clip_slot.clip else None for clip_slot in track.clip_slots)
 
         def track_get_arrangement_clip_names(track, _):
@@ -149,7 +162,12 @@ class TrackHandler(AbletonOSCHandler):
             return tuple(device.class_name for device in track.devices)
 
         def track_get_device_can_have_chains(track, _):
-            return tuple(device.can_have_chains for device in track.devices)
+            def has_chains(d):
+                try:
+                    return 1 if (hasattr(d, 'chains') and len(d.chains) > 0) else 0
+                except Exception:
+                    return 0
+            return tuple(has_chains(d) for d in track.devices)
 
         """
          - name: the device's human-readable name

@@ -162,50 +162,79 @@ class SongHandler(AbletonOSCHandler):
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 
+        #--------------------------------------------------------------------------------
+        # Master and return track info
+        #--------------------------------------------------------------------------------
+        self.osc_server.add_handler("/live/song/get/num_return_tracks",
+            lambda _: (len(self.song.return_tracks),))
+        self.osc_server.add_handler("/live/song/get/return_track_names",
+            lambda _: tuple(rt.name for rt in self.song.return_tracks))
+        self.osc_server.add_handler("/live/song/get/master_track_name",
+            lambda _: (self.song.master_track.name,))
 
-        def song_export_structure(params):
-            tracks = []
-            for track_index, track in enumerate(self.song.tracks):
-                group_track = None
-                if track.group_track is not None:
-                    group_track = list(self.song.tracks).index(track.group_track)
-                track_data = {
-                    "index": track_index,
-                    "name": track.name,
-                    "is_foldable": track.is_foldable,
-                    "group_track": group_track,
-                    "clips": [],
-                    "devices": []
-                }
+
+        def serialize_device(device):
+            """Recursively serialize a device, including chains for rack devices."""
+            device_data = {
+                "class_name": device.class_name,
+                "type": device.type,
+                "name": device.name,
+                "can_have_chains": hasattr(device, 'chains') and len(device.chains) > 0 if hasattr(device, 'chains') else False,
+                "parameters": []
+            }
+            for parameter in device.parameters:
+                device_data["parameters"].append({
+                    "name": parameter.name,
+                    "value": parameter.value,
+                    "min": parameter.min,
+                    "max": parameter.max,
+                    "is_quantized": parameter.is_quantized,
+                })
+            if hasattr(device, 'chains') and len(device.chains) > 0:
+                device_data["chains"] = []
+                try:
+                    for chain in device.chains:
+                        chain_data = {
+                            "name": chain.name,
+                            "devices": [serialize_device(d) for d in chain.devices]
+                        }
+                        device_data["chains"].append(chain_data)
+                except Exception as e:
+                    self.logger.warning("Error serializing chains: %s" % e)
+            return device_data
+
+        def serialize_track(track, track_id):
+            """Serialize a track with its clips and devices."""
+            track_data = {
+                "index": track_id,
+                "name": track.name,
+                "devices": [serialize_device(d) for d in track.devices]
+            }
+            if hasattr(track, 'clip_slots'):
+                track_data["clips"] = []
                 for clip_index, clip_slot in enumerate(track.clip_slots):
                     if clip_slot.clip:
-                        clip_data = {
+                        track_data["clips"].append({
                             "index": clip_index,
                             "name": clip_slot.clip.name,
                             "length": clip_slot.clip.length,
-                        }
-                        track_data["clips"].append(clip_data)
-
-                for device_index, device in enumerate(track.devices):
-                    device_data = {
-                        "class_name": device.class_name,
-                        "type": device.type,
-                        "name": device.name,
-                        "parameters": []
-                    }
-                    for parameter in device.parameters:
-                        device_data["parameters"].append({
-                            "name": parameter.name,
-                            "value": parameter.value,
-                            "min": parameter.min,
-                            "max": parameter.max,
-                            "is_quantized": parameter.is_quantized,
                         })
-                    track_data["devices"].append(device_data)
+                try:
+                    track_data["is_foldable"] = track.is_foldable
+                    if track.group_track is not None:
+                        track_data["group_track"] = list(self.song.tracks).index(track.group_track)
+                except Exception:
+                    pass
+            return track_data
 
-                tracks.append(track_data)
+        def song_export_structure(params):
+            tracks = [serialize_track(track, i) for i, track in enumerate(self.song.tracks)]
+
             song = {
-                "tracks": tracks
+                "tracks": tracks,
+                "master_track": serialize_track(self.song.master_track, "master"),
+                "return_tracks": [serialize_track(rt, "return_%d" % i)
+                                  for i, rt in enumerate(self.song.return_tracks)],
             }
 
             if sys.platform == "darwin":

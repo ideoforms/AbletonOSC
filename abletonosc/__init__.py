@@ -13,4 +13,5 @@ from .device import DeviceHandler
 from .scene import SceneHandler
 from .view import ViewHandler
 from .midimap import MidiMapHandler
+from .chain import ChainHandler
 from .constants import OSC_LISTEN_PORT, OSC_RESPONSE_PORT

@@ -100,6 +100,7 @@ class Manager(ControlSurface):
                 abletonosc.ViewHandler(self),
                 abletonosc.SceneHandler(self),
                 abletonosc.MidiMapHandler(self),
+                abletonosc.BrowserHandler(self),
             ]
 
     def clear_api(self):
@@ -119,21 +120,30 @@ class Manager(ControlSurface):
         self.schedule_message(1, self.tick)
 
     def reload_imports(self):
+        # Reload the package FIRST so __init__.py re-runs and picks up any
+        # newly-added submodules (e.g. browser). Then reload each submodule
+        # individually, tolerating any that are missing.
         try:
-            importlib.reload(abletonosc.application)
-            importlib.reload(abletonosc.clip)
-            importlib.reload(abletonosc.clip_slot)
-            importlib.reload(abletonosc.device)
-            importlib.reload(abletonosc.handler)
-            importlib.reload(abletonosc.osc_server)
-            importlib.reload(abletonosc.scene)
-            importlib.reload(abletonosc.song)
-            importlib.reload(abletonosc.track)
-            importlib.reload(abletonosc.view)
             importlib.reload(abletonosc)
-        except Exception as e:
-            exc = traceback.format_exc()
-            logging.warning(exc)
+        except Exception:
+            logger.warning(traceback.format_exc())
+
+        for modname in (
+            "application", "clip", "clip_slot", "device", "handler",
+            "osc_server", "scene", "song", "track", "view", "browser",
+        ):
+            mod = getattr(abletonosc, modname, None)
+            if mod is None:
+                continue
+            try:
+                importlib.reload(mod)
+            except Exception:
+                logger.warning("reload %s failed:\n%s" % (modname, traceback.format_exc()))
+
+        try:
+            importlib.reload(abletonosc)
+        except Exception:
+            logger.warning(traceback.format_exc())
 
         self.clear_api()
         self.init_api()

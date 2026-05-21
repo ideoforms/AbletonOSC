@@ -86,8 +86,7 @@ class ClipHandler(AbletonOSCHandler):
             "start_time",
             "will_record_on_start"
             ## TODO list:
-            ##"groove", ## if other than None, says "Error handling OSC message: Infered arg_value type is not supported"
-            ## is_arrangement_clip            
+            ## is_arrangement_clip
             ##"warp_markers", ## "Infered arg_value type is not supported"
             ##"view", ##"Infered arg_value type is not supported"
         ]
@@ -166,6 +165,17 @@ class ClipHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/clip/get/notes", create_clip_callback(clip_get_notes))
         self.osc_server.add_handler("/live/clip/add/notes", create_clip_callback(clip_add_notes))
         self.osc_server.add_handler("/live/clip/remove/notes", create_clip_callback(clip_remove_notes))
+
+        def clip_get_groove(clip, params: Tuple[Any] = ()):
+            #--------------------------------------------------------------------------------
+            # clip.groove returns a Live.Groove.Groove instance (or None when no groove
+            # is assigned). The generic _get_property can't serialise the Groove object
+            # for OSC ("Infered arg_value type is not supported"), so return its name.
+            #--------------------------------------------------------------------------------
+            groove = clip.groove
+            return (groove.name if groove is not None else "",)
+
+        self.osc_server.add_handler("/live/clip/get/groove", create_clip_callback(clip_get_groove))
 
         def clips_filter_handler(params: Tuple):
             # TODO: Pre-cache clip notes

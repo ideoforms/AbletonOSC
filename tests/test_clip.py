@@ -51,6 +51,14 @@ def test_clip_property_pitch_coarse(client):
 def test_clip_property_pitch_fine(client):
     _test_clip_property(client, 2, 0, "pitch_fine", (0.5, 0.0))
 
+def test_clip_get_groove_unassigned(client):
+    #--------------------------------------------------------------------------------
+    # A freshly created clip has no groove assigned, so the handler should return
+    # an empty string. Verifies that the custom handler doesn't crash on None,
+    # which was the original "Infered arg_value type is not supported" failure mode.
+    #--------------------------------------------------------------------------------
+    assert client.query("/live/clip/get/groove", (0, 0)) == (0, 0, "")
+
 def test_clip_add_remove_notes(client):
     assert client.query("/live/clip/get/notes", (0, 0)) == (0, 0)
 

@@ -76,6 +76,61 @@ def test_track_devices(client):
     assert client.query("/live/track/get/num_devices", (track_id,)) == (track_id, 0,)
 
 #--------------------------------------------------------------------------------
+# /live/track/create_midi_clip and /live/track/create_audio_clip exercise the
+# arrangement-view clip creation surface of the Live API. They do not affect
+# the session view — that surface is served by /live/clip_slot/create_clip.
+#
+# These tests use /live/song/undo to roll back state after each create, so the
+# test set is left as it was found.
+#--------------------------------------------------------------------------------
+
+def test_track_create_midi_clip_in_arrangement(client):
+    track_id = 0
+    start_time, end_time = 0.0, 4.0
+
+    initial = client.query("/live/track/get/arrangement_clips/name", (track_id,))
+
+    client.send_message("/live/track/create_midi_clip", (track_id, start_time, end_time))
+    wait_one_tick()
+
+    after = client.query("/live/track/get/arrangement_clips/name", (track_id,))
+    # (track_id,) is the response prefix; after the new clip there must be one
+    # more entry than before.
+    assert len(after) == len(initial) + 1, \
+        "Expected arrangement clip count to grow by 1; before=%s after=%s" % (initial, after)
+
+    # Undo to clean up — create_midi_clip is undoable per the LOM contract.
+    client.send_message("/live/song/undo", ())
+    wait_one_tick()
+
+def test_track_create_audio_clip_in_arrangement(client, tmp_path):
+    """Generate a one-second silent WAV on disk and import it as an arrangement
+    audio clip onto track 2 (the default test audio track). Undo afterwards."""
+    import wave
+    wav_path = tmp_path / "abletonosc_test_silence.wav"
+    with wave.open(str(wav_path), "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(44100)
+        wf.writeframes(b"\x00\x00" * 44100)
+
+    track_id = 2
+    position = 0.0
+
+    initial = client.query("/live/track/get/arrangement_clips/name", (track_id,))
+
+    client.send_message("/live/track/create_audio_clip",
+                        (track_id, str(wav_path), position))
+    wait_one_tick()
+
+    after = client.query("/live/track/get/arrangement_clips/name", (track_id,))
+    assert len(after) == len(initial) + 1, \
+        "Expected arrangement clip count to grow by 1; before=%s after=%s" % (initial, after)
+
+    client.send_message("/live/song/undo", ())
+    wait_one_tick()
+
+#--------------------------------------------------------------------------------
 # Test track properties - listeners
 #--------------------------------------------------------------------------------
 

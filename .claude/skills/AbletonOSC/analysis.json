@@ -1,0 +1,88 @@
+{
+  "version": "2.0",
+  "generated": "2026-05-21",
+  "source_repo": "https://github.com/ideoforms/AbletonOSC",
+  "source_platform": "github",
+  "repository": {
+    "name": "AbletonOSC",
+    "description": "Control Ableton Live via Open Sound Control (OSC)",
+    "languages": ["Python"],
+    "topics": [],
+    "default_branch": "master",
+    "license": "MIT License",
+    "stars": 743
+  },
+  "architecture": {
+    "entrypoint": "abletonosc/__init__.py + manager.py",
+    "base_class": "abletonosc/handler.py::AbletonOSCHandler",
+    "registration_pattern": "methods + properties_r + properties_rw lists in init_api(); framework auto-registers /live/<class>/get|set|start_listen|stop_listen/<prop>",
+    "listener_convention": "Live API: add_<prop>_listener / remove_<prop>_listener — fully generic",
+    "modules": ["application", "song", "track", "clip", "clip_slot", "scene", "view", "device", "midimap"]
+  },
+  "testing": {
+    "framework": "pytest",
+    "needs_running_live": true,
+    "preconditions": [
+      "Live started with blank default set",
+      "Default audio I/O configured",
+      "Preferences > Record, Warp & Launch > Count-In = None"
+    ],
+    "tick_duration_seconds": 0.125,
+    "fixture": "AbletonOSCClient (module-scoped); sends /live/api/reload on test-module import",
+    "patterns": {
+      "property_roundtrip": "_test_clip_property(client, ids, prop, (val1, val2))",
+      "listener": "start_listen → mutate → await_message(..., TICK_DURATION*2) → stop_listen",
+      "method": "send_message + query + assert"
+    }
+  },
+  "contributors": [
+    {"login": "ideoforms", "name": "Daniel Jones", "contributions": 251, "role": "maintainer"},
+    {"login": "markmarijnissen", "name": "Mark Marijnissen", "contributions": 11, "focus_areas": ["view", "master/return tracks"]},
+    {"login": "esaruoho", "name": "Esa Juhani Ruoho", "contributions": 8, "focus_areas": ["clip properties", "run-console autocomplete"]},
+    {"login": "marcobn", "name": "Marco Buongiorno Nardelli", "contributions": 7},
+    {"login": "steeltrack", "name": "Dave Bailey", "contributions": 6, "focus_areas": ["send/return"]}
+  ],
+  "conventions": {
+    "commit_format": "freeform, imperative mood",
+    "pr_title_format": "freeform, descriptive",
+    "pr_has_template": true,
+    "pr_template_checklist": ["title descriptive", "code style", "README docs", "unit tests", "tests pass"]
+  },
+  "maintainer_preferences": {
+    "philosophy": "Lean codebase, no surplus files, reuse existing namespaces",
+    "warns_about": "AI-generated content is hard to review",
+    "tests_required": "for new logic/methods; encouraged but not blocking for property-list additions"
+  },
+  "recent_activity": {
+    "analysis_period_days": 180,
+    "active_contributors_180d": 1,
+    "notable": "PRs #143 (esaruoho), #140 (esaruoho), #142 (esaruoho) merged Sep-Nov 2025"
+  },
+  "stalls_and_patterns": {
+    "stall_causes": [
+      "Massive refactors (PR #185 +1734/-363; #186 +1135/-321)",
+      "Multiple competing implementations (5 Browser API PRs open)",
+      "Surplus docs/devel folders (PR #167)",
+      "New top-level namespaces when existing one fits (PR #153)"
+    ],
+    "merge_recipe": [
+      "Single focused PR, ≤200 lines, 1-3 files",
+      "Append to properties_r/rw lists when adding endpoints",
+      "Update README.md tables",
+      "Reuse existing /live/<class>/ namespaces",
+      "Strip AI-generated commentary, devel notes, extra markdown"
+    ]
+  },
+  "esaruoho_prs": {
+    "open": [],
+    "merged": [
+      {"number": 143, "title": "Introduce missing Clip properties to run-console.py + view.py", "merged_at": "2025-11-16"},
+      {"number": 142, "title": "Tab AutoComplete + exit/quit", "merged_at": "2024-09-24"},
+      {"number": 140, "title": "Minor copy tweaks to code comments", "merged_at": "2024-09-23"}
+    ],
+    "closed": [
+      {"number": 201, "title": "Add clip property handlers + README docs (leftovers)", "reason": "duplicate of merged #143, opened from stale fork master"},
+      {"number": 141, "title": "tab autocomplete, exit/quit to exit"}
+    ]
+  }
+}

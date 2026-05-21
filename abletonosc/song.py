@@ -162,6 +162,18 @@ class SongHandler(AbletonOSCHandler):
             return tuple(rv)
         self.osc_server.add_handler("/live/song/get/track_data", song_get_track_data)
 
+        #--------------------------------------------------------------------------------
+        # Master and return track info — explicit endpoints rather than smuggling
+        # them into track_names/num_tracks, which historically counted only the
+        # regular Audio/MIDI tracks.
+        #--------------------------------------------------------------------------------
+        self.osc_server.add_handler("/live/song/get/num_return_tracks",
+                                    lambda _: (len(self.song.return_tracks),))
+        self.osc_server.add_handler("/live/song/get/return_track_names",
+                                    lambda _: tuple(rt.name for rt in self.song.return_tracks))
+        self.osc_server.add_handler("/live/song/get/master_track_name",
+                                    lambda _: (self.song.master_track.name,))
+
 
         def song_export_structure(params):
             tracks = []

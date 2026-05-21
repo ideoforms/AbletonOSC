@@ -163,7 +163,10 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 |:---------------------------|:-------------|:-----------------------|:----------------------------------------------------------------------------|
 | /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
 | /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  |
-| /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  |
+| /live/song/get/num_tracks  |              | num_tracks             | Query the number of regular Audio/MIDI tracks (excludes master + returns)   |
+| /live/song/get/num_return_tracks |        | num_return_tracks       | Query the number of return tracks                                           |
+| /live/song/get/master_track_name |        | name                    | Query the name of the master track                                          |
+| /live/song/get/return_track_names |       | name, ...               | Query the names of all return tracks, in order                              |
 | /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          |
 | /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. |
 
@@ -228,6 +231,20 @@ To query the properties of multiple tracks, see [Song: Properties of cue points,
 
 <details>
 <summary><b>Documentation</b>: Track API</summary>
+
+### Track identifiers
+
+Every `/live/track/*` and `/live/device/*` endpoint accepts a `track_id` in any of these forms:
+
+| Form | Example | Meaning |
+|---|---|---|
+| Integer | `0`, `1`, `2`, ...        | Index into the regular Audio/MIDI tracks |
+| `"master"` or `"main"` | `"master"` | The master track |
+| `"return_<N>"` | `"return_0"`, `"return_1"` | Return track by numeric index |
+| `"return_<LETTER>"` | `"return_A"`, `"return_B"` | Return track by Live's letter label (`A` → `return_0`, `B` → `return_1`, ...) |
+| `"*"` (wildcard) | `"*"` | Fan out across all regular tracks plus the master and every return |
+
+Responses echo the canonical identifier (`int` for regular tracks, `"master"` for master, `"return_N"` for returns), so clients can match responses to requests even when a wildcard or letter-labelled return was used. Properties that are only meaningful on session tracks (e.g. `clips/name`, `clips/length`) return an empty tuple for master/return tracks.
 
 ### Track methods
 
@@ -471,6 +488,8 @@ Represents a scene, used to trigger a row of clips simultaneously. A scene's nam
 ## Device API
 
 Represents an instrument or effect.
+
+Every `/live/device/*` endpoint accepts the same `track_id` forms as the Track API: integer index, `"master"` / `"main"`, or `"return_<N>"` / `"return_<LETTER>"`. See [Track identifiers](#track-identifiers).
 
 <details>
 <summary><b>Documentation</b>: Device API</summary>

@@ -9,15 +9,16 @@ class DeviceHandler(AbletonOSCHandler):
     def init_api(self):
         def create_device_callback(func, *args, include_ids: bool = False):
             def device_callback(params: Tuple[Any]):
-                track_index, device_index = int(params[0]), int(params[1])
-                device = self.song.tracks[track_index].devices[device_index]
-                if (include_ids):
-                    rv = func(device, *args, params[0:])
+                track, track_id = self._resolve_track(params[0])
+                device_index = int(params[1])
+                device = track.devices[device_index]
+                if include_ids:
+                    rv = func(device, *args, tuple([track_id, device_index] + list(params[2:])))
                 else:
                     rv = func(device, *args, params[2:])
 
                 if rv is not None:
-                    return (track_index, device_index, *rv)
+                    return (track_id, device_index, *rv)
 
             return device_callback
 

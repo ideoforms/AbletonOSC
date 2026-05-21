@@ -22,6 +22,51 @@ class AbletonOSCHandler(Component):
         self._clear_listeners()
 
     #--------------------------------------------------------------------------------
+    # Track-identifier resolver
+    #--------------------------------------------------------------------------------
+    def _resolve_track(self, track_param):
+        """
+        Resolve a track identifier to a (track_object, canonical_identifier) pair.
+
+        Accepts:
+          - int or numeric string: index into self.song.tracks → (track, int)
+          - "master" or "main" (case-insensitive): the master track → (track, "master")
+          - "return_0", "return_1", ...: indexed return track → (track, "return_N")
+          - "return_A", "return_B", ...: letter-indexed return track → (track, "return_N")
+
+        The canonical identifier is what should be echoed back in OSC responses so
+        clients can match replies to requests; "return_A" requests get a "return_0"
+        response so the index is unambiguous.
+
+        Raises ValueError if the identifier cannot be resolved.
+        """
+        if isinstance(track_param, (int, float)) and not isinstance(track_param, bool):
+            index = int(track_param)
+            return self.song.tracks[index], index
+
+        param_str = str(track_param)
+        lowered = param_str.lower()
+
+        if lowered in ("master", "main"):
+            return self.song.master_track, "master"
+
+        if lowered.startswith("return_"):
+            suffix = param_str[7:]
+            if suffix.isdigit():
+                index = int(suffix)
+            elif len(suffix) == 1 and suffix.isalpha():
+                index = ord(suffix.upper()) - ord("A")
+            else:
+                raise ValueError("Invalid return track identifier: %s" % param_str)
+            return self.song.return_tracks[index], "return_%d" % index
+
+        try:
+            index = int(param_str)
+        except ValueError:
+            raise ValueError("Cannot resolve track: %s" % param_str)
+        return self.song.tracks[index], index
+
+    #--------------------------------------------------------------------------------
     # Generic callbacks
     #--------------------------------------------------------------------------------
     def _call_method(self, target, method, params: Optional[Tuple] = ()):

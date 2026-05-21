@@ -527,6 +527,83 @@ Note that, for consistency with other object types (and Live's internal API), **
 
 ---
 
+## Browser API
+
+Exposes Live's content browser over OSC so that instruments, effects, samples, presets, and Max for Live devices can be loaded programmatically — useful for live performance setups, AI/MCP tool integrations, and headless scripting.
+
+<details>
+<summary><b>Documentation</b>: Browser API</summary>
+
+### Load items by name
+
+These endpoints search the named category tree and load the first match onto `track_index`. Matching is case-insensitive, prefers exact matches, falls back to substring matches.
+
+| Address                                  | Query params              | Response params | Description                                                                                          |
+|:-----------------------------------------|:--------------------------|:----------------|:-----------------------------------------------------------------------------------------------------|
+| /live/browser/load_instrument            | name, track_index         | name            | Load an instrument (searches `instruments`, `drums`, `sounds`)                                       |
+| /live/browser/load_drum_kit              | name, track_index         | name            | Load a drum kit (searches `drums`)                                                                   |
+| /live/browser/load_audio_effect          | name, track_index         | name            | Load an audio effect                                                                                 |
+| /live/browser/load_midi_effect           | name, track_index         | name            | Load a MIDI effect                                                                                   |
+| /live/browser/load_effect                | name, track_index         | name            | Load an effect (searches both audio and MIDI effect roots)                                           |
+| /live/browser/load_sound                 | name, track_index         | name            | Load a sound                                                                                         |
+| /live/browser/load_sample                | name, track_index         | name            | Load a sample                                                                                        |
+| /live/browser/load_plugin                | name, track_index         | name            | Load a VST/AU plugin (searches `plugins`, `instruments`, `audio_effects`)                            |
+| /live/browser/load_max_device            | name, track_index         | name            | Load a Max for Live device                                                                           |
+| /live/browser/load_user_preset           | name, track_index         | name            | Load a preset from the user library                                                                  |
+
+### Load by target
+
+| Address                                  | Query params                                  | Response params              | Description                                                                                                            |
+|:-----------------------------------------|:----------------------------------------------|:-----------------------------|:-----------------------------------------------------------------------------------------------------------------------|
+| /live/browser/load_to_slot               | category, name, track_index, slot_index       | name, track_index, slot_index | Load an item directly into a session-view clip slot                                                                    |
+| /live/browser/load_to_arrangement        | category, name, track_index, beat_time        | name, track_index, beat_time | Load an item at a position in the arrangement view (best-effort: the Live API does not support direct positional insertion) |
+
+### Load by query / category
+
+These endpoints don't require knowing the item's exact name. Returns an empty string if no match is found.
+
+| Address                                  | Query params                       | Response params | Description                                                                              |
+|:-----------------------------------------|:-----------------------------------|:----------------|:-----------------------------------------------------------------------------------------|
+| /live/browser/load_by_query              | track_index, query                 | name            | Search user-facing roots (sounds, instruments, drums, samples, packs, user_library) and load the first match |
+| /live/browser/load_from_category         | track_index, category, query       | name            | Restricted-scope search within a single category                                         |
+
+### Defaults
+
+Convenience one-shots for the common case of "just give me a working instrument / effect on this track".
+
+| Address                                          | Query params  | Response params | Description                                                                          |
+|:-------------------------------------------------|:--------------|:----------------|:-------------------------------------------------------------------------------------|
+| /live/browser/load_default_instrument            | track_index   | name            | Load a default synth (prefers Drift / Analog / Wavetable / Operator over samplers)   |
+| /live/browser/load_default_audio_effect          | track_index   | name            | Load a default audio effect (prefers Reverb / Delay / EQ Eight / Compressor / Utility) |
+| /live/browser/load_default_midi_effect           | track_index   | name            | Load a default MIDI effect (prefers Arpeggiator / Chord / Scale)                     |
+
+### Discovery
+
+| Address                                  | Query params                       | Response params      | Description                                                                              |
+|:-----------------------------------------|:-----------------------------------|:---------------------|:-----------------------------------------------------------------------------------------|
+| /live/browser/get/categories             |                                    | category_name, ...   | List available browser categories                                                        |
+| /live/browser/get/children               | category, [path...]                | child_name, ...      | List immediate children at a path within a category                                      |
+| /live/browser/search                     | query, [max_results=20]            | name, ...            | Search for loadable items across all main categories                                     |
+| /live/browser/list_audio_effects         |                                    | name, ...            | List all loadable audio effects                                                          |
+| /live/browser/list_midi_effects          |                                    | name, ...            | List all loadable MIDI effects                                                           |
+| /live/browser/list_sounds                |                                    | name, ...            | List all loadable sounds                                                                 |
+| /live/browser/list_plugins               |                                    | name, ...            | List all loadable plugins                                                                |
+| /live/browser/list_user_presets          |                                    | name, ...            | List all loadable user-library presets                                                   |
+
+### Preview, hotswap, utility
+
+| Address                                  | Query params                       | Response params | Description                                                                              |
+|:-----------------------------------------|:-----------------------------------|:----------------|:-----------------------------------------------------------------------------------------|
+| /live/browser/preview                    | category, name                     | name            | Preview an item through Live's preview channel                                           |
+| /live/browser/stop_preview               |                                    | "stopped"       | Stop the currently previewing item                                                       |
+| /live/browser/refresh                    |                                    | "refreshed"     | Force a browser cache invalidation                                                       |
+| /live/browser/hotswap_start              | track_index, device_index          | track_index, device_index | Enter hotswap mode for the given device                                       |
+| /live/browser/hotswap_load               | name                               | name            | Load an item into the current hotswap context                                            |
+
+</details>
+
+---
+
 # Utilities
 
 Included with the framework is a command-line console utility `run-console.py`, which can be used as a quick and easy way to send OSC queries to AbletonOSC. Example:

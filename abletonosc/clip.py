@@ -70,27 +70,48 @@ class ClipHandler(AbletonOSCHandler):
             "remove_notes_by_id"
         ]
         properties_r = [
+            "end_time", ## New, works
             "file_path",
             "gain_display_string",
+            "groove", ## New, works
+            "has_groove", ## New, test
+            ## is_arrangement_clip - wasn't able to get this to do anything
             "is_midi_clip",
             "is_audio_clip",
+            "is_overdubbing",
+            ## is_overdubbing - didn't seem to get any details -- requires listener?
             "is_playing",
             "is_recording",
+            "is_triggered", ## if clip was triggered to record, or is recording
             "length",
-            "playing_position"
+            "playing_position",
+            "sample_length", ## AudioClips only, -1 if no sample
+            "start_time", ## New, test
+            "view", ##New, test
+            "warp_markers", ##New, test
+            "will_record_on_start" ##New, test
         ]
         properties_rw = [
             "color",
+            "color_index", ## New, works
+            "end_marker",
             "gain",
+            "launch_mode", ##New, works
+            "launch_quantization", ## New, test
+            "legato", ## New, test
+            "loop_end",
+            "loop_start",
+            "looping",
+            "muted", ##New, test
             "name",
             "pitch_coarse",
             "pitch_fine",
-            "looping",
-            "loop_start",
-            "loop_end",
-            "warping",
+            "position", ##New, test
+            "ram_mode", ##New, test
             "start_marker",
-            "end_marker",
+            "velocity_amount", ##New, test
+            "warp_mode", ##New, test
+            "warping",
         ]
 
         for method in methods:

@@ -26,11 +26,17 @@ class AbletonOSCHandler(Component):
     #--------------------------------------------------------------------------------
     def _call_method(self, target, method, params: Optional[Tuple] = ()):
         self.logger.info("Calling method for %s: %s (params %s)" % (self.class_identifier, method, str(params)))
-        getattr(target, method)(*params)
+        try:
+            getattr(target, method)(*params)
+        except Exception as e:
+            self.logger.error("Error calling %s.%s: %s" % (self.class_identifier, method, e))
 
     def _set_property(self, target, prop, params: Tuple) -> None:
         self.logger.info("Setting property for %s: %s (new value %s)" % (self.class_identifier, prop, params[0]))
-        setattr(target, prop, params[0])
+        try:
+            setattr(target, prop, params[0])
+        except Exception as e:
+            self.logger.error("Error setting %s.%s: %s" % (self.class_identifier, prop, e))
 
     def _get_property(self, target, prop, params: Optional[Tuple] = ()) -> Tuple[Any]:
         try:

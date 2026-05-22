@@ -91,11 +91,9 @@ class OSCServer:
 
             if rv is not None:
                 assert isinstance(rv, tuple)
-                remote_hostname, _ = remote_addr
-                response_addr = (remote_hostname, self._response_port)
                 self.send(address=message.address,
                           params=rv,
-                          remote_addr=response_addr)
+                          remote_addr=remote_addr)
         elif "*" in message.address:
             regex = message.address.replace("*", "[^/]+")
             for callback_address, callback in self._callbacks.items():
@@ -116,11 +114,9 @@ class OSCServer:
                         continue
                     if rv is not None:
                         assert isinstance(rv, tuple)
-                        remote_hostname, _ = remote_addr
-                        response_addr = (remote_hostname, self._response_port)
                         self.send(address=callback_address,
                                   params=rv,
-                                  remote_addr=response_addr)
+                                  remote_addr=remote_addr)
         else:
             self.logger.error("AbletonOSC: Unknown OSC address: %s" % message.address)
 
@@ -148,44 +144,26 @@ class OSCServer:
     def process(self) -> None:
         """
         Synchronously process all data queued on the OSC socket.
+        Per-message error handling: one failed message does not drop remaining queued messages.
         """
-        try:
-            repeats = 0
-            while True:
-                #--------------------------------------------------------------------------------
-                # Loop until no more data is available.
-                #--------------------------------------------------------------------------------
+        while True:
+            try:
                 data, remote_addr = self._socket.recvfrom(65536)
-                #--------------------------------------------------------------------------------
-                # Update the default reply address to the most recent client. Used when
-                # sending (e.g) /live/song/beat messages and listen updates.
-                #
-                # This is slightly ugly and prevents registering listeners from different IPs.
-                #--------------------------------------------------------------------------------
+            except socket.error as e:
+                if e.errno == errno.ECONNRESET:
+                    self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
+                elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
+                    pass
+                else:
+                    self.logger.error("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
+                break
+
+            try:
                 self._remote_addr = (remote_addr[0], OSC_RESPONSE_PORT)
                 self.parse_bundle(data, remote_addr)
-
-        except socket.error as e:
-            if e.errno == errno.ECONNRESET:
-                #--------------------------------------------------------------------------------
-                # This benign error seems to occur on startup on Windows
-                #--------------------------------------------------------------------------------
-                self.logger.warning("AbletonOSC: Non-fatal socket error: %s" % (traceback.format_exc()))
-            elif e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK:
-                #--------------------------------------------------------------------------------
-                # Another benign networking error, throw when no data is received
-                # on a call to recvfrom() on a non-blocking socket
-                #--------------------------------------------------------------------------------
-                pass
-            else:
-                #--------------------------------------------------------------------------------
-                # Something more serious has happened
-                #--------------------------------------------------------------------------------
-                self.logger.error("AbletonOSC: Socket error: %s" % (traceback.format_exc()))
-
-        except Exception as e:
-            self.logger.error("AbletonOSC: Error handling OSC message: %s" % e)
-            self.logger.warning("AbletonOSC: %s" % traceback.format_exc())
+            except Exception as e:
+                self.logger.error("AbletonOSC: Error handling OSC message: %s" % e)
+                self.logger.warning("AbletonOSC: %s" % traceback.format_exc())
 
     def shutdown(self) -> None:
         """

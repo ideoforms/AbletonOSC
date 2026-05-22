@@ -140,3 +140,114 @@ class DeviceHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/device/get/parameter/name", create_device_callback(device_get_parameter_name))
         self.osc_server.add_handler("/live/device/start_listen/parameter/value", create_device_callback(device_get_parameter_value_listener, include_ids = True))
         self.osc_server.add_handler("/live/device/stop_listen/parameter/value", create_device_callback(device_get_parameter_remove_value_listener, include_ids = True))
+
+        #--------------------------------------------------------------------------------
+        # PluginDevice: Get all plugin parameters via bank system
+        # Returns all parameters across all banks, not just configured ones
+        #--------------------------------------------------------------------------------
+        def device_get_plugin_all_params(device, params: Tuple[Any] = ()):
+            """Get all parameter names from a plugin device using get_parameter_names."""
+            result = []
+            try:
+                # get_parameter_names returns the full list of AU/VST parameter names
+                names = device.get_parameter_names(512)  # request up to 512 names
+                result.append(len(names))
+                for name in names:
+                    result.append(name)
+            except Exception as e:
+                result.append("error:" + str(e))
+                # Fallback: try with different count
+                try:
+                    names = device.get_parameter_names()
+                    result.append(len(names))
+                    for name in names:
+                        result.append(name)
+                except Exception as e2:
+                    result.append("error2:" + str(e2))
+            return tuple(result)
+
+        def device_get_presets(device, params: Tuple[Any] = ()):
+            """Get preset list from a plugin device."""
+            result = []
+            try:
+                presets = list(device.presets)
+                result.append(len(presets))
+                for p in presets:
+                    result.append(str(p))
+            except Exception as e:
+                result.append("error:" + str(e))
+            return tuple(result)
+
+        self.osc_server.add_handler("/live/device/get/plugin_all_params", create_device_callback(device_get_plugin_all_params))
+        self.osc_server.add_handler("/live/device/get/presets", create_device_callback(device_get_presets))
+
+        #--------------------------------------------------------------------------------
+        # Flat device addressing — walks into racks/chains so nested devices
+        # can be accessed by a single flat index per track.
+        #--------------------------------------------------------------------------------
+        def _flatten_devices(device_list):
+            """Recursively collect all devices, walking into racks/chains."""
+            result = []
+            for device in device_list:
+                result.append(device)
+                if device.can_have_chains:
+                    for chain in device.chains:
+                        result.extend(_flatten_devices(chain.devices))
+            return result
+
+        def flat_device_callback(func):
+            def callback(params: Tuple[Any]):
+                track_index = int(params[0])
+                flat_index = int(params[1])
+                all_devices = _flatten_devices(self.song.tracks[track_index].devices)
+                device = all_devices[flat_index]
+                rv = func(device, params[2:])
+                if rv is not None:
+                    return (track_index, flat_index, *rv)
+            return callback
+
+        def flat_get_name(device, params):
+            return device.name,
+
+        def flat_get_class_name(device, params):
+            return device.class_name,
+
+        def flat_get_parameters_name(device, params):
+            return tuple(p.name for p in device.parameters)
+
+        def flat_get_parameters_value(device, params):
+            return tuple(p.value for p in device.parameters)
+
+        def flat_get_parameters_min(device, params):
+            return tuple(p.min for p in device.parameters)
+
+        def flat_get_parameters_max(device, params):
+            return tuple(p.max for p in device.parameters)
+
+        def flat_set_parameter_value(device, params):
+            param_index = int(params[0])
+            param_value = float(params[1])
+            device.parameters[param_index].value = param_value
+
+        def flat_refresh_parameters(device, params):
+            """Re-set all parameter values wrapped in begin/end gesture to force plugin GUI update."""
+            count = 0
+            for param in device.parameters:
+                try:
+                    val = param.value
+                    param.begin_gesture()
+                    param.value = val
+                    param.end_gesture()
+                    count += 1
+                except Exception:
+                    pass
+            return (count,)
+
+        self.osc_server.add_handler("/live/flat_device/refresh_parameters", flat_device_callback(flat_refresh_parameters))
+        self.osc_server.add_handler("/live/flat_device/get/name", flat_device_callback(flat_get_name))
+        self.osc_server.add_handler("/live/flat_device/get/class_name", flat_device_callback(flat_get_class_name))
+        self.osc_server.add_handler("/live/flat_device/get/parameters/name", flat_device_callback(flat_get_parameters_name))
+        self.osc_server.add_handler("/live/flat_device/get/parameters/value", flat_device_callback(flat_get_parameters_value))
+        self.osc_server.add_handler("/live/flat_device/get/parameters/min", flat_device_callback(flat_get_parameters_min))
+        self.osc_server.add_handler("/live/flat_device/get/parameters/max", flat_device_callback(flat_get_parameters_max))
+        self.osc_server.add_handler("/live/flat_device/set/parameter/value", flat_device_callback(flat_set_parameter_value))

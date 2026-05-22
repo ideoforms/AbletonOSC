@@ -255,6 +255,23 @@ class SongHandler(AbletonOSCHandler):
                 cue_point.jump()
         self.osc_server.add_handler("/live/song/cue_point/jump", partial(song_jump_to_cue_point, self.song))
 
+        #--------------------------------------------------------------------------------
+        # Song: move_device(device, target_track, position)
+        # Moves a device from one track to another.
+        # Args: source_track_idx, device_idx, dest_track_idx, dest_position
+        #--------------------------------------------------------------------------------
+        def song_move_device(params):
+            src_track_idx = int(params[0])
+            device_idx = int(params[1])
+            dst_track_idx = int(params[2])
+            dst_position = int(params[3])
+            device = self.song.tracks[src_track_idx].devices[device_idx]
+            dst_track = self.song.tracks[dst_track_idx]
+            self.song.move_device(device, dst_track, dst_position)
+            self.logger.info("Moved device %d from track %d to track %d position %d" %
+                             (device_idx, src_track_idx, dst_track_idx, dst_position))
+        self.osc_server.add_handler("/live/song/move_device", song_move_device)
+
         self.osc_server.add_handler("/live/song/cue_point/add_or_delete", partial(self._call_method, self.song, "set_or_delete_cue"))
         def song_cue_point_set_name(song, params: Tuple[Any] = ()):
             cue_point_index = params[0]

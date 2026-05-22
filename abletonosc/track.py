@@ -31,6 +31,7 @@ class TrackHandler(AbletonOSCHandler):
 
         methods = [
             "delete_device",
+            "insert_device",
             "stop_all_clips"
         ]
         properties_r = [
@@ -46,6 +47,7 @@ class TrackHandler(AbletonOSCHandler):
             "output_meter_level",
             "output_meter_left",
             "output_meter_right",
+            "performance_impact",
             "playing_slot_index",
         ]
         properties_rw = [
@@ -151,6 +153,28 @@ class TrackHandler(AbletonOSCHandler):
         def track_get_device_can_have_chains(track, _):
             return tuple(device.can_have_chains for device in track.devices)
 
+        def _collect_all_devices(device_list):
+            """Recursively collect all devices, walking into racks/chains."""
+            names = []
+            class_names = []
+            for device in device_list:
+                names.append(device.name)
+                class_names.append(device.class_name)
+                if device.can_have_chains:
+                    for chain in device.chains:
+                        sub_names, sub_classes = _collect_all_devices(chain.devices)
+                        names.extend(sub_names)
+                        class_names.extend(sub_classes)
+            return names, class_names
+
+        def track_get_all_device_names(track, _):
+            names, _ = _collect_all_devices(track.devices)
+            return tuple(names)
+
+        def track_get_all_device_class_names(track, _):
+            _, class_names = _collect_all_devices(track.devices)
+            return tuple(class_names)
+
         """
          - name: the device's human-readable name
          - type: 0 = audio_effect, 1 = instrument, 2 = midi_effect
@@ -161,6 +185,8 @@ class TrackHandler(AbletonOSCHandler):
         self.osc_server.add_handler("/live/track/get/devices/type", create_track_callback(track_get_device_types))
         self.osc_server.add_handler("/live/track/get/devices/class_name", create_track_callback(track_get_device_class_names))
         self.osc_server.add_handler("/live/track/get/devices/can_have_chains", create_track_callback(track_get_device_can_have_chains))
+        self.osc_server.add_handler("/live/track/get/devices/all_names", create_track_callback(track_get_all_device_names))
+        self.osc_server.add_handler("/live/track/get/devices/all_class_names", create_track_callback(track_get_all_device_class_names))
 
         #--------------------------------------------------------------------------------
         # Track: Output routing.

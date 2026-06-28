@@ -83,6 +83,12 @@ class OSCServer:
             self._socket.sendto(msg.dgram, remote_addr)
         except BuildError:
             self.logger.error("AbletonOSC: OSC build error: %s" % (traceback.format_exc()))
+        except socket.error as e:
+            # Catch and ignore WSAECONNRESET (10054) to prevent Ableton Live from freezing
+            if e.errno == errno.ECONNRESET:
+                pass
+            else:
+                self.logger.error("AbletonOSC: Socket send error: %s" % (traceback.format_exc()))
 
     def process_message(self, message, remote_addr):
         if message.address in self._callbacks:

@@ -59,8 +59,24 @@ class ViewHandler(AbletonOSCHandler):
 
             clip.view.hide_envelope()
 
+        def nudge_clip_transposition(params: Optional[Tuple] = ()):
+            """
+            Adds params[0] semitones to the pitch_coarse of the clip currently shown in
+            Clip View, clamped to Live's -48..48 range. Returns the new value.
+            """
+            clip = self.song.view.detail_clip
+            if clip is None:
+                raise RuntimeError("No clip is currently shown in Clip View")
+            if not clip.is_audio_clip:
+                raise RuntimeError("Transposition only applies to audio clips")
+
+            new_value = max(-48, min(48, clip.pitch_coarse + int(params[0])))
+            clip.pitch_coarse = new_value
+            return (new_value,)
+
         self.osc_server.add_handler("/live/view/show_clip_envelope", show_clip_envelope)
         self.osc_server.add_handler("/live/view/hide_clip_envelope", hide_clip_envelope)
+        self.osc_server.add_handler("/live/view/nudge_clip_transposition", nudge_clip_transposition)
 
         self.osc_server.add_handler("/live/view/get/selected_scene", get_selected_scene)
         self.osc_server.add_handler("/live/view/get/selected_track", get_selected_track)

@@ -1,6 +1,7 @@
 from functools import partial
 from typing import Optional, Tuple, Any
 from .handler import AbletonOSCHandler
+import Live
 
 class ViewHandler(AbletonOSCHandler):
     def __init__(self, manager):
@@ -34,6 +35,32 @@ class ViewHandler(AbletonOSCHandler):
             device = self.song.tracks[params[0]].devices[params[1]]
             self.song.view.select_device(device)
             return params[0], params[1]
+
+        def show_clip_envelope(params: Optional[Tuple] = ()):
+            """
+            Focuses Clip View and shows the Envelopes box for the clip currently
+            displayed there.
+            """
+            clip = self.song.view.detail_clip
+            if clip is None:
+                raise RuntimeError("No clip is currently shown in Clip View")
+
+            Live.Application.get_application().view.focus_view("Detail/Clip")
+            clip.view.show_envelope()
+
+        def hide_clip_envelope(params: Optional[Tuple] = ()):
+            """
+            Hides the Envelopes box for the clip currently shown in Clip View,
+            returning it to the Sample (or Notes) editor.
+            """
+            clip = self.song.view.detail_clip
+            if clip is None:
+                raise RuntimeError("No clip is currently shown in Clip View")
+
+            clip.view.hide_envelope()
+
+        self.osc_server.add_handler("/live/view/show_clip_envelope", show_clip_envelope)
+        self.osc_server.add_handler("/live/view/hide_clip_envelope", hide_clip_envelope)
 
         self.osc_server.add_handler("/live/view/get/selected_scene", get_selected_scene)
         self.osc_server.add_handler("/live/view/get/selected_track", get_selected_track)

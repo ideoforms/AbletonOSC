@@ -216,6 +216,8 @@ Represents the view (user interface) of live
 | /live/view/start_listen/selected_track |                          | selected_track           | Start listening to selected track (first track = 0)     |
 | /live/view/stop_listen/selected_scene  |                          |                          | Stop listening to the selected scene (first scene = 0)  |
 | /live/view/stop_listen/selected_track  |                          |                          | Stop listening to selected track (first track = 0)      |
+| /live/view/show_clip_envelope          |                          |                          | Focus Clip View and show the Envelopes box for the clip displayed there |
+| /live/view/hide_clip_envelope          |                          |                          | Hide the Envelopes box for the clip displayed in Clip View              |
 </details>
 
 ---

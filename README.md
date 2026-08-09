@@ -219,6 +219,7 @@ Represents the view (user interface) of live
 | /live/view/show_clip_envelope          |                          |                          | Focus Clip View and show the Envelopes box for the clip displayed there |
 | /live/view/hide_clip_envelope          |                          |                          | Hide the Envelopes box for the clip displayed in Clip View              |
 | /live/view/nudge_clip_transposition    | semitones                | new_value                | Add `semitones` to the pitch_coarse of the clip displayed in Clip View, clamped to -48..48 |
+| /live/view/set_clip_transposition      | semitones                | new_value                | Set the pitch_coarse of the clip displayed in Clip View to `semitones`, clamped to -48..48 |
 </details>
 
 ---

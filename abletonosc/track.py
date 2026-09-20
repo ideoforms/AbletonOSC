@@ -2,6 +2,30 @@ from typing import Tuple, Any, Callable, Optional
 from .handler import AbletonOSCHandler
 
 
+class CueBus:
+    """Live's Cue (headphone) level, dressed as a track so that index -2 reaches
+    it exactly as -1 reaches the master.
+
+    The Cue level is not a track, and not a property of the song either: it lives
+    on the master track's mixer device, as `cue_volume` -- documented "MainTrack
+    only: Const access to the Cue Volume Parameter". No OSC address reached it
+    until now.
+
+    Volume is all this bus exposes, and that is not an omission: the Live API has
+    no cue output routing at all, the cue output being chosen in the audio
+    preferences rather than through the object model. Anything else raises,
+    rather than silently acting on some other object.
+    """
+
+    def __init__(self, song):
+        self._song = song
+        self.mixer_device = self        # the track API looks for volume here
+
+    @property
+    def volume(self):
+        return self._song.master_track.mixer_device.cue_volume
+
+
 class TrackHandler(AbletonOSCHandler):
     def __init__(self, manager):
         super().__init__(manager)
@@ -18,7 +42,18 @@ class TrackHandler(AbletonOSCHandler):
                     track_indices = [int(params[0])]
 
                 for track_index in track_indices:
-                    track = self.song.tracks[track_index]
+                    # Index -1 addresses the master track, -2 the Cue bus. Neither is
+                    # in `song.tracks`, and a plain negative index would silently
+                    # resolve to a regular track -- tracks[-1] to the last one,
+                    # tracks[-2] to the one before it -- so both cases have to be
+                    # explicit. Without this, the master's volume, panning and output
+                    # routing, and the cue level, are simply not reachable over OSC.
+                    if track_index == -1:
+                        track = self.song.master_track
+                    elif track_index == -2:
+                        track = CueBus(self.song)
+                    else:
+                        track = self.song.tracks[track_index]
                     if include_track_id:
                         rv = func(track, *args, tuple([track_index] + params[1:]))
                     else:

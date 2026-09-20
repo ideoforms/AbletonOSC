@@ -222,6 +222,10 @@ Represents the view (user interface) of live
 
 ## Track API
 
+> **Master track.** Pass `-1` as the track index to address the master track
+> (for example `/live/track/set/volume -1 0.85`). It is not part of `song.tracks`,
+> so it has no ordinary index of its own.
+
 Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
 
 To query the properties of multiple tracks, see [Song: Properties of cue points, scenes and tracks](https://github.com/ideoforms/AbletonOSC#song-properties-of-cue-points-scenes-and-tracks).

@@ -222,6 +222,13 @@ Represents the view (user interface) of live
 
 ## Track API
 
+> **Output routing by index.** `/live/track/set/output_routing_channel` accepts a
+> position in `available_output_routing_channels` as well as a display name, so
+> `... 3 5` and `... 3 "MyRack | Piano | 1-Drift"` do the same thing. A MIDI
+> control can only ever send a number -- a CC carries 0-127, never a string -- so
+> the index is what makes this address reachable from a hardware controller
+> through a MIDI-to-OSC bridge. The name stays the readable form for a config file.
+
 Represents an audio, MIDI, return or master track. Can be used to set track audio parameters (volume, panning, send, mute, solo), listen for the playing clip slot, query devices, etc. Can also be used to query clips in arrangement view.
 
 To query the properties of multiple tracks, see [Song: Properties of cue points, scenes and tracks](https://github.com/ideoforms/AbletonOSC#song-properties-of-cue-points-scenes-and-tracks).

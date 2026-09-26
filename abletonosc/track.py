@@ -184,8 +184,20 @@ class TrackHandler(AbletonOSCHandler):
         def track_get_output_routing_channel(track, _):
             return track.output_routing_channel.display_name,
         def track_set_output_routing_channel(track, params):
-            channel_name = str(params[0])
-            for channel in track.available_output_routing_channels:
+            # An index is accepted as well as a display name, because a MIDI control
+            # can only ever send a number: a CC carries 0-127, never a string. The
+            # name stays the readable form for a configuration file.
+            channels = list(track.available_output_routing_channels)
+            arg = params[0]
+            if isinstance(arg, int) or (isinstance(arg, str) and arg.lstrip("-").isdigit()):
+                i = int(arg)
+                if 0 <= i < len(channels):
+                    track.output_routing_channel = channels[i]
+                    return
+                self.logger.warning("Output routing channel index out of range: %d" % i)
+                return
+            channel_name = str(arg)
+            for channel in channels:
                 if channel.display_name == channel_name:
                     track.output_routing_channel = channel
                     return

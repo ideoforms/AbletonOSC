@@ -98,6 +98,15 @@ class SongHandler(AbletonOSCHandler):
         #--------------------------------------------------------------------------------
         self.osc_server.add_handler("/live/song/get/num_tracks", lambda _: (len(self.song.tracks),))
 
+        #--------------------------------------------------------------------------------
+        # How many times this control surface has started. Live restarts it when another
+        # Set is loaded, so a client that polls can compare this with the value it last
+        # saw and know whether the document it is describing is still the one open.
+        # The broadcast is /live/startup; this is the same number, for clients that ask.
+        #--------------------------------------------------------------------------------
+        self.osc_server.add_handler("/live/song/get/startup_count",
+                                    lambda _: (self.manager.startup_count,))
+
         def song_get_track_names(params):
             if len(params) == 0:
                 track_index_min, track_index_max = 0, len(self.song.tracks)

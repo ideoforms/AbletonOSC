@@ -20,6 +20,13 @@ class Manager(ControlSurface):
         self.handlers = []
         self.midi_mappings = {}
 
+        #--------------------------------------------------------------------------------
+        # How many times this control surface has started. Live restarts it when another
+        # Set is loaded -- measured, see _announce_startup() -- so a client can use this
+        # to know that the document it was describing is gone.
+        #--------------------------------------------------------------------------------
+        self.startup_count = 1
+
         try:
             self.osc_server = abletonosc.OSCServer()
             self.schedule_message(0, self.tick)
@@ -29,6 +36,7 @@ class Manager(ControlSurface):
 
             self.show_message("AbletonOSC: Listening for OSC on port %d" % abletonosc.OSC_LISTEN_PORT)
             logger.info("Started AbletonOSC on address %s" % str(self.osc_server._local_addr))
+            self._announce_startup()
         except OSError as msg:
             self.show_message("AbletonOSC: Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
             logger.info("Couldn't bind to port %d (%s)" % (abletonosc.OSC_LISTEN_PORT, msg))
@@ -117,6 +125,35 @@ class Manager(ControlSurface):
         logger.debug("Tick...")
         self.osc_server.process()
         self.schedule_message(1, self.tick)
+
+    def _announce_startup(self):
+        """
+        Tell clients that this control surface has just started.
+
+        WHY THIS IS THE WHOLE ANSWER. Loading another Live Set RESTARTS the control
+        surface. Measured on Live 12 on 2026-09-27, from this script's own log:
+
+            14:01:59  Disconnecting...          <- the Set was opened here
+            14:02:10  Started AbletonOSC ...
+
+        So a client does not need AbletonOSC to compare documents, or fingerprint them,
+        or watch a value that happens to change with them. It needs to be told that
+        everything it had learned -- track indices, scene count, routings -- belongs to
+        a document that is no longer open. A startup announcement says exactly that, is
+        true by construction, and has no false positive to reason about.
+
+        Clients have been working around the absence of this by watching a value that
+        usually changes with the document, most often track names. That fires on a
+        rename, which is not a document change, and stays silent between two Sets whose
+        track names match.
+
+        The message carries the startup count, so a client that reconnects can tell a
+        first sight from a restart it slept through.
+        """
+        try:
+            self.osc_server.send("/live/startup", (self.startup_count,))
+        except Exception as e:
+            logger.warning("Could not announce startup: %s" % e)
 
     def reload_imports(self):
         try:

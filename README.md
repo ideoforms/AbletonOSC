@@ -164,8 +164,76 @@ for [Live Object Model - Song](https://docs.cycling74.com/max8/vignettes/live_ob
 | /live/song/get/cue_points  |              | name, time, ...        | Query a list of the song's cue points                                       |
 | /live/song/get/num_scenes  |              | num_scenes             | Query the number of scenes                                                  |
 | /live/song/get/num_tracks  |              | num_tracks             | Query the number of tracks                                                  |
+| /live/song/get/startup_count |             | startup_count          | How many times this control surface has started. See below. |
 | /live/song/get/track_names |              | [index_min, index_max] | Query track names (optionally, over a given range)                          |
 | /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. |
+
+#### Knowing that another Set has been loaded
+
+Loading another Live Set **restarts the control surface**. From AbletonOSC's own log,
+measured on Live 12:
+
+```
+14:01:59  Disconnecting...          <- the Set was opened here
+14:02:10  Started AbletonOSC on address ('0.0.0.0', 11000)
+```
+
+A client therefore does not need AbletonOSC to compare documents or fingerprint them. It
+needs to be *told* that everything it had learned — track indices, scene count, routings
+— belongs to a document that is no longer open. AbletonOSC now says so on startup:
+
+| address | when | payload |
+| --- | --- | --- |
+| `/live/startup` | broadcast, once per start | `startup_count` |
+| `/live/song/get/startup_count` | on request | `startup_count` |
+
+This is true by construction and has no false positive to reason about. Clients have been
+working around its absence by watching a value that usually changes with the document,
+most often `track_names` — which fires on a rename, and stays silent between two Sets
+whose track names match.
+
+The count lets a client that reconnects tell a first sight from a restart it slept
+through.
+
+| /live/song/get/track_data  |              | [various]              | Query bulk properties of multiple tracks/clips. See below for further info. |
+
+#### Knowing that another Set has been loaded
+
+A control surface is bound to its MIDI ports, not to the document. Loading another Live
+Set therefore does **not** restart AbletonOSC — it simply swaps the object returned by
+`song()`. Nothing is sent, nothing goes quiet, and a client has no way of knowing that
+everything it had learned about the document (track indices, scene count, routings) now
+describes a Set that is no longer open.
+
+Clients have worked around this by watching a value that usually changes with the
+document, most often `track_names`. That is unreliable in both directions: renaming one
+track looks like a new document, and two Sets with the same track names look like the
+same one.
+
+AbletonOSC compares a fingerprint of the document's **shape** instead — track count,
+scene count, song length and time signature. Renaming a track leaves all four untouched,
+which is the whole point.
+
+> Object identity was tried first and **does not work**: measured on Live 12, loading
+> another Set leaves `song()` returning the same Python object. The check is kept as a
+> free first test, since a different object cannot be the same document, but the
+> fingerprint is what does the work.
+
+The tradeoff is taken knowingly: two Sets sharing all four values would be missed, which
+is far less likely than the false positive measured on a single rename.
+
+The answer is published two ways:
+
+| address | when | payload |
+| --- | --- | --- |
+| `/live/song/loaded` | broadcast, on each change | `generation` |
+| `/live/song/get/document_generation` | on request | `generation` |
+
+The counter starts at 0 and only grows. The broadcast suits clients that subscribe; the
+counter suits clients that poll and would miss a broadcast sent while they were not
+listening. Startup is not counted as a change, so a client does not see a phantom load
+when AbletonOSC starts.
+
 
 
 #### Querying track/clip data in bulk with /live/song/get/track_data
